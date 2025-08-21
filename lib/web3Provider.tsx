@@ -106,6 +106,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }
 
       try {
+        // Validate tokenAddress is a valid hex address to prevent ENS resolution
+        if (!ethers.isAddress(tokenAddress)) {
+          throw new Error("Invalid token address");
+        }
+
         // ERC-20 ABI for balanceOf function
         const erc20Abi = [
           "function balanceOf(address owner) view returns (uint256)",
@@ -117,7 +122,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
         return ethers.formatUnits(balance, decimals);
       } catch (err) {
-        console.error("Failed to fetch token balance:", err);
+        const error = err as Error;
+        // Don't log ENS errors for Kaia network
+        if (!error.message.includes("does not support ENS")) {
+          console.error("Failed to fetch token balance:", err);
+        }
         return "0";
       }
     },

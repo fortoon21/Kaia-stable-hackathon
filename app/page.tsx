@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Lending from "@/components/Lending";
 import Markets from "@/components/Markets";
 import Navigation from "@/components/Navigation";
@@ -32,6 +32,7 @@ interface SelectedPair {
 }
 
 export default function Home() {
+  const [isClient, setIsClient] = useState(false);
   const [currentPage, setCurrentPage] = useState<"lending" | "markets">(
     "lending"
   );
@@ -58,10 +59,69 @@ export default function Home() {
     liquidity: "$506,685.97",
   });
 
+  // Initialize client-side state and load saved data
+  useEffect(() => {
+    setIsClient(true);
+
+    const savedPage = localStorage.getItem("currentPage") as
+      | "lending"
+      | "markets"
+      | null;
+    const savedPair = localStorage.getItem("selectedPair");
+
+    if (savedPage && (savedPage === "lending" || savedPage === "markets")) {
+      setCurrentPage(savedPage);
+    }
+
+    if (savedPair) {
+      try {
+        const parsedPair = JSON.parse(savedPair);
+        setSelectedPair(parsedPair);
+      } catch (error) {
+        console.warn("Failed to parse saved pair:", error);
+      }
+    }
+  }, []);
+
+  // Save page state to localStorage when it changes
+  const handlePageChange = (page: "lending" | "markets") => {
+    setCurrentPage(page);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("currentPage", page);
+    }
+  };
+
+  const handlePairSelect = (pair: SelectedPair) => {
+    setSelectedPair(pair);
+    setCurrentPage("lending");
+    if (typeof window !== "undefined") {
+      localStorage.setItem("currentPage", "lending");
+      localStorage.setItem("selectedPair", JSON.stringify(pair));
+    }
+  };
+
+  // Show loading state on initial render to prevent flash
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-[#08131f] text-white">
+        {/* Navigation */}
+        <Navigation currentPage={currentPage} onPageChange={handlePageChange} />
+
+        {/* Network Warning */}
+        <NetworkWarning />
+
+        {/* Loading Content */}
+        <div className="pt-[59px] min-h-screen flex items-center justify-center">
+          <div className="animate-pulse text-[#728395]">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#08131f] text-white">
       {/* Navigation */}
-      <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+      <Navigation currentPage={currentPage} onPageChange={handlePageChange} />
 
       {/* Network Warning */}
       <NetworkWarning />
@@ -70,12 +130,7 @@ export default function Home() {
       <div className="pt-[59px] min-h-screen">
         {currentPage === "lending" && <Lending selectedPair={selectedPair} />}
         {currentPage === "markets" && (
-          <Markets
-            onSelectPair={(pair) => {
-              setSelectedPair(pair);
-              setCurrentPage("lending");
-            }}
-          />
+          <Markets onSelectPair={handlePairSelect} />
         )}
       </div>
     </div>

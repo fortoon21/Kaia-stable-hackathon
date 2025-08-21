@@ -30,9 +30,16 @@ export function useTokenBalance(selectedPair?: SelectedPair) {
           TOKEN_DECIMALS[symbol as keyof typeof TOKEN_DECIMALS] || 18;
 
         if (tokenAddress) {
-          const tokenBalance = await getTokenBalance(tokenAddress, decimals);
-          setCollateralBalance(tokenBalance);
+          // Only fetch if the token address is valid
+          if (/^0x[a-fA-F0-9]{40}$/.test(tokenAddress)) {
+            const tokenBalance = await getTokenBalance(tokenAddress, decimals);
+            setCollateralBalance(tokenBalance);
+          } else {
+            console.warn(`Invalid token address for ${symbol}:`, tokenAddress);
+            setCollateralBalance("0");
+          }
         } else {
+          console.warn(`No token address found for symbol: ${symbol}`);
           setCollateralBalance("0");
         }
       } catch (error) {
