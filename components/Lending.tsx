@@ -179,7 +179,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:26"
                 >
                   <p className="block leading-[42.67px]">
-                    {selectedPair?.maxMultiplier?.replace("x", "") || "8.31"}
+                    {maxLeverage.toFixed(2)}
                   </p>
                 </div>
                 <div
