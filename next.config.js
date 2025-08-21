@@ -14,6 +14,12 @@ const nextConfig = {
         port: "",
         pathname: "/logos/**",
       },
+      {
+        protocol: "https",
+        hostname: "rabby.io",
+        port: "",
+        pathname: "/assets/**",
+      },
     ],
   },
 };
