@@ -42,6 +42,7 @@ interface Web3ContextType {
   connectWallet: (walletType: string) => Promise<void>;
   disconnectWallet: () => void;
   switchNetwork: (chainId: number) => Promise<void>;
+  getTokenBalance: (tokenAddress: string, decimals?: number) => Promise<string>;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -96,6 +97,31 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }
     },
     [provider]
+  );
+
+  const getTokenBalance = useCallback(
+    async (tokenAddress: string, decimals: number = 18): Promise<string> => {
+      if (!provider || !address) {
+        throw new Error("Wallet not connected");
+      }
+
+      try {
+        // ERC-20 ABI for balanceOf function
+        const erc20Abi = [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function decimals() view returns (uint8)",
+        ];
+
+        const contract = new ethers.Contract(tokenAddress, erc20Abi, provider);
+        const balance = await contract.balanceOf(address);
+
+        return ethers.formatUnits(balance, decimals);
+      } catch (err) {
+        console.error("Failed to fetch token balance:", err);
+        return "0";
+      }
+    },
+    [provider, address]
   );
 
   const disconnectWallet = useCallback(() => {
@@ -334,6 +360,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     connectWallet,
     disconnectWallet,
     switchNetwork,
+    getTokenBalance,
   };
 
   // Prevent hydration mismatches by only rendering after client mount

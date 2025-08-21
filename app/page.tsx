@@ -37,8 +37,8 @@ export default function Home() {
   );
   const [selectedPair, setSelectedPair] = useState<SelectedPair>({
     collateralAsset: {
-      asset: "KAIA",
-      symbol: "KAIA",
+      asset: "WKAIA",
+      symbol: "WKAIA",
       protocol: "Avalon Finance",
       imageUrl:
         "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png",

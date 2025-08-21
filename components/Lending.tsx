@@ -1,9 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
+import { calculateLeverageParams, calculateMaxLeverage } from "@/lib/leverage";
 import { useWeb3 } from "@/lib/web3Provider";
+
+// Kaia token contract addresses
+const TOKEN_ADDRESSES = {
+  WKAIA: "0x19aac5f612f524b754ca7e7c41cbfa2e981a4432",
+  USDC: "0x608792deb376cce1c9fa4d0356c943e4fdb",
+  "USD₮": "0xd077a400968890eacc75cdc901f0356c943e4fdb",
+  USDT0: "0x5c13e303a62fc5dedf5b52d66873f2e59fedadc2",
+  USDT: "0xd077a400968890eacc75cdc901f0356c943e4fdb",
+};
+
+const TOKEN_DECIMALS = {
+  WKAIA: 18,
+  USDC: 6,
+  "USD₮": 6,
+  USDT0: 6,
+  USDT: 6,
+};
 
 interface LendingProps {
   selectedPair?: {
@@ -39,7 +57,102 @@ export default function Lending({ selectedPair }: LendingProps) {
   const [bottomTab, setBottomTab] = useState<"pair" | "collateral" | "debt">(
     "pair"
   );
-  const { isConnected } = useWeb3();
+  const [collateralBalance, setCollateralBalance] = useState<string>("-");
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const { isConnected, getTokenBalance } = useWeb3();
+
+  // Calculate max leverage using the leverage library
+  const maxLeverage = useMemo(() => {
+    if (!selectedPair) return 1;
+
+    // If no collateral amount, assume 1 token to show max possible leverage
+    const amount =
+      !collateralAmount || parseFloat(collateralAmount) === 0
+        ? "1"
+        : collateralAmount;
+
+    // Get token decimals from selectedPair or fallback to TOKEN_DECIMALS
+    const collateralDecimals =
+      TOKEN_DECIMALS[selectedPair.collateralAsset.symbol] || 18;
+    const debtDecimals = TOKEN_DECIMALS[selectedPair.debtAsset.symbol] || 6;
+
+    return calculateMaxLeverage({
+      collateralDecimals,
+      debtDecimals,
+      initialCollateralAmount: "0", // No existing position
+      initialDebtAmount: "0", // No existing debt
+      additionalCollateralAmount: amount,
+      priceOfCollateral: "0.99", // Mock price - should be from oracle
+      priceOfDebt: "1.0", // Mock price
+      flashloanPremium: "0.0009", // 9 bps
+      maxLTV: "0.80", // 80% LTV
+    });
+  }, [collateralAmount, selectedPair]);
+
+  // Calculate actual leverage position details using HTML tester logic
+  const leveragePosition = useMemo(() => {
+    if (
+      !collateralAmount ||
+      parseFloat(collateralAmount) === 0 ||
+      !selectedPair
+    ) {
+      return {
+        flashloanAmount: "0",
+        ltv: "0",
+        collateralAmount: collateralAmount || "0",
+        debtAmount: "0",
+      };
+    }
+
+    // Get token decimals dynamically
+    const collateralDecimals =
+      TOKEN_DECIMALS[selectedPair.collateralAsset.symbol] || 18;
+    const debtDecimals = TOKEN_DECIMALS[selectedPair.debtAsset.symbol] || 6;
+
+    const result = calculateLeverageParams({
+      collateralDecimals,
+      debtDecimals,
+      initialCollateralAmount: "0", // No existing position
+      initialDebtAmount: "0", // No existing debt
+      additionalCollateralAmount: collateralAmount,
+      targetLeverage: multiplier.toString(),
+      priceOfCollateral: "0.99", // Mock price - should be from oracle
+      priceOfDebt: "1.0", // Mock price
+      flashloanPremium: "0.0009", // 9 bps
+    });
+
+    return result;
+  }, [collateralAmount, multiplier, selectedPair]);
+
+  // Fetch token balance when wallet is connected
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!isConnected || !selectedPair) return;
+
+      setIsLoadingBalance(true);
+      try {
+        const symbol = selectedPair.collateralAsset.symbol;
+        const tokenAddress =
+          TOKEN_ADDRESSES[symbol as keyof typeof TOKEN_ADDRESSES];
+        const decimals =
+          TOKEN_DECIMALS[symbol as keyof typeof TOKEN_DECIMALS] || 18;
+
+        if (tokenAddress) {
+          const tokenBalance = await getTokenBalance(tokenAddress, decimals);
+          setCollateralBalance(tokenBalance);
+        } else {
+          setCollateralBalance("0");
+        }
+      } catch (error) {
+        console.error("Failed to fetch token balance:", error);
+        setCollateralBalance("-");
+      } finally {
+        setIsLoadingBalance(false);
+      }
+    };
+
+    fetchBalance();
+  }, [isConnected, selectedPair, getTokenBalance]);
 
   return (
     <div
@@ -130,12 +243,10 @@ export default function Lending({ selectedPair }: LendingProps) {
               {/* Title Section */}
               <div className="absolute left-[120px] top-0">
                 <div className="text-[#728395] text-[16px] font-semibold leading-[20px] mb-2">
-                  {selectedPair?.collateralAsset.protocol || "Euler Yield"}
+                  {selectedPair?.collateralAsset.protocol || "Cozy Yield"}
                 </div>
                 <div className="flex items-center text-[#f7f7f8] text-[36px] font-medium leading-[48px]">
-                  <span>
-                    {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
-                  </span>
+                  <span>{selectedPair?.collateralAsset.asset || "Error"}</span>
                   <span className="text-[#728395] mx-2">/</span>
                   <span>{selectedPair?.debtAsset.symbol || "USDC"}</span>
                 </div>
@@ -327,8 +438,38 @@ export default function Lending({ selectedPair }: LendingProps) {
                   <div className="space-y-4">
                     {/* Margin Collateral */}
                     <div className="bg-[#040a10] rounded-lg p-6">
-                      <div className="text-[#a1acb8] text-sm mb-3">
-                        Margin collateral
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-[#a1acb8] text-sm">
+                          Margin collateral
+                        </div>
+                        {isConnected && (
+                          <div className="flex items-center space-x-2">
+                            <div className="text-[#728395] text-xs flex items-center space-x-1">
+                              <span>Balance:</span>
+                              <span className="inline-block tabular-nums font-mono whitespace-nowrap min-w-[8ch] text-right">
+                                {isLoadingBalance ? "..." : collateralBalance}
+                              </span>
+                              <span>
+                                {selectedPair?.collateralAsset.symbol ||
+                                  "WKAIA"}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setCollateralAmount(collateralBalance || "0")
+                              }
+                              className="bg-[#14304e] hover:bg-[#1a3d5c] text-[#2ae5b9] text-xs px-2 py-1 rounded transition-colors"
+                              disabled={
+                                isLoadingBalance ||
+                                !collateralBalance ||
+                                collateralBalance === "-"
+                              }
+                            >
+                              MAX
+                            </button>
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center justify-between">
                         <input
@@ -336,7 +477,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                           placeholder="0"
                           value={collateralAmount}
                           onChange={(e) => setCollateralAmount(e.target.value)}
-                          className="bg-transparent text-white text-2xl w-full outline-none"
+                          className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                         />
                         <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
                           {selectedPair?.collateralAsset.imageUrl ? (
@@ -364,12 +505,12 @@ export default function Lending({ selectedPair }: LendingProps) {
                     {/* Multiplier Section - Only for Multiply Tab */}
                     {activeTab === "multiply" && (
                       <div className="bg-[#040a10] rounded-lg p-6">
-                        <div className="text-white text-sm font-semibold mb-4">
-                          Multiplier
-                        </div>
-                        <div className="bg-[#0c1d2f] rounded p-3 mb-4">
-                          <div className="flex items-center justify-center">
-                            <span className="text-white text-lg font-semibold">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="text-white text-sm font-semibold">
+                            Multiplier
+                          </div>
+                          <div className="bg-[#0c1d2f] rounded px-3 py-1">
+                            <span className="text-white text-sm font-semibold">
                               {multiplier.toFixed(2)}x
                             </span>
                           </div>
@@ -378,7 +519,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                           <input
                             type="range"
                             min="1"
-                            max="8.31"
+                            max={maxLeverage}
                             step="0.01"
                             value={multiplier}
                             onChange={(e) =>
@@ -389,10 +530,16 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                         <div className="flex justify-between text-xs text-[#728395]">
                           <span>1.00X</span>
-                          <span className="text-[#435971]">2.83X</span>
-                          <span>4.66X</span>
-                          <span className="text-[#435971]">6.48X</span>
-                          <span>Max (8.31X)</span>
+                          <span className="text-[#435971]">
+                            {((maxLeverage - 1) * 0.25 + 1).toFixed(2)}X
+                          </span>
+                          <span>
+                            {((maxLeverage - 1) * 0.5 + 1).toFixed(2)}X
+                          </span>
+                          <span className="text-[#435971]">
+                            {((maxLeverage - 1) * 0.75 + 1).toFixed(2)}X
+                          </span>
+                          <span>Max ({maxLeverage.toFixed(2)}X)</span>
                         </div>
                       </div>
                     )}
@@ -408,8 +555,8 @@ export default function Lending({ selectedPair }: LendingProps) {
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-white">
-                                {(
-                                  parseFloat(collateralAmount) * multiplier || 0
+                                {parseFloat(
+                                  leveragePosition.collateralAmount
                                 ).toFixed(2)}{" "}
                                 {selectedPair?.collateralAsset.symbol ||
                                   "PT-USDe"}
@@ -417,9 +564,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                               <div className="text-[#a1acb8] text-sm">
                                 $
                                 {(
-                                  parseFloat(collateralAmount) *
-                                    multiplier *
-                                    0.99 || 0
+                                  parseFloat(
+                                    leveragePosition.collateralAmount
+                                  ) * 0.99
                                 ).toFixed(2)}
                               </div>
                             </div>
@@ -451,17 +598,15 @@ export default function Lending({ selectedPair }: LendingProps) {
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-white">
-                                {(
-                                  parseFloat(collateralAmount) *
-                                    (multiplier - 1) || 0
+                                {parseFloat(
+                                  leveragePosition.debtAmount || "0"
                                 ).toFixed(2)}{" "}
                                 {selectedPair?.debtAsset.symbol || "USDC"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
                                 $
-                                {(
-                                  parseFloat(collateralAmount) *
-                                    (multiplier - 1) || 0
+                                {parseFloat(
+                                  leveragePosition.debtAmount || "0"
                                 ).toFixed(2)}
                               </div>
                             </div>

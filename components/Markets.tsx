@@ -44,13 +44,13 @@ export default function Markets({ onSelectPair }: MarketsProps) {
 
   const marketGroups: MarketGroup[] = [
     {
-      name: "KAIA Markets",
+      name: "WKAIA Markets",
       tradingPairs: [
         {
           collateralAsset: {
-            asset: "KAIA",
-            symbol: "KAIA",
-            icon: "K",
+            asset: "WKAIA",
+            symbol: "WKAIA",
+            icon: "W",
             iconBg: "#00D4FF",
             protocol: "Avalon Finance",
             imageUrl:
@@ -76,9 +76,9 @@ export default function Markets({ onSelectPair }: MarketsProps) {
         },
         {
           collateralAsset: {
-            asset: "KAIA",
-            symbol: "KAIA",
-            icon: "K",
+            asset: "WKAIA",
+            symbol: "WKAIA",
+            icon: "W",
             iconBg: "#00D4FF",
             protocol: "Avalon Finance",
             imageUrl:
@@ -104,9 +104,9 @@ export default function Markets({ onSelectPair }: MarketsProps) {
         },
         {
           collateralAsset: {
-            asset: "KAIA",
-            symbol: "KAIA",
-            icon: "K",
+            asset: "WKAIA",
+            symbol: "WKAIA",
+            icon: "W",
             iconBg: "#00D4FF",
             protocol: "Avalon Finance",
             imageUrl:
@@ -146,9 +146,9 @@ export default function Markets({ onSelectPair }: MarketsProps) {
               "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/usdt.png",
           },
           debtAsset: {
-            asset: "KAIA",
-            symbol: "KAIA",
-            icon: "K",
+            asset: "WKAIA",
+            symbol: "WKAIA",
+            icon: "W",
             iconBg: "#00D4FF",
             protocol: "Avalon Finance",
             imageUrl:
@@ -235,9 +235,9 @@ export default function Markets({ onSelectPair }: MarketsProps) {
               "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/usdc.png",
           },
           debtAsset: {
-            asset: "KAIA",
-            symbol: "KAIA",
-            icon: "K",
+            asset: "WKAIA",
+            symbol: "WKAIA",
+            icon: "W",
             iconBg: "#00D4FF",
             protocol: "Avalon Finance",
             imageUrl:
@@ -324,9 +324,9 @@ export default function Markets({ onSelectPair }: MarketsProps) {
               "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/usdt0.png",
           },
           debtAsset: {
-            asset: "KAIA",
-            symbol: "KAIA",
-            icon: "K",
+            asset: "WKAIA",
+            symbol: "WKAIA",
+            icon: "W",
             iconBg: "#00D4FF",
             protocol: "Avalon Finance",
             imageUrl:
@@ -407,6 +407,8 @@ export default function Markets({ onSelectPair }: MarketsProps) {
 
   const getMarketImage = (marketName: string) => {
     const assetMap: { [key: string]: string } = {
+      "WKAIA Markets":
+        "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png",
       "KAIA Markets":
         "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png",
       "USDT Markets":
