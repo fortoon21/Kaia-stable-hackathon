@@ -222,7 +222,7 @@ export const mockMarketsData: MockMarketsData = {
 // Mock API functions for other parts of the app
 export const mockApi = {
   // Get pool data for Page 1
-  getPoolData: async (poolId: string) => {
+  getPoolData: async (_poolId: string) => {
     return {
       liquidity: "$22.84M",
       maxMultiplier: "8.31x",
@@ -237,7 +237,7 @@ export const mockApi = {
   },
 
   // Get user wallet data
-  getUserWalletData: async (address: string) => {
+  getUserWalletData: async (_address: string) => {
     return {
       balance: "1,234.56 KAIA",
       usdValue: "$987.65",
@@ -257,7 +257,7 @@ export const mockApi = {
   },
 
   // Get transaction history
-  getTransactionHistory: async (address: string) => {
+  getTransactionHistory: async (_address: string) => {
     return [
       {
         id: "0x123...abc",
@@ -279,7 +279,7 @@ export const mockApi = {
   },
 
   // Get gas estimates
-  getGasEstimate: async (txType: string) => {
+  getGasEstimate: async (_txType: string) => {
     return {
       gasPrice: "20 gwei",
       gasLimit: "150,000",

@@ -4,14 +4,20 @@ export interface WalletProvider {
   isMetaMask?: boolean;
   isRabby?: boolean;
   isCoinbaseWallet?: boolean;
-  request: (args: { method: string; params?: any[] }) => Promise<any>;
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
   enable?: () => Promise<string[]>;
   selectedAddress?: string;
   chainId?: string;
+  on?: (event: string, handler: (...args: unknown[]) => void) => void;
+  removeListener?: (
+    event: string,
+    handler: (...args: unknown[]) => void
+  ) => void;
 }
 
 export interface KlaytnProvider {
-  enable: () => Promise<string[]>;
+  enable?: () => Promise<string[]>;
+  request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
   selectedAddress?: string;
   networkVersion?: string;
 }
@@ -19,6 +25,7 @@ export interface KlaytnProvider {
 export interface WindowWithWallets extends Window {
   ethereum?: WalletProvider;
   klaytn?: KlaytnProvider;
+  kaia?: KlaytnProvider; // New Kaia property
 }
 
 export interface WalletInfo {
@@ -39,5 +46,6 @@ declare global {
   interface Window {
     ethereum?: WalletProvider;
     klaytn?: KlaytnProvider;
+    kaia?: KlaytnProvider; // New Kaia property
   }
 }
