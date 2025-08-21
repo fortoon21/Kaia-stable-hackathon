@@ -1,27 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
+import { TOKEN_DECIMALS } from "@/constants/tokens";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { calculateLeverageParams, calculateMaxLeverage } from "@/lib/leverage";
 import { useWeb3 } from "@/lib/web3Provider";
-
-// Kaia token contract addresses
-const TOKEN_ADDRESSES = {
-  WKAIA: "0x19aac5f612f524b754ca7e7c41cbfa2e981a4432",
-  USDC: "0x608792deb376cce1c9fa4d0356c943e4fdb",
-  "USD₮": "0xd077a400968890eacc75cdc901f0356c943e4fdb",
-  USDT0: "0x5c13e303a62fc5dedf5b52d66873f2e59fedadc2",
-  USDT: "0xd077a400968890eacc75cdc901f0356c943e4fdb",
-};
-
-const TOKEN_DECIMALS = {
-  WKAIA: 18,
-  USDC: 6,
-  "USD₮": 6,
-  USDT0: 6,
-  USDT: 6,
-};
 
 interface LendingProps {
   selectedPair?: {
@@ -57,9 +42,8 @@ export default function Lending({ selectedPair }: LendingProps) {
   const [bottomTab, setBottomTab] = useState<"pair" | "collateral" | "debt">(
     "pair"
   );
-  const [collateralBalance, setCollateralBalance] = useState<string>("-");
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
-  const { isConnected, getTokenBalance } = useWeb3();
+  const { isConnected } = useWeb3();
+  const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
 
   // Calculate max leverage using the leverage library
   const maxLeverage = useMemo(() => {
@@ -123,37 +107,6 @@ export default function Lending({ selectedPair }: LendingProps) {
 
     return result;
   }, [collateralAmount, multiplier, selectedPair]);
-
-  // Fetch token balance when wallet is connected
-  // biome-ignore lint/correctness/useExhaustiveDependencies: getTokenBalance causes flickering
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (!isConnected || !selectedPair) return;
-
-      setIsLoadingBalance(true);
-      try {
-        const symbol = selectedPair.collateralAsset.symbol;
-        const tokenAddress =
-          TOKEN_ADDRESSES[symbol as keyof typeof TOKEN_ADDRESSES];
-        const decimals =
-          TOKEN_DECIMALS[symbol as keyof typeof TOKEN_DECIMALS] || 18;
-
-        if (tokenAddress) {
-          const tokenBalance = await getTokenBalance(tokenAddress, decimals);
-          setCollateralBalance(tokenBalance);
-        } else {
-          setCollateralBalance("0");
-        }
-      } catch (error) {
-        console.error("Failed to fetch token balance:", error);
-        setCollateralBalance("-");
-      } finally {
-        setIsLoadingBalance(false);
-      }
-    };
-
-    fetchBalance();
-  }, [isConnected, selectedPair]);
 
   return (
     <div
