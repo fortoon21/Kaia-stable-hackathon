@@ -1,112 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
-import { TOKEN_DECIMALS } from "@/constants/tokens";
+import { DEFAULT_VALUES, MOCK_PRICES } from "@/constants/mockData";
+import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
-import { calculateLeverageParams, calculateMaxLeverage } from "@/lib/leverage";
 import { useWeb3 } from "@/lib/web3Provider";
-
-interface LendingProps {
-  selectedPair?: {
-    collateralAsset: {
-      asset: string;
-      symbol: string;
-      icon?: string;
-      iconBg?: string;
-      protocol?: string;
-      imageUrl?: string;
-    };
-    debtAsset: {
-      asset: string;
-      symbol: string;
-      icon?: string;
-      iconBg?: string;
-      protocol?: string;
-      imageUrl?: string;
-    };
-    supplyAPY?: string;
-    borrowAPY?: string;
-    maxROE?: string;
-    maxMultiplier?: string;
-    lltv?: string;
-    liquidity?: string;
-  };
-}
+import type { BottomTabType, LendingProps, TabType } from "@/types/lending";
+import {
+  calculateUSDValue,
+  formatDollarAmount,
+  formatTokenAmount,
+} from "@/utils/formatters";
 
 export default function Lending({ selectedPair }: LendingProps) {
-  const [activeTab, setActiveTab] = useState<"borrow" | "multiply">("multiply");
+  const [activeTab, setActiveTab] = useState<TabType>("multiply");
   const [multiplier, setMultiplier] = useState(1.0);
   const [collateralAmount, setCollateralAmount] = useState("");
-  const [bottomTab, setBottomTab] = useState<"pair" | "collateral" | "debt">(
-    "pair"
-  );
+  const [bottomTab, setBottomTab] = useState<BottomTabType>("pair");
   const { isConnected } = useWeb3();
   const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
-
-  // Calculate max leverage using the leverage library
-  const maxLeverage = useMemo(() => {
-    if (!selectedPair) return 1;
-
-    // If no collateral amount, assume 1 token to show max possible leverage
-    const amount =
-      !collateralAmount || parseFloat(collateralAmount) === 0
-        ? "1"
-        : collateralAmount;
-
-    // Get token decimals from selectedPair or fallback to TOKEN_DECIMALS
-    const collateralDecimals =
-      TOKEN_DECIMALS[selectedPair.collateralAsset.symbol] || 18;
-    const debtDecimals = TOKEN_DECIMALS[selectedPair.debtAsset.symbol] || 6;
-
-    return calculateMaxLeverage({
-      collateralDecimals,
-      debtDecimals,
-      initialCollateralAmount: "0", // No existing position
-      initialDebtAmount: "0", // No existing debt
-      additionalCollateralAmount: amount,
-      priceOfCollateral: "0.99", // Mock price - should be from oracle
-      priceOfDebt: "1.0", // Mock price
-      flashloanPremium: "0.0009", // 9 bps
-      maxLTV: "0.80", // 80% LTV
-    });
-  }, [collateralAmount, selectedPair]);
-
-  // Calculate actual leverage position details using HTML tester logic
-  const leveragePosition = useMemo(() => {
-    if (
-      !collateralAmount ||
-      parseFloat(collateralAmount) === 0 ||
-      !selectedPair
-    ) {
-      return {
-        flashloanAmount: "0",
-        ltv: "0",
-        collateralAmount: collateralAmount || "0",
-        debtAmount: "0",
-      };
-    }
-
-    // Get token decimals dynamically
-    const collateralDecimals =
-      TOKEN_DECIMALS[selectedPair.collateralAsset.symbol] || 18;
-    const debtDecimals = TOKEN_DECIMALS[selectedPair.debtAsset.symbol] || 6;
-
-    const result = calculateLeverageParams({
-      collateralDecimals,
-      debtDecimals,
-      initialCollateralAmount: "0", // No existing position
-      initialDebtAmount: "0", // No existing debt
-      additionalCollateralAmount: collateralAmount,
-      targetLeverage: multiplier.toString(),
-      priceOfCollateral: "0.99", // Mock price - should be from oracle
-      priceOfDebt: "1.0", // Mock price
-      flashloanPremium: "0.0009", // 9 bps
-    });
-
-    return result;
-  }, [collateralAmount, multiplier, selectedPair]);
+  const { maxLeverage, leveragePosition } = useLeverageCalculations(
+    selectedPair,
+    collateralAmount,
+    multiplier
+  );
 
   return (
     <div
@@ -451,8 +370,11 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                       </div>
                       <div className="text-[#a1acb8] text-sm mt-3">
-                        ~ $
-                        {(parseFloat(collateralAmount) * 0.99 || 0).toFixed(2)}
+                        ~{" "}
+                        {calculateUSDValue(
+                          collateralAmount || "0",
+                          MOCK_PRICES.COLLATERAL_PRICE
+                        )}
                       </div>
                     </div>
 
@@ -516,12 +438,10 @@ export default function Lending({ selectedPair }: LendingProps) {
                                   "PT-USDe"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
-                                $
-                                {(
-                                  parseFloat(
-                                    leveragePosition.collateralAmount
-                                  ) * 0.99
-                                ).toFixed(2)}
+                                {calculateUSDValue(
+                                  leveragePosition.collateralAmount,
+                                  MOCK_PRICES.COLLATERAL_PRICE
+                                )}
                               </div>
                             </div>
                             <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
@@ -558,10 +478,10 @@ export default function Lending({ selectedPair }: LendingProps) {
                                 {selectedPair?.debtAsset.symbol || "USDC"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
-                                $
-                                {parseFloat(
-                                  leveragePosition.debtAmount || "0"
-                                ).toFixed(2)}
+                                {calculateUSDValue(
+                                  leveragePosition.debtAmount || "0",
+                                  MOCK_PRICES.DEBT_PRICE
+                                )}
                               </div>
                             </div>
                             <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
@@ -821,7 +741,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                   <div className="text-[#728395] text-sm mb-2">
                     Oracle price
                   </div>
-                  <div className="text-white text-lg font-medium">$0.99</div>
+                  <div className="text-white text-lg font-medium">
+                    {DEFAULT_VALUES.ORACLE_PRICE}
+                  </div>
                   <div className="text-[#a1acb8] text-sm mt-1 flex items-center">
                     {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
                     <span className="ml-2">🔗</span>
