@@ -125,6 +125,7 @@ export default function Lending({ selectedPair }: LendingProps) {
   }, [collateralAmount, multiplier, selectedPair]);
 
   // Fetch token balance when wallet is connected
+  // biome-ignore lint/correctness/useExhaustiveDependencies: getTokenBalance causes flickering
   useEffect(() => {
     const fetchBalance = async () => {
       if (!isConnected || !selectedPair) return;
@@ -152,7 +153,7 @@ export default function Lending({ selectedPair }: LendingProps) {
     };
 
     fetchBalance();
-  }, [isConnected, selectedPair, getTokenBalance]);
+  }, [isConnected, selectedPair]);
 
   return (
     <div
