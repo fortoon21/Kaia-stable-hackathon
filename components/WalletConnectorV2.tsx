@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { getNetworkColor, getNetworkName } from "@/constants/networks";
 import { validations } from "@/lib/validations";
 import { useWeb3 } from "@/lib/web3Provider";
 import LoadingSpinner from "./ui/LoadingSpinner";
@@ -176,35 +177,6 @@ export default function WalletConnectorV2() {
   const formatBalance = (bal: string) => {
     const num = parseFloat(bal);
     return num > 0.0001 ? num.toFixed(4) : "<0.0001";
-  };
-
-  const getNetworkName = (id: number | null) => {
-    switch (id) {
-      case 8217:
-        return "Kaia Mainnet";
-      case 1001:
-        return "Kaia Testnet";
-      case 1:
-        return "Ethereum";
-      case 137:
-        return "Polygon";
-      default:
-        return "Unknown Network";
-    }
-  };
-
-  const getNetworkColor = (id: number | null) => {
-    switch (id) {
-      case 8217:
-      case 1001:
-        return "bg-[#2ae5b9]";
-      case 1:
-        return "bg-blue-500";
-      case 137:
-        return "bg-purple-500";
-      default:
-        return "bg-gray-500";
-    }
   };
 
   if (address) {

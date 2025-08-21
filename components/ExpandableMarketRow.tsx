@@ -15,6 +15,8 @@ interface MarketData {
   totalLiquidity?: string;
   ytPercentage?: string;
   ptPercentage?: string;
+  longYieldApy?: string;
+  fixedApy?: string;
   subMarkets?: Array<{
     name: string;
     maturity: string;

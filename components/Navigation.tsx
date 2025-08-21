@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { getNetworkInfo } from "@/constants/networks";
 import { useWeb3 } from "@/lib/web3Provider";
 import WalletConnectorV2 from "./WalletConnectorV2";
 
@@ -14,34 +15,6 @@ export default function Navigation({
   onPageChange,
 }: NavigationProps) {
   const { chainId, isConnected } = useWeb3();
-
-  // Network configurations with logos
-  const getNetworkInfo = (chainId: number | null) => {
-    switch (chainId) {
-      case 8217: // Kaia Mainnet
-        return {
-          name: "Kaia",
-          logo: "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png",
-          symbol: "K",
-          bgColor: "bg-[#2ae5b9]",
-        };
-      case 1: // Ethereum Mainnet
-        return {
-          name: "Ethereum",
-          logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
-          symbol: "E",
-          bgColor: "bg-blue-600",
-        };
-      default:
-        return {
-          name: "Kaia",
-          logo: "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png",
-          symbol: "K",
-          bgColor: "bg-[#2ae5b9]",
-        };
-    }
-  };
-
   const networkInfo = getNetworkInfo(chainId);
 
   return (

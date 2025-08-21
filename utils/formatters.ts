@@ -18,3 +18,10 @@ export function formatTokenAmount(
 export function calculateUSDValue(amount: string, price: number): string {
   return formatDollarAmount(parseFloat(amount) * price);
 }
+
+export function getMarketImage(
+  marketName: string,
+  imageMap: { [key: string]: string }
+) {
+  return imageMap[marketName] || null;
+}

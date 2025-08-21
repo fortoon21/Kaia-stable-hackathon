@@ -8,11 +8,7 @@ import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useWeb3 } from "@/lib/web3Provider";
 import type { BottomTabType, LendingProps, TabType } from "@/types/lending";
-import {
-  calculateUSDValue,
-  formatDollarAmount,
-  formatTokenAmount,
-} from "@/utils/formatters";
+import { calculateUSDValue } from "@/utils/formatters";
 
 export default function Lending({ selectedPair }: LendingProps) {
   const [activeTab, setActiveTab] = useState<TabType>("multiply");

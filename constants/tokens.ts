@@ -7,10 +7,10 @@ export const TOKEN_ADDRESSES = {
   USDT: "0xd077a400968890eacc75cdc901f0356c943e4fdb",
 } as const;
 
-export const TOKEN_DECIMALS = {
+export const TOKEN_DECIMALS: { [key: string]: number } = {
   WKAIA: 18,
   USDC: 6,
   "USD₮": 6,
   USDT0: 6,
   USDT: 6,
-} as const;
+};

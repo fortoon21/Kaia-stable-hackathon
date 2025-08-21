@@ -278,7 +278,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   // Listen for account and network changes
   useEffect(() => {
     if (typeof window !== "undefined" && window.ethereum) {
-      const handleAccountsChanged = (accounts: string[]) => {
+      const handleAccountsChanged = (...args: unknown[]) => {
+        const accounts = args[0] as string[];
         if (accounts.length === 0) {
           disconnectWallet();
         } else {
@@ -287,7 +288,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         }
       };
 
-      const handleChainChanged = (chainIdHex: string) => {
+      const handleChainChanged = (...args: unknown[]) => {
+        const chainIdHex = args[0] as string;
         const newChainId = parseInt(chainIdHex, 16);
         setChainId(newChainId);
 
