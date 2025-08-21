@@ -1,10 +1,38 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import { useWeb3 } from "@/lib/web3Provider";
 
-export default function Lending() {
+interface LendingProps {
+  selectedPair?: {
+    collateralAsset: {
+      asset: string;
+      symbol: string;
+      icon?: string;
+      iconBg?: string;
+      protocol?: string;
+      imageUrl?: string;
+    };
+    debtAsset: {
+      asset: string;
+      symbol: string;
+      icon?: string;
+      iconBg?: string;
+      protocol?: string;
+      imageUrl?: string;
+    };
+    supplyAPY?: string;
+    borrowAPY?: string;
+    maxROE?: string;
+    maxMultiplier?: string;
+    lltv?: string;
+    liquidity?: string;
+  };
+}
+
+export default function Lending({ selectedPair }: LendingProps) {
   const [activeTab, setActiveTab] = useState<"borrow" | "multiply">("multiply");
   const [multiplier, setMultiplier] = useState(1.0);
   const [collateralAmount, setCollateralAmount] = useState("");
@@ -46,14 +74,23 @@ export default function Lending() {
                     data-node-id="1:7"
                   >
                     <div
-                      className="absolute inset-0 rounded-[29px]"
+                      className="absolute inset-0 rounded-[29px] flex items-center justify-center"
                       data-name="Border"
                       data-node-id="1:9"
                     >
-                      <div
-                        aria-hidden="true"
-                        className="absolute border-[#17e3c2] border-[3px] border-solid inset-0 pointer-events-none rounded-[29px]"
-                      />
+                      {selectedPair?.collateralAsset.imageUrl ? (
+                        <Image
+                          src={selectedPair.collateralAsset.imageUrl}
+                          alt={selectedPair.collateralAsset.symbol}
+                          width={56}
+                          height={56}
+                          className="w-14 h-14 rounded-full object-cover z-10"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-[#17e3c2] rounded-full flex items-center justify-center text-white font-bold z-10">
+                          {selectedPair?.collateralAsset.symbol?.[0] || "K"}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -71,8 +108,20 @@ export default function Lending() {
                     data-name="Background"
                     data-node-id="1:11"
                   >
-                    <div className="absolute bg-blue-500 rounded-full w-8 h-8 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center text-white font-bold">
-                      U
+                    <div className="absolute inset-0 rounded-[29px] flex items-center justify-center">
+                      {selectedPair?.debtAsset.imageUrl ? (
+                        <Image
+                          src={selectedPair.debtAsset.imageUrl}
+                          alt={selectedPair.debtAsset.symbol}
+                          width={56}
+                          height={56}
+                          className="w-14 h-14 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="bg-blue-500 rounded-full w-14 h-14 flex items-center justify-center text-white font-bold">
+                          {selectedPair?.debtAsset.symbol?.[0] || "U"}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -81,20 +130,14 @@ export default function Lending() {
               {/* Title Section */}
               <div className="absolute left-[120px] top-0">
                 <div className="text-[#728395] text-[16px] font-semibold leading-[20px] mb-2">
-                  Euler Yield
+                  {selectedPair?.collateralAsset.protocol || "Euler Yield"}
                 </div>
                 <div className="flex items-center text-[#f7f7f8] text-[36px] font-medium leading-[48px]">
-                  <span>PT-USDe-25SEP2025</span>
+                  <span>
+                    {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
+                  </span>
                   <span className="text-[#728395] mx-2">/</span>
-                  <span>USDC</span>
-                  {/* Warning Icon */}
-                  <div
-                    className="ml-3 bg-[rgba(236,192,51,0.2)] rounded-md size-7 flex items-center justify-center"
-                    data-name="Overlay"
-                    data-node-id="1:15"
-                  >
-                    <div className="text-yellow-400 text-sm">⚠️</div>
-                  </div>
+                  <span>{selectedPair?.debtAsset.symbol || "USDC"}</span>
                 </div>
               </div>
             </div>
@@ -126,13 +169,18 @@ export default function Lending() {
                   className="absolute flex flex-col font-medium h-[39px] justify-center left-[26.59px] text-[#f7f7f8] text-[32px] top-[48.5px] translate-y-[-50%] w-[117.772px]"
                   data-node-id="1:22"
                 >
-                  <p className="block leading-[42.67px]">22.84M</p>
+                  <p className="block leading-[42.67px]">
+                    {selectedPair?.liquidity?.replace("$", "") || "22.84M"}
+                  </p>
                 </div>
                 <div
                   className="absolute flex flex-col font-semibold h-[17px] justify-center left-0 text-[#728395] text-[14px] top-[88.16px] translate-y-[-50%] w-[95.427px]"
                   data-node-id="1:23"
                 >
-                  <p className="block leading-[20px]">22.85M USDC</p>
+                  <p className="block leading-[20px]">
+                    {selectedPair?.liquidity?.replace("$", "") || "22.85M"}{" "}
+                    {selectedPair?.debtAsset.symbol || "USDC"}
+                  </p>
                 </div>
               </div>
               <div
@@ -150,7 +198,9 @@ export default function Lending() {
                   className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#f7f7f8] text-[32px] top-[48.5px] translate-y-[-50%] w-[63.875px]"
                   data-node-id="1:26"
                 >
-                  <p className="block leading-[42.67px]">8.31</p>
+                  <p className="block leading-[42.67px]">
+                    {selectedPair?.maxMultiplier?.replace("x", "") || "8.31"}
+                  </p>
                 </div>
                 <div
                   className="absolute flex flex-col font-medium h-[39px] justify-center left-[69.48px] text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[17.944px]"
@@ -176,7 +226,9 @@ export default function Lending() {
                   className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#23c09b] text-[32px] top-[48.5px] translate-y-[-50%] w-[85.221px]"
                   data-node-id="1:30"
                 >
-                  <p className="block leading-[42.67px]">39.41</p>
+                  <p className="block leading-[42.67px]">
+                    {selectedPair?.maxROE?.replace("%", "") || "39.41"}
+                  </p>
                 </div>
                 <div
                   className="absolute flex flex-col font-medium h-[39px] justify-center left-[90.89px] text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[26.88px]"
@@ -286,10 +338,20 @@ export default function Lending() {
                           onChange={(e) => setCollateralAmount(e.target.value)}
                           className="bg-transparent text-white text-2xl w-full outline-none"
                         />
-                        <div className="bg-[#10263e] rounded-full px-4 py-2 flex items-center space-x-2">
-                          <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                        <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                          {selectedPair?.collateralAsset.imageUrl ? (
+                            <Image
+                              src={selectedPair.collateralAsset.imageUrl}
+                              alt={selectedPair.collateralAsset.symbol}
+                              width={20}
+                              height={20}
+                              className="w-5 h-5 rounded-full"
+                            />
+                          ) : (
+                            <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                          )}
                           <span className="text-white text-sm font-semibold">
-                            PT-USDe-25SEP2025
+                            {selectedPair?.collateralAsset.symbol || "PT-USDe"}
                           </span>
                         </div>
                       </div>
@@ -349,7 +411,8 @@ export default function Lending() {
                                 {(
                                   parseFloat(collateralAmount) * multiplier || 0
                                 ).toFixed(2)}{" "}
-                                PT-USDe...
+                                {selectedPair?.collateralAsset.symbol ||
+                                  "PT-USDe"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
                                 $
@@ -360,10 +423,21 @@ export default function Lending() {
                                 ).toFixed(2)}
                               </div>
                             </div>
-                            <div className="bg-[#10263e] rounded-full px-4 py-2 flex items-center space-x-2">
-                              <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                            <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                              {selectedPair?.collateralAsset.imageUrl ? (
+                                <Image
+                                  src={selectedPair.collateralAsset.imageUrl}
+                                  alt={selectedPair.collateralAsset.symbol}
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5 rounded-full"
+                                />
+                              ) : (
+                                <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                              )}
                               <span className="text-white text-sm">
-                                PT-USDe...
+                                {selectedPair?.collateralAsset.symbol ||
+                                  "PT-USDe"}
                               </span>
                             </div>
                           </div>
@@ -381,7 +455,7 @@ export default function Lending() {
                                   parseFloat(collateralAmount) *
                                     (multiplier - 1) || 0
                                 ).toFixed(2)}{" "}
-                                USDC
+                                {selectedPair?.debtAsset.symbol || "USDC"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
                                 $
@@ -391,11 +465,23 @@ export default function Lending() {
                                 ).toFixed(2)}
                               </div>
                             </div>
-                            <div className="bg-[#10263e] rounded-full px-4 py-2 flex items-center space-x-2">
-                              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
-                                U
-                              </div>
-                              <span className="text-white text-sm">USDC</span>
+                            <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                              {selectedPair?.debtAsset.imageUrl ? (
+                                <Image
+                                  src={selectedPair.debtAsset.imageUrl}
+                                  alt={selectedPair.debtAsset.symbol}
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5 rounded-full"
+                                />
+                              ) : (
+                                <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                                  {selectedPair?.debtAsset.symbol?.[0] || "U"}
+                                </div>
+                              )}
+                              <span className="text-white text-sm">
+                                {selectedPair?.debtAsset.symbol || "USDC"}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -414,11 +500,23 @@ export default function Lending() {
                             placeholder="0"
                             className="bg-transparent text-white text-xl w-full outline-none"
                           />
-                          <div className="bg-[#10263e] rounded-full px-4 py-2 flex items-center space-x-2">
-                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
-                              U
-                            </div>
-                            <span className="text-white text-sm">USDC</span>
+                          <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                            {selectedPair?.debtAsset.imageUrl ? (
+                              <Image
+                                src={selectedPair.debtAsset.imageUrl}
+                                alt={selectedPair.debtAsset.symbol}
+                                width={20}
+                                height={20}
+                                className="w-5 h-5 rounded-full"
+                              />
+                            ) : (
+                              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                                {selectedPair?.debtAsset.symbol?.[0] || "U"}
+                              </div>
+                            )}
+                            <span className="text-white text-sm">
+                              {selectedPair?.debtAsset.symbol || "USDC"}
+                            </span>
                           </div>
                         </div>
                         <div className="text-[#a1acb8] text-sm mt-2">
@@ -426,7 +524,7 @@ export default function Lending() {
                           {(parseFloat(collateralAmount) * 0.88 || 0).toFixed(
                             2
                           )}{" "}
-                          USDC
+                          {selectedPair?.debtAsset.symbol || "USDC"}
                         </div>
                       </div>
                     )}
@@ -514,7 +612,7 @@ export default function Lending() {
                   >
                     {activeTab === "multiply"
                       ? "Open Multiply Position"
-                      : "Borrow USDC"}
+                      : `Borrow ${selectedPair?.debtAsset.symbol || "USDC"}`}
                   </button>
                 )}
               </div>
@@ -536,8 +634,28 @@ export default function Lending() {
                   } transition-colors cursor-pointer`}
                 >
                   <div className="flex space-x-1">
-                    <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
-                    <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
+                    {selectedPair?.collateralAsset.imageUrl ? (
+                      <Image
+                        src={selectedPair.collateralAsset.imageUrl}
+                        alt={selectedPair.collateralAsset.symbol}
+                        width={20}
+                        height={20}
+                        className="w-5 h-5 rounded-full"
+                      />
+                    ) : (
+                      <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                    )}
+                    {selectedPair?.debtAsset.imageUrl ? (
+                      <Image
+                        src={selectedPair.debtAsset.imageUrl}
+                        alt={selectedPair.debtAsset.symbol}
+                        width={20}
+                        height={20}
+                        className="w-5 h-5 rounded-full"
+                      />
+                    ) : (
+                      <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
+                    )}
                   </div>
                   <span className="font-semibold">Pair details</span>
                 </button>
@@ -550,9 +668,20 @@ export default function Lending() {
                       : "border-transparent text-[#728395] hover:text-white"
                   } transition-colors cursor-pointer`}
                 >
-                  <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                  {selectedPair?.collateralAsset.imageUrl ? (
+                    <Image
+                      src={selectedPair.collateralAsset.imageUrl}
+                      alt={selectedPair.collateralAsset.symbol}
+                      width={20}
+                      height={20}
+                      className="w-5 h-5 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                  )}
                   <span className="font-semibold">
-                    Collateral PT-USDe-25SEP2025
+                    Collateral{" "}
+                    {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
                   </span>
                 </button>
                 <button
@@ -564,8 +693,20 @@ export default function Lending() {
                       : "border-transparent text-[#728395] hover:text-white"
                   } transition-colors cursor-pointer`}
                 >
-                  <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
-                  <span className="font-semibold">Debt USDC</span>
+                  {selectedPair?.debtAsset.imageUrl ? (
+                    <Image
+                      src={selectedPair.debtAsset.imageUrl}
+                      alt={selectedPair.debtAsset.symbol}
+                      width={20}
+                      height={20}
+                      className="w-5 h-5 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
+                  )}
+                  <span className="font-semibold">
+                    Debt {selectedPair?.debtAsset.symbol || "USDC"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -583,7 +724,7 @@ export default function Lending() {
                   </div>
                   <div className="text-white text-lg font-medium">$0.99</div>
                   <div className="text-[#a1acb8] text-sm mt-1 flex items-center">
-                    PT-USDe-25SEP2025
+                    {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
                     <span className="ml-2">🔗</span>
                   </div>
                   <div className="flex space-x-1 mt-2">
@@ -595,12 +736,16 @@ export default function Lending() {
 
                 <div>
                   <div className="text-[#728395] text-sm mb-2">Supply APY</div>
-                  <div className="text-white text-lg font-medium">13.45%</div>
+                  <div className="text-white text-lg font-medium">
+                    {selectedPair?.supplyAPY || "13.45%"}
+                  </div>
                 </div>
 
                 <div>
                   <div className="text-[#728395] text-sm mb-2">Borrow APY</div>
-                  <div className="text-white text-lg font-medium">9.90%</div>
+                  <div className="text-white text-lg font-medium">
+                    {selectedPair?.borrowAPY || "9.90%"}
+                  </div>
                 </div>
               </div>
 
@@ -619,7 +764,9 @@ export default function Lending() {
 
                 <div>
                   <div className="text-[#728395] text-sm mb-2">LLTV</div>
-                  <div className="text-white text-lg font-medium">90.00%</div>
+                  <div className="text-white text-lg font-medium">
+                    {selectedPair?.lltv || "90.00%"}
+                  </div>
                 </div>
               </div>
             </div>

@@ -35,7 +35,11 @@ interface MarketGroup {
   tradingPairs: TradingPair[];
 }
 
-export default function Markets() {
+interface MarketsProps {
+  onSelectPair?: (pair: TradingPair) => void;
+}
+
+export default function Markets({ onSelectPair }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
   const marketGroups: MarketGroup[] = [
@@ -533,9 +537,11 @@ export default function Markets() {
                       </div>
                     </div>
                     {group.tradingPairs.map((pair) => (
-                      <div
+                      <button
+                        type="button"
                         key={`${pair.collateralAsset.symbol}-${pair.debtAsset.symbol}`}
-                        className="px-6 py-4 border-b border-[#14304e]/20 last:border-b-0 hover:bg-[#14304e]/10 transition-colors"
+                        className="w-full px-6 py-4 border-b border-[#14304e]/20 last:border-b-0 hover:bg-[#14304e]/10 transition-colors cursor-pointer text-left"
+                        onClick={() => onSelectPair?.(pair)}
                       >
                         <div className="flex items-center">
                           <div className="grid grid-cols-8 gap-3 flex-1">
@@ -651,7 +657,7 @@ export default function Markets() {
                           {/* Empty space for alignment */}
                           <div className="w-8"></div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )}
