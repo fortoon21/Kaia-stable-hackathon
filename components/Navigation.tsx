@@ -82,24 +82,6 @@ export default function Navigation({
               >
                 Markets
               </button>
-              <button
-                type="button"
-                className="text-[#728395] hover:text-[#ddfbf4] px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
-              >
-                Strategies
-              </button>
-              <button
-                type="button"
-                className="text-[#728395] hover:text-[#ddfbf4] px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
-              >
-                Pools
-              </button>
-              <button
-                type="button"
-                className="text-[#728395] hover:text-[#ddfbf4] px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap"
-              >
-                Points
-              </button>
             </nav>
           </div>
 
