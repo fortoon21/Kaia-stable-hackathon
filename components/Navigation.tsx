@@ -6,8 +6,8 @@ import { useWeb3 } from "@/lib/web3Provider";
 import WalletConnectorV2 from "./WalletConnectorV2";
 
 interface NavigationProps {
-  currentPage: "lending" | "markets";
-  onPageChange: (page: "lending" | "markets") => void;
+  currentPage: "lending" | "markets" | "repay";
+  onPageChange: (page: "lending" | "markets" | "repay") => void;
 }
 
 export default function Navigation({
@@ -54,6 +54,17 @@ export default function Navigation({
                 }`}
               >
                 Markets
+              </button>
+              <button
+                type="button"
+                onClick={() => onPageChange("repay")}
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
+                  currentPage === "repay"
+                    ? "text-[#ddfbf4] bg-[#14304e]"
+                    : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
+                }`}
+              >
+                Repay
               </button>
             </nav>
           </div>

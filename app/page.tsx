@@ -5,6 +5,7 @@ import Lending from "@/components/Lending";
 import Markets from "@/components/Markets";
 import Navigation from "@/components/Navigation";
 import NetworkWarning from "@/components/NetworkWarning";
+import Repay from "@/components/Repay";
 
 interface SelectedPair {
   collateralAsset: {
@@ -33,9 +34,9 @@ interface SelectedPair {
 
 export default function Home() {
   const [isClient, setIsClient] = useState(false);
-  const [currentPage, setCurrentPage] = useState<"lending" | "markets">(
-    "lending"
-  );
+  const [currentPage, setCurrentPage] = useState<
+    "lending" | "markets" | "repay"
+  >("lending");
   const [selectedPair, setSelectedPair] = useState<SelectedPair>({
     collateralAsset: {
       asset: "WKAIA",
@@ -66,10 +67,16 @@ export default function Home() {
     const savedPage = localStorage.getItem("currentPage") as
       | "lending"
       | "markets"
+      | "repay"
       | null;
     const savedPair = localStorage.getItem("selectedPair");
 
-    if (savedPage && (savedPage === "lending" || savedPage === "markets")) {
+    if (
+      savedPage &&
+      (savedPage === "lending" ||
+        savedPage === "markets" ||
+        savedPage === "repay")
+    ) {
       setCurrentPage(savedPage);
     }
 
@@ -84,7 +91,7 @@ export default function Home() {
   }, []);
 
   // Save page state to localStorage when it changes
-  const handlePageChange = (page: "lending" | "markets") => {
+  const handlePageChange = (page: "lending" | "markets" | "repay") => {
     setCurrentPage(page);
     if (typeof window !== "undefined") {
       localStorage.setItem("currentPage", page);
@@ -132,6 +139,7 @@ export default function Home() {
         {currentPage === "markets" && (
           <Markets onSelectPair={handlePairSelect} />
         )}
+        {currentPage === "repay" && <Repay />}
       </div>
     </div>
   );
