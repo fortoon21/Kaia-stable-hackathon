@@ -691,8 +691,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                     <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
                   )}
                   <span className="font-semibold">
-                    Collateral{" "}
-                    {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
+                    Collateral {selectedPair?.collateralAsset.symbol || "WKAIA"}
                   </span>
                 </button>
                 <button
@@ -716,72 +715,165 @@ export default function Lending({ selectedPair }: LendingProps) {
                     <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
                   )}
                   <span className="font-semibold">
-                    Debt {selectedPair?.debtAsset.symbol || "USDC"}
+                    Debt {selectedPair?.debtAsset.symbol || "USDT0"}
                   </span>
                 </button>
               </div>
             </div>
 
-            {/* Overview Content */}
+            {/* Content based on selected tab */}
             <div className="bg-[#0c1d2f] border border-[#14304e] border-t-0 rounded-b-2xl p-8">
-              <h2 className="text-white text-xl font-semibold mb-8">
-                Overview
-              </h2>
+              {bottomTab === "pair" ? (
+                <>
+                  <h2 className="text-white text-xl font-semibold mb-8">
+                    Overview
+                  </h2>
 
-              <div className="grid grid-cols-3 gap-8 mb-8">
-                <div>
-                  <div className="text-[#728395] text-sm mb-2">
-                    Oracle price
-                  </div>
-                  <div className="text-white text-lg font-medium">
-                    ${collateralPrice.toFixed(4)}
-                  </div>
-                  <div className="text-[#a1acb8] text-sm mt-1 flex items-center">
-                    {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
-                    <span className="ml-2">🔗</span>
-                  </div>
-                  <div className="flex space-x-1 mt-2">
-                    <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
-                    <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
-                    <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
-                  </div>
-                </div>
+                  <div className="grid grid-cols-3 gap-8 mb-8">
+                    <div>
+                      <div className="text-[#728395] text-sm mb-2">
+                        Oracle price
+                      </div>
+                      <div className="text-white text-lg font-medium">
+                        ${collateralPrice.toFixed(4)}
+                      </div>
+                      <div className="text-[#a1acb8] text-sm mt-1 flex items-center">
+                        {selectedPair?.collateralAsset.asset ||
+                          "PT-USDe-25SEP2025"}
+                        <span className="ml-2">🔗</span>
+                      </div>
+                      <div className="flex space-x-1 mt-2">
+                        <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
+                        <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
+                        <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
+                      </div>
+                    </div>
 
-                <div>
-                  <div className="text-[#728395] text-sm mb-2">Supply APY</div>
-                  <div className="text-white text-lg font-medium">
-                    {selectedPair?.supplyAPY || "13.45%"}
-                  </div>
-                </div>
+                    <div>
+                      <div className="text-[#728395] text-sm mb-2">
+                        Supply APY
+                      </div>
+                      <div className="text-white text-lg font-medium">
+                        {selectedPair?.supplyAPY || "13.45%"}
+                      </div>
+                    </div>
 
-                <div>
-                  <div className="text-[#728395] text-sm mb-2">Borrow APY</div>
-                  <div className="text-white text-lg font-medium">
-                    {selectedPair?.borrowAPY || "9.90%"}
+                    <div>
+                      <div className="text-[#728395] text-sm mb-2">
+                        Borrow APY
+                      </div>
+                      <div className="text-white text-lg font-medium">
+                        {selectedPair?.borrowAPY || "9.90%"}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-3 gap-8">
-                <div>
-                  <div className="text-[#728395] text-sm mb-2">
-                    Correlated assets
+                  <div className="grid grid-cols-3 gap-8">
+                    <div>
+                      <div className="text-[#728395] text-sm mb-2">
+                        Correlated assets
+                      </div>
+                      <div className="text-white text-lg">Yes</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#728395] text-sm mb-2">Max LTV</div>
+                      <div className="text-white text-lg font-medium">
+                        88.00%
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[#728395] text-sm mb-2">LLTV</div>
+                      <div className="text-white text-lg font-medium">
+                        {selectedPair?.lltv || "90.00%"}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-white text-lg">Yes</div>
-                </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-white text-xl font-semibold mb-8">
+                    Statistics
+                  </h2>
 
-                <div>
-                  <div className="text-[#728395] text-sm mb-2">Max LTV</div>
-                  <div className="text-white text-lg font-medium">88.00%</div>
-                </div>
+                  <div className="space-y-8">
+                    {/* First row - Total supply, Total borrowed, Available liquidity */}
+                    <div className="grid grid-cols-3 gap-8">
+                      <div>
+                        <div className="text-[#728395] text-sm mb-2">
+                          Total supply
+                        </div>
+                        <div className="text-white text-lg font-medium">
+                          ${bottomTab === "collateral" ? "2.85M" : "1.24M"}
+                        </div>
+                        <div className="text-[#a1acb8] text-xs mt-1">
+                          {bottomTab === "collateral"
+                            ? `${(2850000 / collateralPrice).toLocaleString()} ${selectedPair?.collateralAsset.symbol || "WKAIA"}`
+                            : `${(1240000 / debtPrice).toLocaleString()} ${selectedPair?.debtAsset.symbol || "USDT0"}`}
+                        </div>
+                      </div>
 
-                <div>
-                  <div className="text-[#728395] text-sm mb-2">LLTV</div>
-                  <div className="text-white text-lg font-medium">
-                    {selectedPair?.lltv || "90.00%"}
+                      <div>
+                        <div className="text-[#728395] text-sm mb-2">
+                          Total borrowed
+                        </div>
+                        <div className="text-white text-lg font-medium">
+                          ${bottomTab === "collateral" ? "2.34M" : "896K"}
+                        </div>
+                        <div className="text-[#a1acb8] text-xs mt-1">
+                          {bottomTab === "collateral"
+                            ? `${(2340000 / collateralPrice).toLocaleString()} ${selectedPair?.collateralAsset.symbol || "WKAIA"}`
+                            : `${(896000 / debtPrice).toLocaleString()} ${selectedPair?.debtAsset.symbol || "USDT0"}`}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#728395] text-sm mb-2">
+                          Available liquidity
+                        </div>
+                        <div className="text-white text-lg font-medium">
+                          {selectedPair?.liquidity || "$506.7K"}
+                        </div>
+                        <div className="text-[#a1acb8] text-xs mt-1">
+                          {selectedPair?.liquidityAmount}{" "}
+                          {selectedPair?.liquidityToken}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Second row - Supply APY, Borrow APY, Utilization */}
+                    <div className="grid grid-cols-3 gap-8">
+                      <div>
+                        <div className="text-[#728395] text-sm mb-2">
+                          Supply APY
+                        </div>
+                        <div className="text-[#2ae5b9] text-lg font-medium">
+                          {selectedPair?.supplyAPY || "8.83%"}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#728395] text-sm mb-2">
+                          Borrow APY
+                        </div>
+                        <div className="text-orange-400 text-lg font-medium">
+                          {selectedPair?.borrowAPY || "5.40%"}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[#728395] text-sm mb-2">
+                          Utilization
+                        </div>
+                        <div className="text-white text-lg font-medium">
+                          {bottomTab === "collateral" ? "82.1%" : "72.3%"}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>

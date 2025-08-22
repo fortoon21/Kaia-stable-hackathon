@@ -22,6 +22,8 @@ export interface LendingProps {
     maxMultiplier?: string;
     lltv?: string;
     liquidity?: string;
+    liquidityAmount?: string;
+    liquidityToken?: string;
   };
 }
 
