@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { LAYOUT } from "@/constants/layout";
 
 export default function Footer() {
   return (
-    <footer className="mt-16 pt-8 border-t border-[#14304e] max-w-[1400px] mx-auto px-6">
+    <footer
+      className={`mt-16 pt-8 border-t border-[#14304e] ${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6`}
+    >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         {/* Company Info */}
         <div>

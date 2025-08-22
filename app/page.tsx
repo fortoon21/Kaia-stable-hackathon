@@ -7,6 +7,7 @@ import Markets from "@/components/Markets";
 import Navigation from "@/components/Navigation";
 import NetworkWarning from "@/components/NetworkWarning";
 import Repay from "@/components/Repay";
+import { LAYOUT } from "@/constants/layout";
 
 interface SelectedPair {
   collateralAsset: {
@@ -111,7 +112,7 @@ export default function Home() {
   // Show loading state on initial render to prevent flash
   if (!isClient) {
     return (
-      <div className="min-h-screen bg-[#08131f] text-white">
+      <div className="text-white min-h-screen flex flex-col">
         {/* Navigation */}
         <Navigation currentPage={currentPage} onPageChange={handlePageChange} />
 
@@ -119,7 +120,9 @@ export default function Home() {
         <NetworkWarning />
 
         {/* Loading Content */}
-        <div className="pt-[59px] min-h-screen flex items-center justify-center">
+        <div
+          className={`${LAYOUT.CONTENT_PADDING_TOP_CLASS} flex-grow flex items-center justify-center`}
+        >
           <div className="animate-pulse text-[#728395]">Loading...</div>
         </div>
       </div>
@@ -127,7 +130,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#08131f] text-white">
+    <div className="text-white min-h-screen flex flex-col">
       {/* Navigation */}
       <Navigation currentPage={currentPage} onPageChange={handlePageChange} />
 
@@ -135,12 +138,16 @@ export default function Home() {
       <NetworkWarning />
 
       {/* Main Content */}
-      <div className="pt-[59px] min-h-screen">
-        {currentPage === "lending" && <Lending selectedPair={selectedPair} />}
-        {currentPage === "markets" && (
-          <Markets onSelectPair={handlePairSelect} />
-        )}
-        {currentPage === "repay" && <Repay />}
+      <div
+        className={`${LAYOUT.CONTENT_PADDING_TOP_CLASS} flex-grow flex flex-col`}
+      >
+        <div className="flex-grow">
+          {currentPage === "lending" && <Lending selectedPair={selectedPair} />}
+          {currentPage === "markets" && (
+            <Markets onSelectPair={handlePairSelect} />
+          )}
+          {currentPage === "repay" && <Repay />}
+        </div>
 
         {/* Footer */}
         <Footer />

@@ -21,11 +21,11 @@ export default function Lending({ selectedPair }: LendingProps) {
 
   return (
     <div
-      className="relative w-full bg-[#08131f] min-h-screen flex flex-col"
+      className="relative w-full flex flex-col"
       data-name="Body"
       data-node-id="1:4"
     >
-      <div className="pt-20 flex-1 min-h-[1000px]">
+      <div className="pt-20 flex-1">
         <div
           className="mx-auto w-[1400px] relative mb-8"
           data-name="Container"

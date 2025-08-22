@@ -7,7 +7,7 @@ export default function Repay() {
   const [repayPercent, setRepayPercent] = useState(0);
 
   return (
-    <div className="min-h-screen bg-[#08131f] text-white p-6">
+    <div className="text-white p-6">
       <div className="max-w-7xl mx-auto">
         {/* Back to position button */}
         <button

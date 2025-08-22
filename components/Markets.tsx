@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
@@ -50,8 +51,8 @@ export default function Markets({ onSelectPair }: MarketsProps) {
   };
 
   return (
-    <div className="bg-[#08131f] text-white">
-      <div className="max-w-[1400px] mx-auto px-6 pt-8">
+    <div className="text-white">
+      <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6 pt-20`}>
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">TGIF Lending Markets</h1>

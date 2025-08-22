@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LAYOUT } from "@/constants/layout";
 import { getNetworkInfo } from "@/constants/networks";
 import { useWeb3 } from "@/lib/web3Provider";
 import WalletConnectorV2 from "./WalletConnectorV2";
@@ -18,7 +19,9 @@ export default function Navigation({
   const networkInfo = getNetworkInfo(chainId);
 
   return (
-    <div className="fixed h-[68px] left-0 top-0 w-full bg-[#08131f] border-b border-[#10263e] z-50">
+    <div
+      className={`fixed ${LAYOUT.NAVIGATION_HEIGHT_CLASS} left-0 top-0 w-full ${LAYOUT.BACKGROUND_CLASS} border-b border-[#10263e] z-50`}
+    >
       <div className="h-full overflow-hidden">
         <div className="min-w-max px-6 h-full flex items-center justify-between">
           {/* Logo and Navigation */}

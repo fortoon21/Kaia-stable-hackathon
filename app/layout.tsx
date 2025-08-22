@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { ToastContainer } from "@/components/ui/Toast";
+import { LAYOUT } from "@/constants/layout";
 import { Web3Provider } from "@/lib/web3Provider";
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body
-        className={`antialiased bg-[#08131f] min-h-screen w-full`}
+        className={`antialiased ${LAYOUT.BACKGROUND_CLASS} w-full`}
         suppressHydrationWarning={true}
       >
         <ErrorBoundary>
