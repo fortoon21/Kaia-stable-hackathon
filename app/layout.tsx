@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "The future of DeFi lending and leveraged trading on Kaia Network",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/favicon.png", type: "image/png" }],
   },
 };
 
