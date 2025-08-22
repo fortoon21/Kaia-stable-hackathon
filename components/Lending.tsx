@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
-import { DEFAULT_VALUES, MOCK_PRICES } from "@/constants/mockData";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useWeb3 } from "@/lib/web3Provider";
@@ -17,11 +16,8 @@ export default function Lending({ selectedPair }: LendingProps) {
   const [bottomTab, setBottomTab] = useState<BottomTabType>("pair");
   const { isConnected } = useWeb3();
   const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
-  const { maxLeverage, leveragePosition } = useLeverageCalculations(
-    selectedPair,
-    collateralAmount,
-    multiplier
-  );
+  const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
+    useLeverageCalculations(selectedPair, collateralAmount, multiplier);
 
   return (
     <div
@@ -369,7 +365,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                         ~{" "}
                         {calculateUSDValue(
                           collateralAmount || "0",
-                          MOCK_PRICES.COLLATERAL_PRICE
+                          collateralPrice
                         )}
                       </div>
                     </div>
@@ -436,7 +432,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                               <div className="text-[#a1acb8] text-sm">
                                 {calculateUSDValue(
                                   leveragePosition.collateralAmount,
-                                  MOCK_PRICES.COLLATERAL_PRICE
+                                  collateralPrice
                                 )}
                               </div>
                             </div>
@@ -476,7 +472,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                               <div className="text-[#a1acb8] text-sm">
                                 {calculateUSDValue(
                                   leveragePosition.debtAmount || "0",
-                                  MOCK_PRICES.DEBT_PRICE
+                                  debtPrice
                                 )}
                               </div>
                             </div>
@@ -738,7 +734,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                     Oracle price
                   </div>
                   <div className="text-white text-lg font-medium">
-                    {DEFAULT_VALUES.ORACLE_PRICE}
+                    ${collateralPrice.toFixed(4)}
                   </div>
                   <div className="text-[#a1acb8] text-sm mt-1 flex items-center">
                     {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}

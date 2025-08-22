@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
 import { useDebounce } from "./useDebounce";
 
 export interface MarketData {
@@ -30,6 +31,7 @@ export function useMarketData(): UseMarketDataReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const { prices } = useTokenPrices();
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -46,7 +48,7 @@ export function useMarketData(): UseMarketDataReturn {
       const mockData: MarketData[] = [
         {
           symbol: "PT-USDe-25SEP2025",
-          price: 0.99,
+          price: prices["USDC"] || 1.0,
           change24h: 2.5,
           volume24h: 5440000,
           liquidity: 22840000,
@@ -56,7 +58,7 @@ export function useMarketData(): UseMarketDataReturn {
         },
         {
           symbol: "USDC",
-          price: 1.0,
+          price: prices["USDC"] || 1.0,
           change24h: 0.02,
           volume24h: 119260000,
           liquidity: 102500000,
@@ -66,7 +68,7 @@ export function useMarketData(): UseMarketDataReturn {
         },
         {
           symbol: "KAIA",
-          price: 0.8,
+          price: prices["WKAIA"] || 0.14,
           change24h: -1.23,
           volume24h: 45200000,
           liquidity: 89300000,
@@ -103,7 +105,7 @@ export function useMarketData(): UseMarketDataReturn {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [prices]);
 
   // Initial fetch
   useEffect(() => {

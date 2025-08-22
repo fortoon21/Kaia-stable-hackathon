@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { MOCK_PRICES } from "@/constants/mockData";
 import { TOKEN_DECIMALS } from "@/constants/tokens";
+import { usePairPrices } from "@/hooks/useTokenPrices";
 import { calculateLeverageParams, calculateMaxLeverage } from "@/lib/leverage";
 import type { LendingProps } from "@/types/lending";
 
@@ -9,9 +10,14 @@ export function useLeverageCalculations(
   collateralAmount: string,
   multiplier: number
 ) {
+  // Get real-time prices for the selected pair
+  const { collateralPrice, debtPrice, isReady } = usePairPrices(
+    selectedPair?.collateralAsset.symbol || "",
+    selectedPair?.debtAsset.symbol || ""
+  );
   // Calculate max leverage using the leverage library
   const maxLeverage = useMemo(() => {
-    if (!selectedPair) return 1;
+    if (!selectedPair || !isReady) return 1;
 
     // If no collateral amount, assume 1 token to show max possible leverage
     const amount =
@@ -30,19 +36,20 @@ export function useLeverageCalculations(
       initialCollateralAmount: "0", // No existing position
       initialDebtAmount: "0", // No existing debt
       additionalCollateralAmount: amount,
-      priceOfCollateral: MOCK_PRICES.COLLATERAL_PRICE.toString(),
-      priceOfDebt: MOCK_PRICES.DEBT_PRICE.toString(),
+      priceOfCollateral: collateralPrice.toString(),
+      priceOfDebt: debtPrice.toString(),
       flashloanPremium: MOCK_PRICES.FLASHLOAN_PREMIUM.toString(),
       maxLTV: MOCK_PRICES.MAX_LTV.toString(),
     });
-  }, [collateralAmount, selectedPair]);
+  }, [collateralAmount, selectedPair, isReady, collateralPrice, debtPrice]);
 
   // Calculate actual leverage position details using HTML tester logic
   const leveragePosition = useMemo(() => {
     if (
       !collateralAmount ||
       parseFloat(collateralAmount) === 0 ||
-      !selectedPair
+      !selectedPair ||
+      !isReady
     ) {
       return {
         flashloanAmount: "0",
@@ -64,13 +71,26 @@ export function useLeverageCalculations(
       initialDebtAmount: "0", // No existing debt
       additionalCollateralAmount: collateralAmount,
       targetLeverage: multiplier.toString(),
-      priceOfCollateral: MOCK_PRICES.COLLATERAL_PRICE.toString(),
-      priceOfDebt: MOCK_PRICES.DEBT_PRICE.toString(),
+      priceOfCollateral: collateralPrice.toString(),
+      priceOfDebt: debtPrice.toString(),
       flashloanPremium: MOCK_PRICES.FLASHLOAN_PREMIUM.toString(),
     });
 
     return result;
-  }, [collateralAmount, multiplier, selectedPair]);
+  }, [
+    collateralAmount,
+    multiplier,
+    selectedPair,
+    isReady,
+    collateralPrice,
+    debtPrice,
+  ]);
 
-  return { maxLeverage, leveragePosition };
+  return {
+    maxLeverage,
+    leveragePosition,
+    isReady,
+    collateralPrice,
+    debtPrice,
+  };
 }
