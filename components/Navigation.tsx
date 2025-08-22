@@ -28,7 +28,7 @@ export default function Navigation({
               <div className="w-6 h-6 bg-[#2ae5b9] rounded-full flex items-center justify-center">
                 <span className="text-black text-sm font-bold">C</span>
               </div>
-              <span className="text-white font-semibold text-lg">COZY</span>
+              <span className="text-white font-semibold text-lg">TGIF</span>
             </div>
 
             {/* Navigation Links */}

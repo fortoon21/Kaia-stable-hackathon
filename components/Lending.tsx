@@ -108,7 +108,7 @@ export default function Lending({ selectedPair }: LendingProps) {
               {/* Title Section */}
               <div className="absolute left-[120px] top-0">
                 <div className="text-[#728395] text-[16px] font-semibold leading-[20px] mb-2">
-                  {selectedPair?.collateralAsset.protocol || "Cozy Yield"}
+                  {selectedPair?.collateralAsset.protocol || "TGIF Yield"}
                 </div>
                 <div className="flex items-center text-[#f7f7f8] text-[36px] font-medium leading-[48px]">
                   <span>{selectedPair?.collateralAsset.asset || "Error"}</span>
@@ -796,7 +796,7 @@ export default function Lending({ selectedPair }: LendingProps) {
               <div className="w-6 h-6 bg-[#2ae5b9] rounded-full flex items-center justify-center">
                 <span className="text-black text-sm font-bold">C</span>
               </div>
-              <span className="text-white font-semibold text-lg">COZY</span>
+              <span className="text-white font-semibold text-lg">TGIF</span>
             </div>
             <p className="text-[#728395] text-sm mb-4">
               The future of DeFi lending and leveraged trading on Kaia Network.
@@ -936,7 +936,7 @@ export default function Lending({ selectedPair }: LendingProps) {
         {/* Bottom Footer */}
         <div className="pt-6 border-t border-[#14304e] flex flex-col md:flex-row justify-between items-center mb-8">
           <p className="text-[#728395] text-sm">
-            © 2024 COZY Finance. All rights reserved.
+            © 2024 TGIF Finance. All rights reserved.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <span className="text-[#728395] text-sm">Built on</span>

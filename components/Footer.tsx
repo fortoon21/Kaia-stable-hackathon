@@ -10,7 +10,7 @@ export default function Footer() {
             <div className="w-6 h-6 bg-[#2ae5b9] rounded-full flex items-center justify-center">
               <span className="text-black text-sm font-bold">C</span>
             </div>
-            <span className="text-white font-semibold text-lg">COZY</span>
+            <span className="text-white font-semibold text-lg">TGIF</span>
           </div>
           <p className="text-[#728395] text-sm mb-4">
             The future of DeFi lending and leveraged trading on Kaia Network.
@@ -150,7 +150,7 @@ export default function Footer() {
       {/* Bottom Footer */}
       <div className="pt-6 border-t border-[#14304e] flex flex-col md:flex-row justify-between items-center mb-8">
         <p className="text-[#728395] text-sm">
-          © 2024 COZY Finance. All rights reserved.
+          © 2024 TGIF Finance. All rights reserved.
         </p>
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
           <span className="text-[#728395] text-sm">Built on</span>

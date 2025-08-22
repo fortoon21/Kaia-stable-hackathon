@@ -10,6 +10,20 @@ import { getMarketImage } from "@/utils/formatters";
 export default function Markets({ onSelectPair }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
+  // Calculate total pairs and assets
+  const totalPairs = MARKET_GROUPS.reduce(
+    (sum, group) => sum + group.tradingPairs.length,
+    0
+  );
+  const totalAssets = new Set(
+    MARKET_GROUPS.flatMap((group) =>
+      group.tradingPairs.flatMap((pair) => [
+        pair.collateralAsset.symbol,
+        pair.debtAsset.symbol,
+      ])
+    )
+  ).size;
+
   const toggleExpand = (groupName: string) => {
     setExpandedGroup(expandedGroup === groupName ? null : groupName);
   };
@@ -41,7 +55,7 @@ export default function Markets({ onSelectPair }: MarketsProps) {
       <div className="max-w-[1400px] mx-auto px-6 pt-8">
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Cozy Lending Markets</h1>
+          <h1 className="text-3xl font-bold mb-2">TGIF Lending Markets</h1>
           <p className="text-[#728395]">
             Leverage your positions with collateral and debt assets
           </p>
@@ -56,8 +70,8 @@ export default function Markets({ onSelectPair }: MarketsProps) {
           </div>
           <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-4">
             <div className="text-[#728395] text-sm mb-1">Active Pairs</div>
-            <div className="text-2xl font-bold">10</div>
-            <div className="text-[#2ae5b9] text-sm">4 Assets</div>
+            <div className="text-2xl font-bold">{totalPairs}</div>
+            <div className="text-[#2ae5b9] text-sm">{totalAssets} Assets</div>
           </div>
           <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-4">
             <div className="text-[#728395] text-sm mb-1">Best ROE</div>
