@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Footer from "@/components/Footer";
 import Lending from "@/components/Lending";
 import Markets from "@/components/Markets";
 import Navigation from "@/components/Navigation";
@@ -140,6 +141,9 @@ export default function Home() {
           <Markets onSelectPair={handlePairSelect} />
         )}
         {currentPage === "repay" && <Repay />}
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );

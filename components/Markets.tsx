@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import Footer from "@/components/Footer";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
@@ -294,8 +293,6 @@ export default function Markets({ onSelectPair }: MarketsProps) {
           </button>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }
