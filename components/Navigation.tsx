@@ -20,7 +20,7 @@ export default function Navigation({
 
   return (
     <div
-      className={`fixed ${LAYOUT.NAVIGATION_HEIGHT_CLASS} left-0 top-0 w-full ${LAYOUT.BACKGROUND_CLASS} border-b border-[#10263e] z-50`}
+      className={`fixed ${LAYOUT.NAVIGATION_HEIGHT_CLASS} left-4 right-4 top-4 mx-auto max-w-7xl ${LAYOUT.BACKGROUND_CLASS} border border-[#10263e] rounded-2xl backdrop-blur-sm bg-opacity-95 z-50 shadow-lg`}
     >
       <div className="h-full overflow-hidden">
         <div className="min-w-max px-6 h-full flex items-center justify-between">
