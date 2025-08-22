@@ -15,27 +15,6 @@ export const NETWORK_CONFIG: { [chainId: number]: NetworkInfo } = {
     symbol: "K",
     bgColor: "bg-[#2ae5b9]",
   },
-  1: {
-    // Ethereum Mainnet
-    name: "Ethereum",
-    logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
-    symbol: "E",
-    bgColor: "bg-blue-600",
-  },
-  1001: {
-    // Kaia Testnet
-    name: "Kaia Testnet",
-    logo: "https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png",
-    symbol: "K",
-    bgColor: "bg-[#2ae5b9]",
-  },
-  137: {
-    // Polygon
-    name: "Polygon",
-    logo: "https://cryptologos.cc/logos/polygon-matic-logo.png",
-    symbol: "P",
-    bgColor: "bg-purple-500",
-  },
 };
 
 export function getNetworkInfo(chainId: number | null): NetworkInfo {
