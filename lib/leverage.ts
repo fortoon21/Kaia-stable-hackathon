@@ -110,8 +110,8 @@ export function calculateMaxLeverage({
 
     // Cap for UI sanity, same as in original code
     return Math.min(maxLev, 25);
-  } catch (error) {
-    console.error("Error in calculateMaxLeverage:", error);
+  } catch (_error) {
+    // Error in calculateMaxLeverage
     return 1; // Return a safe default value in case of input parsing errors
   }
 }
@@ -258,8 +258,8 @@ export function calculateLeverageParams({
       collateralAmount: longPosition.toFixed(6), // Leveraged collateral
       debtAmount: shortPosition.toFixed(6), // Debt amount
     };
-  } catch (error) {
-    console.error("Error in calculateLeverageParams:", error);
+  } catch (_error) {
+    // Error in calculateLeverageParams
     return {
       flashloanAmount: "0",
       ltv: "0",

@@ -84,8 +84,8 @@ export default function Home() {
       try {
         const parsedPair = JSON.parse(savedPair);
         setSelectedPair(parsedPair);
-      } catch (error) {
-        console.warn("Failed to parse saved pair:", error);
+      } catch (_error) {
+        // Failed to parse saved pair
       }
     }
   }, []);

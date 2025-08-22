@@ -35,15 +35,15 @@ export function useTokenBalance(selectedPair?: SelectedPair) {
             const tokenBalance = await getTokenBalance(tokenAddress, decimals);
             setCollateralBalance(tokenBalance);
           } else {
-            console.warn(`Invalid token address for ${symbol}:`, tokenAddress);
+            // Invalid token address
             setCollateralBalance("0");
           }
         } else {
-          console.warn(`No token address found for symbol: ${symbol}`);
+          // No token address found
           setCollateralBalance("0");
         }
-      } catch (error) {
-        console.error("Failed to fetch token balance:", error);
+      } catch (_error) {
+        // Failed to fetch token balance
         setCollateralBalance("-");
       } finally {
         setIsLoadingBalance(false);

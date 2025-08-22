@@ -97,9 +97,9 @@ export function useMarketData(): UseMarketDataReturn {
       ];
 
       setData(mockData);
-    } catch (err) {
+    } catch (_err) {
       setError("Failed to fetch market data");
-      console.error(err);
+      // Error fetching market data
     } finally {
       setLoading(false);
     }
@@ -181,9 +181,9 @@ export function usePoolData(poolId: string) {
         };
 
         setData(poolData);
-      } catch (err) {
+      } catch (_err) {
         setError("Failed to fetch pool data");
-        console.error(err);
+        // Error fetching market data
       } finally {
         setLoading(false);
       }
@@ -240,9 +240,9 @@ export function useUserPositions(address: string | null) {
         ];
 
         setPositions(userPositions);
-      } catch (err) {
+      } catch (_err) {
         setError("Failed to fetch positions");
-        console.error(err);
+        // Error fetching market data
       } finally {
         setLoading(false);
       }

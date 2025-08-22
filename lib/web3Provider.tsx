@@ -92,8 +92,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       try {
         const balance = await provider.getBalance(userAddress);
         setBalance(ethers.formatEther(balance));
-      } catch (err) {
-        console.error("Failed to fetch balance:", err);
+      } catch (_err) {
+        // Failed to fetch balance
       }
     },
     [provider]
@@ -125,7 +125,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         const error = err as Error;
         // Don't log ENS errors for Kaia network
         if (!error.message.includes("does not support ENS")) {
-          console.error("Failed to fetch token balance:", err);
+          // Failed to fetch token balance
         }
         return "0";
       }
@@ -201,8 +201,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       // Try Kaia Mainnet first, fallback to Testnet
       const targetChainId = 8217; // Kaia Mainnet
       await switchNetwork(targetChainId);
-    } catch (error) {
-      console.error("Failed to switch to Kaia network:", error);
+    } catch (_error) {
+      // Failed to switch to Kaia network
       setError("Please switch to Kaia network to use this application");
     }
   }, [chainId, isKaiaNetwork, switchNetwork]);
@@ -259,8 +259,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
           const balance = await web3Provider.getBalance(accounts[0]);
           const formattedBalance = ethers.formatEther(balance);
           setBalance(formattedBalance);
-        } catch (err) {
-          console.error("Failed to fetch balance:", err);
+        } catch (_err) {
+          // Failed to fetch balance
         }
 
         // Force balance update after a short delay
@@ -275,7 +275,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         localStorage.setItem("connectedWallet", walletType);
         localStorage.setItem("walletAddress", accounts[0]);
       } catch (err: unknown) {
-        console.error("Wallet connection failed:", err);
+        // Wallet connection failed
         setError((err as Error).message || "Failed to connect wallet");
       } finally {
         setIsConnecting(false);
@@ -347,8 +347,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             localStorage.removeItem("connectedWallet");
             localStorage.removeItem("walletAddress");
           }
-        } catch (err) {
-          console.error("Auto-reconnect failed:", err);
+        } catch (_err) {
+          // Auto-reconnect failed
         }
       }
     };

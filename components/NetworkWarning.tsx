@@ -14,8 +14,8 @@ export default function NetworkWarning() {
   const handleSwitchToKaia = async () => {
     try {
       await switchNetwork(8217); // Switch to Kaia Mainnet
-    } catch (error) {
-      console.error("Failed to switch network:", error);
+    } catch (_error) {
+      // Failed to switch network
     }
   };
 
