@@ -1,16 +1,21 @@
 "use client";
 
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="mt-16 pt-8 border-t border-[#14304e] max-w-[1400px] mx-auto px-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         {/* Company Info */}
         <div>
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-6 h-6 bg-[#2ae5b9] rounded-full flex items-center justify-center">
-              <span className="text-black text-sm font-bold">C</span>
-            </div>
-            <span className="text-white font-semibold text-lg">TGIF</span>
+          <div className="flex items-center mb-4">
+            <Image
+              src="/tgif-wordmark.svg"
+              alt="TGIF"
+              width={120}
+              height={48}
+              className="h-8 w-auto"
+            />
           </div>
           <p className="text-[#728395] text-sm mb-4">
             The future of DeFi lending and leveraged trading on Kaia Network.
@@ -155,9 +160,13 @@ export default function Footer() {
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
           <span className="text-[#728395] text-sm">Built on</span>
           <div className="flex items-center space-x-2">
-            <div className="w-5 h-5 bg-[#2ae5b9] rounded-full flex items-center justify-center">
-              <span className="text-black text-xs font-bold">K</span>
-            </div>
+            <Image
+              src="https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png"
+              alt="Kaia"
+              width={20}
+              height={20}
+              className="w-5 h-5 rounded-full"
+            />
             <span className="text-white font-semibold text-sm">
               Kaia Network
             </span>
