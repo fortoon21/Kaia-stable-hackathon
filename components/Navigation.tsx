@@ -18,17 +18,21 @@ export default function Navigation({
   const networkInfo = getNetworkInfo(chainId);
 
   return (
-    <div className="fixed h-[59px] left-0 top-0 w-full bg-[#08131f] border-b border-[#10263e] z-50">
+    <div className="fixed h-[68px] left-0 top-0 w-full bg-[#08131f] border-b border-[#10263e] z-50">
       <div className="h-full overflow-hidden">
         <div className="min-w-max px-6 h-full flex items-center justify-between">
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8 flex-shrink-0">
             {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-[#2ae5b9] rounded-full flex items-center justify-center">
-                <span className="text-black text-sm font-bold">C</span>
-              </div>
-              <span className="text-white font-semibold text-lg">TGIF</span>
+            <div className="flex items-center ml-2">
+              <Image
+                src="/tgif-wordmark.svg"
+                alt="TGIF"
+                width={150}
+                height={48}
+                className="h-10 w-auto"
+                priority
+              />
             </div>
 
             {/* Navigation Links */}

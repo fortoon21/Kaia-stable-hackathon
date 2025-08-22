@@ -5,8 +5,12 @@ import { ToastContainer } from "@/components/ui/Toast";
 import { Web3Provider } from "@/lib/web3Provider";
 
 export const metadata: Metadata = {
-  title: "Kaia Hackathon App",
-  description: "Frontend application for Kaia hackathon",
+  title: "TGIF - DeFi Lending Platform",
+  description:
+    "The future of DeFi lending and leveraged trading on Kaia Network",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
