@@ -737,15 +737,22 @@ export default function Lending({ selectedPair }: LendingProps) {
                       <div className="text-white text-lg font-medium">
                         ${collateralPrice.toFixed(4)}
                       </div>
-                      <div className="text-[#a1acb8] text-sm mt-1 flex items-center">
+                      <div className="text-[#a1acb8] text-xs mt-1 flex items-center">
                         {selectedPair?.collateralAsset.asset ||
                           "PT-USDe-25SEP2025"}
-                        <span className="ml-2">🔗</span>
-                      </div>
-                      <div className="flex space-x-1 mt-2">
-                        <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
-                        <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
-                        <div className="w-6 h-6 bg-[#14304e] rounded-xl"></div>
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          className="ml-1.5 w-3 h-3 text-[#a1acb8]"
+                          role="img"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 448 512"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M103 497c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-55-55L424 408c13.3 0 24-10.7 24-24s-10.7-24-24-24L81.9 360l55-55c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0L7 367c-9.4 9.4-9.4 24.6 0 33.9l96 96zM441 145c9.4-9.4 9.4-24.6 0-33.9L345 15c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l55 55L24 104c-13.3 0-24 10.7-24 24s10.7 24 24 24l342.1 0-55 55c9.4-9.4 9.4-24.6 0 33.9s24.6 9.4 33.9 0l96-96z"
+                          />
+                        </svg>
                       </div>
                     </div>
 
