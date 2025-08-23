@@ -42,7 +42,7 @@ export default function Repay() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left side - Main repay interface */}
           <div className="lg:col-span-2">
-            {/* Tab selector */}
+            {/* Tab selector - matching Lending page style */}
             <div className="flex bg-[#0a1420] rounded-lg p-1 mb-6">
               <button
                 type="button"
@@ -68,59 +68,63 @@ export default function Repay() {
               </button>
             </div>
 
-            {/* Collateral to swap section */}
+            {/* Collateral to swap section - Updated design */}
             <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[#728395] text-sm">
-                  Collateral to swap
+                <span className="text-white font-medium">
+                  {activeTab === "wallet"
+                    ? "From Wallet"
+                    : "Collateral to Swap"}
                 </span>
                 <div className="flex items-center text-sm text-[#728395]">
-                  <span className="mr-2">Market</span>
-                  <span>Euler Base</span>
+                  <span className="mr-2">Balance:</span>
+                  <span className="text-white font-medium">28.29 USDC</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-[#2775CA] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold">$</span>
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#2775CA] to-[#1e5f9a] rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg">$</span>
                   </div>
                   <div>
-                    <div className="font-semibold">USDC</div>
-                    <div className="text-[#728395] text-sm">Balance 28.29</div>
+                    <div className="font-semibold text-lg">USDC</div>
+                    <div className="text-[#728395] text-sm">USD Coin</div>
                   </div>
                 </div>
                 <div className="text-right">
                   <NumberInput
                     value={collateralAmount}
                     onChange={setCollateralAmount}
-                    placeholder="0"
-                    className="text-2xl font-bold text-right max-w-[120px]"
+                    placeholder="0.00"
+                    className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
                   />
-                  <div className="text-[#728395] text-sm">~ $0.00</div>
+                  <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
                 </div>
               </div>
             </div>
 
-            {/* Debt to repay section */}
+            {/* Debt to repay section - Updated design */}
             <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[#728395] text-sm">Debt to repay</span>
+                <span className="text-white font-medium">Debt to Repay</span>
                 <div className="flex items-center text-sm text-[#728395]">
-                  <span className="mr-2">Market</span>
-                  <span>Euler Base</span>
+                  <span className="mr-2">Owed:</span>
+                  <span className="text-[#f59e0b] font-medium">
+                    0.000161 LBTC
+                  </span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">₿</span>
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-sm">₿</span>
                   </div>
                   <div>
-                    <div className="font-semibold">LBTC</div>
-                    <div className="text-[#23c09b] text-sm">
-                      Max repay 0.000161 Max debt
+                    <div className="font-semibold text-lg">LBTC</div>
+                    <div className="text-[#728395] text-sm">
+                      Lombard Staked BTC
                     </div>
                   </div>
                 </div>
@@ -128,23 +132,33 @@ export default function Repay() {
                   <NumberInput
                     value={debtAmount}
                     onChange={setDebtAmount}
-                    placeholder="0"
-                    className="text-2xl font-bold text-right max-w-[120px]"
+                    placeholder="0.00"
+                    className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
                   />
-                  <div className="text-[#728395] text-sm">~ $0.00</div>
+                  <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
                 </div>
               </div>
             </div>
 
-            {/* Percent of debt to repay */}
-            <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-white font-semibold">
-                  Percent of debt to repay
-                </span>
-                <span className="text-[#2ae5b9] font-semibold">
-                  {repayPercent}%
-                </span>
+            {/* Repay percentage slider - Enhanced design */}
+            <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <div className="text-white font-semibold text-lg">
+                    Repay Amount
+                  </div>
+                  <div className="text-[#728395] text-sm mt-1">
+                    Select percentage of debt to repay
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[#2ae5b9] font-bold text-2xl">
+                    {repayPercent}%
+                  </span>
+                  <div className="text-[#728395] text-sm mt-1">
+                    of total debt
+                  </div>
+                </div>
               </div>
 
               <div className="relative">
@@ -154,130 +168,147 @@ export default function Repay() {
                   step={1}
                   value={repayPercent}
                   onChange={setRepayPercent}
-                  fillColor="rgba(42,229,185,0.6)"
-                  trackColor="rgba(42,229,185,0.2)"
-                  className="h-2"
+                  fillColor="rgba(42,229,185,0.8)"
+                  trackColor="rgba(42,229,185,0.15)"
+                  className="h-1.5"
                 />
-                <div className="flex justify-between text-xs text-[#728395] mt-2">
-                  <span>0%</span>
-                  <span>25%</span>
-                  <span>50%</span>
-                  <span>75%</span>
-                  <span>100%</span>
+                <div className="flex justify-between text-xs text-[#728395] mt-3">
+                  <span className="bg-[#0a1420] px-2 py-1 rounded">0%</span>
+                  <span className="bg-[#0a1420] px-2 py-1 rounded">25%</span>
+                  <span className="bg-[#0a1420] px-2 py-1 rounded">50%</span>
+                  <span className="bg-[#0a1420] px-2 py-1 rounded">75%</span>
+                  <span className="bg-[#0a1420] px-2 py-1 rounded">100%</span>
                 </div>
               </div>
             </div>
 
-            {/* Action buttons */}
+            {/* Action buttons - Enhanced design */}
             <div className="flex space-x-4">
               <button
                 type="button"
-                className="flex-1 py-3 px-6 bg-[#14304e] border border-[#14304e] text-white font-semibold rounded-lg hover:bg-[#1a3a5c] transition-colors"
+                className="flex-1 py-4 px-6 bg-gradient-to-r from-[#14304e] to-[#1a3a5c] border border-[#14304e] text-white font-semibold rounded-lg hover:from-[#1a3a5c] hover:to-[#1e4062] transition-all duration-200 shadow-lg hover:shadow-xl"
               >
-                Add to batch
+                Add to Batch
               </button>
               <button
                 type="button"
-                className="flex-1 py-3 px-6 bg-[#2ae5b9] text-black font-semibold rounded-lg hover:bg-[#2ae5b9]/90 transition-colors"
+                className="flex-1 py-4 px-6 bg-gradient-to-r from-[#2ae5b9] to-[#22c09b] text-black font-semibold rounded-lg hover:from-[#22c09b] hover:to-[#1ea87a] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                Repay
+                Repay Debt
               </button>
             </div>
           </div>
 
-          {/* Right side - Position details */}
-          <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 h-fit">
-            {/* Sell section */}
+          {/* Right side - Position summary */}
+          <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 h-fit">
+            {/* Current Position */}
             <div className="mb-6">
-              <h3 className="text-white font-semibold mb-3">Sell</h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-[#2775CA] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">$</span>
+              <h3 className="text-white font-semibold text-lg mb-4">
+                Position Summary
+              </h3>
+
+              {/* Collateral */}
+              <div className="bg-[#08131f] rounded-lg p-4 mb-3">
+                <div className="text-[#728395] text-sm mb-2">Collateral</div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-[#2775CA] rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">$</span>
+                    </div>
+                    <span className="font-semibold">USDC</span>
                   </div>
-                  <span className="font-semibold">USDC</span>
+                  <div className="text-right">
+                    <div className="font-semibold">28.29</div>
+                    <div className="text-[#728395] text-xs">$28.29</div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold">0 USDC</div>
-                  <div className="text-[#728395] text-sm">$0</div>
+              </div>
+
+              {/* Debt */}
+              <div className="bg-[#08131f] rounded-lg p-4">
+                <div className="text-[#728395] text-sm mb-2">Debt</div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-xs">₿</span>
+                    </div>
+                    <span className="font-semibold">LBTC</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-[#f59e0b]">0.000161</div>
+                    <div className="text-[#728395] text-xs">$15.68</div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Buy section */}
-            <div className="mb-6">
-              <h3 className="text-white font-semibold mb-3">Buy</h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">₿</span>
-                  </div>
-                  <span className="font-semibold">LBTC</span>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">0 LBTC</div>
-                  <div className="text-[#728395] text-sm">$0</div>
-                </div>
-              </div>
-            </div>
-
-            {/* ROE and other details */}
+            {/* Position metrics */}
             <div className="space-y-3 border-t border-[#14304e] pt-6">
-              <div className="flex justify-between">
-                <span className="text-[#728395]">ROE ⚙️</span>
-                <span className="text-[#23c09b] font-semibold">11.33%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395]">Current price</span>
-                <span>-</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395]">Liquidation oracle price</span>
+              <div className="flex justify-between items-center">
+                <span className="text-[#728395] text-sm">Health Factor</span>
                 <div className="text-right">
-                  <div className="font-semibold">$0.80 USDC</div>
-                  <div className="text-[#728395] text-xs">⇅</div>
+                  <span className="text-[#2ae5b9] font-bold text-lg">1.24</span>
+                  <div className="text-[#728395] text-xs">Safe</div>
                 </div>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#728395]">Your LTV (LLTV)</span>
+                <span className="text-[#728395] text-sm">Current LTV</span>
                 <div className="text-right">
                   <div className="font-semibold">64.21%</div>
-                  <div className="text-[#728395] text-xs">(80.00%)</div>
+                  <div className="text-[#728395] text-xs">Max: 80.00%</div>
                 </div>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#728395]">Your health</span>
-                <span className="font-semibold">1.24</span>
+                <span className="text-[#728395] text-sm">
+                  Liquidation Price
+                </span>
+                <div className="text-right">
+                  <div className="font-semibold">$97,340</div>
+                  <div className="text-[#728395] text-xs">per LBTC</div>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#728395] text-sm">APY</span>
+                <span className="text-[#f59e0b] font-semibold">-4.2%</span>
               </div>
             </div>
 
-            {/* Swap details */}
+            {/* Transaction details */}
             <div className="space-y-3 border-t border-[#14304e] pt-6 mt-6">
               <div className="flex justify-between">
-                <span className="text-[#728395]">Swap</span>
-                <span>-</span>
+                <span className="text-[#728395] text-sm">Repay Method</span>
+                <span className="font-semibold text-white">
+                  {activeTab === "wallet" ? "From Wallet" : "Swap & Repay"}
+                </span>
               </div>
+              {activeTab === "swap" && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-[#728395] text-sm">Price Impact</span>
+                    <span className="text-[#2ae5b9] font-semibold">
+                      &lt; 0.01%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#728395] text-sm">
+                      Slippage Tolerance
+                    </span>
+                    <span className="font-semibold text-white">0.5%</span>
+                  </div>
+                </>
+              )}
               <div className="flex justify-between">
-                <span className="text-[#728395]">Price impact</span>
-                <span>-</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395]">Leveraged price impact</span>
-                <span>-</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395]">Slippage tolerance ⚙️</span>
-                <span className="font-semibold">0.1%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395]">Routed via</span>
-                <span>-</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395]">Estimated gas fee</span>
+                <span className="text-[#728395] text-sm">Network Fee</span>
                 <div className="text-right">
-                  <div className="font-semibold">0 ETH</div>
-                  <div className="text-[#728395] text-xs">$0</div>
+                  <div className="font-semibold text-white">~0.002 ETH</div>
+                  <div className="text-[#728395] text-xs">$6.84</div>
+                </div>
+              </div>
+              <div className="bg-[#08131f] rounded-lg p-3 mt-4">
+                <div className="text-[#728395] text-xs mb-1">After Repay</div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white">New Health Factor:</span>
+                  <span className="text-[#2ae5b9] font-semibold">2.1</span>
                 </div>
               </div>
             </div>
