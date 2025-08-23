@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import NumberInput from "@/components/ui/NumberInput";
 import Slider from "@/components/ui/Slider";
 import { LAYOUT } from "@/constants/layout";
@@ -10,6 +11,47 @@ export default function Repay() {
   const [repayPercent, setRepayPercent] = useState(0);
   const [collateralAmount, setCollateralAmount] = useState("");
   const [debtAmount, setDebtAmount] = useState("");
+  const [repayAsset, setRepayAsset] = useState<any>(null);
+
+  // Load repay asset info from localStorage
+  useEffect(() => {
+    const storedAsset = localStorage.getItem("repayAsset");
+    if (storedAsset) {
+      try {
+        const assetInfo = JSON.parse(storedAsset);
+        setRepayAsset(assetInfo);
+      } catch (error) {
+        console.error("Failed to parse repay asset info:", error);
+        // Fallback to default LBTC
+        setRepayAsset({
+          symbol: "LBTC",
+          amount: "0.000161",
+          usdValue: "$15.68",
+          asset: {
+            symbol: "LBTC",
+            asset: "LBTC",
+            icon: "₿",
+            iconBg: "from-orange-500 to-orange-600",
+            imageUrl: null,
+          },
+        });
+      }
+    } else {
+      // Default fallback
+      setRepayAsset({
+        symbol: "LBTC",
+        amount: "0.000161",
+        usdValue: "$15.68",
+        asset: {
+          symbol: "LBTC",
+          asset: "LBTC",
+          icon: "₿",
+          iconBg: "from-orange-500 to-orange-600",
+          imageUrl: null,
+        },
+      });
+    }
+  }, []);
 
   return (
     <div className="text-white p-6">
@@ -105,40 +147,62 @@ export default function Repay() {
             </div>
 
             {/* Debt to repay section - Updated design */}
-            <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-white font-medium">Debt to Repay</span>
-                <div className="flex items-center text-sm text-[#728395]">
-                  <span className="mr-2">Owed:</span>
-                  <span className="text-[#f59e0b] font-medium">
-                    0.000161 LBTC
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-sm">₿</span>
+            {repayAsset && (
+              <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-white font-medium">Debt to Repay</span>
+                  <div className="flex items-center text-sm text-[#728395]">
+                    <span className="mr-2">Owed:</span>
+                    <span className="text-[#f59e0b] font-medium">
+                      {repayAsset.amount} {repayAsset.symbol}
+                    </span>
                   </div>
-                  <div>
-                    <div className="font-semibold text-lg">LBTC</div>
-                    <div className="text-[#728395] text-sm">
-                      Lombard Staked BTC
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+                      {repayAsset.asset?.imageUrl ? (
+                        <Image
+                          src={repayAsset.asset.imageUrl}
+                          alt={repayAsset.symbol}
+                          width={48}
+                          height={48}
+                          className="object-cover rounded-full"
+                        />
+                      ) : (
+                        <div
+                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.asset?.iconBg || "from-orange-500 to-orange-600"}`}
+                        >
+                          <span className="text-white font-bold text-sm">
+                            {repayAsset.asset?.icon || repayAsset.symbol[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-lg">
+                        {repayAsset.symbol}
+                      </div>
+                      <div className="text-[#728395] text-sm">
+                        {repayAsset.asset?.asset || repayAsset.symbol}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <NumberInput
+                      value={debtAmount}
+                      onChange={setDebtAmount}
+                      placeholder="0.00"
+                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
+                    />
+                    <div className="text-[#728395] text-sm mt-1">
+                      {repayAsset.usdValue}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <NumberInput
-                    value={debtAmount}
-                    onChange={setDebtAmount}
-                    placeholder="0.00"
-                    className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
-                  />
-                  <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
-                </div>
               </div>
-            </div>
+            )}
 
             {/* Repay percentage slider - Enhanced design */}
             <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6">
@@ -225,21 +289,43 @@ export default function Repay() {
               </div>
 
               {/* Debt */}
-              <div className="bg-[#08131f] rounded-lg p-4">
-                <div className="text-[#728395] text-sm mb-2">Debt</div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-xs">₿</span>
+              {repayAsset && (
+                <div className="bg-[#08131f] rounded-lg p-4">
+                  <div className="text-[#728395] text-sm mb-2">Debt</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
+                        {repayAsset.asset?.imageUrl ? (
+                          <Image
+                            src={repayAsset.asset.imageUrl}
+                            alt={repayAsset.symbol}
+                            width={24}
+                            height={24}
+                            className="object-cover rounded-full"
+                          />
+                        ) : (
+                          <div
+                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.asset?.iconBg || "from-orange-500 to-orange-600"}`}
+                          >
+                            <span className="text-white font-bold text-xs">
+                              {repayAsset.asset?.icon || repayAsset.symbol[0]}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-semibold">{repayAsset.symbol}</span>
                     </div>
-                    <span className="font-semibold">LBTC</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-[#f59e0b]">0.000161</div>
-                    <div className="text-[#728395] text-xs">$15.68</div>
+                    <div className="text-right">
+                      <div className="font-semibold text-[#f59e0b]">
+                        {repayAsset.amount}
+                      </div>
+                      <div className="text-[#728395] text-xs">
+                        {repayAsset.usdValue}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Position metrics */}

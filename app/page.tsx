@@ -144,7 +144,10 @@ export default function Home() {
         <div className="flex-grow">
           {currentPage === "lending" && <Lending selectedPair={selectedPair} />}
           {currentPage === "markets" && (
-            <Markets onSelectPair={handlePairSelect} />
+            <Markets
+              onSelectPair={handlePairSelect}
+              onPageChange={handlePageChange}
+            />
           )}
           {currentPage === "repay" && <Repay />}
         </div>

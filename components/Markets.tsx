@@ -8,7 +8,7 @@ import { useTokenPrices } from "@/hooks/useTokenPrices";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
-export default function Markets({ onSelectPair }: MarketsProps) {
+export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const { getPriceBySymbol } = useTokenPrices();
 
@@ -410,8 +410,20 @@ export default function Markets({ onSelectPair }: MarketsProps) {
                                   }`}
                                   disabled={!hasDebt}
                                   onClick={() => {
-                                    if (hasDebt) {
-                                      window.location.href = `/repay?asset=${matchingDebt}`;
+                                    if (hasDebt && onPageChange) {
+                                      // Store the asset info for repay page
+                                      const repayAssetInfo = {
+                                        symbol: matchingDebt,
+                                        amount: position.amount,
+                                        usdValue: position.usdValue,
+                                        asset: collateralAsset,
+                                      };
+                                      localStorage.setItem(
+                                        "repayAsset",
+                                        JSON.stringify(repayAssetInfo)
+                                      );
+                                      // Navigate to repay page
+                                      onPageChange("repay");
                                     }
                                   }}
                                 >

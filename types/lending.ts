@@ -64,4 +64,5 @@ export interface MarketGroup {
 
 export interface MarketsProps {
   onSelectPair?: (pair: TradingPair) => void;
+  onPageChange?: (page: "lending" | "markets" | "repay") => void;
 }
