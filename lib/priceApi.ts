@@ -44,18 +44,21 @@ const CACHED_PRICE_DATA: PriceResponse = {
  */
 export async function fetchTokenPrices(): Promise<PriceResponse> {
   try {
-    // TODO: Replace with actual API call when ready
-    // const response = await fetch('https://api.hetz-01.eisenfinance.com/v1/chains/8217/v2/prices');
-    // const freshData = await response.json();
-    //
-    // // Update cache with fresh data
-    // CACHED_PRICE_DATA = freshData;
-    // return freshData;
+    const response = await fetch(
+      "https://api.hetz-01.eisenfinance.com/v1/chains/8217/v2/prices"
+    );
 
-    // Mock response for now (simulate successful API call)
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate network delay
-    return CACHED_PRICE_DATA;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const freshData = await response.json();
+
+    // Update cache with fresh data
+    Object.assign(CACHED_PRICE_DATA, freshData);
+    return freshData;
   } catch (error) {
+    console.warn("Price API failed, using cached data:", error);
     // Fallback to cached data on error (acts as offline cache)
     return CACHED_PRICE_DATA;
   }

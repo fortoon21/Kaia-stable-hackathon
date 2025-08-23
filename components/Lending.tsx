@@ -27,7 +27,7 @@ export default function Lending({ selectedPair }: LendingProps) {
     >
       <div className="pt-20 flex-1">
         <div
-          className="mx-auto w-[1400px] relative mb-8"
+          className="mx-auto w-[1400px] relative mb-8 min-h-[900px]"
           data-name="Container"
           data-node-id="1:5"
         >
@@ -215,7 +215,7 @@ export default function Lending({ selectedPair }: LendingProps) {
               </div>
             </div>
           </div>
-          <div className="absolute left-[900px] top-24 h-[650px] w-[420px]">
+          <div className="absolute left-[900px] top-24 w-[420px] h-[650px]">
             <div
               className="bg-[#0c1d2f] h-full pointer-events-auto rounded-2xl flex flex-col"
               data-name="Background+Border"

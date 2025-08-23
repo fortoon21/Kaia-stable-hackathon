@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import NumberInput from "@/components/ui/NumberInput";
 
 export default function Repay() {
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("swap");
   const [repayPercent, setRepayPercent] = useState(0);
+  const [collateralAmount, setCollateralAmount] = useState("");
+  const [debtAmount, setDebtAmount] = useState("");
 
   return (
     <div className="text-white p-6">
@@ -86,7 +89,12 @@ export default function Repay() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">0</div>
+                  <NumberInput
+                    value={collateralAmount}
+                    onChange={setCollateralAmount}
+                    placeholder="0"
+                    className="text-2xl font-bold text-right max-w-[120px]"
+                  />
                   <div className="text-[#728395] text-sm">~ $0.00</div>
                 </div>
               </div>
@@ -115,7 +123,12 @@ export default function Repay() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">0</div>
+                  <NumberInput
+                    value={debtAmount}
+                    onChange={setDebtAmount}
+                    placeholder="0"
+                    className="text-2xl font-bold text-right max-w-[120px]"
+                  />
                   <div className="text-[#728395] text-sm">~ $0.00</div>
                 </div>
               </div>
