@@ -3,6 +3,7 @@
 import { useState } from "react";
 import NumberInput from "@/components/ui/NumberInput";
 import Slider from "@/components/ui/Slider";
+import { LAYOUT } from "@/constants/layout";
 
 export default function Repay() {
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("swap");
@@ -12,7 +13,7 @@ export default function Repay() {
 
   return (
     <div className="text-white p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto`}>
         {/* Back to position button */}
         <button
           type="button"

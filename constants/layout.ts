@@ -5,5 +5,5 @@ export const LAYOUT = {
   CONTENT_PADDING_TOP_CLASS: "pt-[96px]", // Padding top for content under navigation (68px + 28px spacing)
   BACKGROUND_COLOR: "#08131f", // Main background color
   BACKGROUND_CLASS: "bg-[#08131f]", // Tailwind class for background
-  MAX_WIDTH_CONTAINER: "max-w-[1400px]", // Max width for content containers
+  MAX_WIDTH_CONTAINER: "max-w-7xl min-w-[1024px]", // Max width for content containers to match navigation with minimum width
 } as const;
