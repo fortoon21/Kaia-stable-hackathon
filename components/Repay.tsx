@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import NumberInput from "@/components/ui/NumberInput";
+import Slider from "@/components/ui/Slider";
 
 export default function Repay() {
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("swap");
@@ -146,22 +147,15 @@ export default function Repay() {
               </div>
 
               <div className="relative">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
+                <Slider
+                  min={0}
+                  max={100}
+                  step={1}
                   value={repayPercent}
-                  onChange={(e) => setRepayPercent(Number(e.target.value))}
-                  className="w-full h-2 bg-[#14304e] rounded-lg appearance-none cursor-pointer 
-                           [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5
-                           [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#2ae5b9] [&::-webkit-slider-thumb]:cursor-pointer
-                           [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#0c1d2f]
-                           [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full 
-                           [&::-moz-range-thumb]:bg-[#2ae5b9] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2 
-                           [&::-moz-range-thumb]:border-[#0c1d2f] [&::-moz-range-thumb]:border-none"
-                  style={{
-                    background: `linear-gradient(to right, #2ae5b9 0%, #2ae5b9 ${repayPercent}%, #14304e ${repayPercent}%, #14304e 100%)`,
-                  }}
+                  onChange={setRepayPercent}
+                  fillColor="rgba(42,229,185,0.6)"
+                  trackColor="rgba(42,229,185,0.2)"
+                  className="h-2"
                 />
                 <div className="flex justify-between text-xs text-[#728395] mt-2">
                   <span>0%</span>

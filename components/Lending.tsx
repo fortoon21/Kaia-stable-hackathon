@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
@@ -14,9 +15,12 @@ export default function Lending({ selectedPair }: LendingProps) {
   const [multiplier, setMultiplier] = useState(1.0);
   const [collateralAmount, setCollateralAmount] = useState("");
   const [bottomTab, setBottomTab] = useState<BottomTabType>("pair");
+  const [ltvValue, setLtvValue] = useState(0);
+  const [ltvInput, setLtvInput] = useState("0.0");
+  const [multiplierInput, setMultiplierInput] = useState("1.00");
   const { isConnected } = useWeb3();
   const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
-  const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
+  const { maxLeverage, leveragePosition, collateralPrice, debtPrice, isReady } =
     useLeverageCalculations(selectedPair, collateralAmount, multiplier);
 
   return (
@@ -175,7 +179,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:26"
                 >
                   <p className="block leading-[42.67px]">
-                    {maxLeverage.toFixed(2)}
+                    {maxLeverage > 1 ? maxLeverage.toFixed(2) : "--"}
                   </p>
                 </div>
                 <div
@@ -301,74 +305,80 @@ export default function Lending({ selectedPair }: LendingProps) {
                 <div className="p-3">
                   {/* Trading Form Container */}
                   <div className="space-y-4">
-                    {/* Margin Collateral */}
-                    <div className="bg-[#040a10] rounded-lg p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="text-[#a1acb8] text-sm">
-                          Margin collateral
-                        </div>
-                        {isConnected && (
-                          <div className="flex items-center space-x-2">
-                            <div className="text-[#728395] text-xs flex items-center space-x-1">
-                              <span>Balance:</span>
-                              <span className="inline-block tabular-nums font-mono whitespace-nowrap min-w-[8ch] text-right">
-                                {isLoadingBalance ? "..." : collateralBalance}
-                              </span>
-                              <span>
-                                {selectedPair?.collateralAsset.symbol ||
-                                  "WKAIA"}
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setCollateralAmount(collateralBalance || "0")
-                              }
-                              className="bg-[#14304e] hover:bg-[#1a3d5c] text-[#2ae5b9] text-xs px-2 py-1 rounded transition-colors"
-                              disabled={
-                                isLoadingBalance ||
-                                !collateralBalance ||
-                                collateralBalance === "-"
-                              }
-                            >
-                              MAX
-                            </button>
+                    {/* Margin Collateral - Only for Multiply Tab */}
+                    {activeTab === "multiply" && (
+                      <div className="bg-[#040a10] rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="text-[#a1acb8] text-sm">
+                            Margin collateral
                           </div>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <input
-                          type="number"
-                          placeholder="0"
-                          value={collateralAmount}
-                          onChange={(e) => setCollateralAmount(e.target.value)}
-                          className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
-                        />
-                        <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
-                          {selectedPair?.collateralAsset.imageUrl ? (
-                            <Image
-                              src={selectedPair.collateralAsset.imageUrl}
-                              alt={selectedPair.collateralAsset.symbol}
-                              width={20}
-                              height={20}
-                              className="w-5 h-5 rounded-full"
-                            />
-                          ) : (
-                            <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                          {isConnected && (
+                            <div className="flex items-center space-x-2">
+                              <div className="text-[#728395] text-xs">
+                                <span>Balance: </span>
+                                <span className="tabular-nums font-mono">
+                                  {isLoadingBalance ? "..." : collateralBalance}
+                                </span>
+                                <span>
+                                  {" "}
+                                  {selectedPair?.collateralAsset.symbol ||
+                                    "WKAIA"}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setCollateralAmount(collateralBalance || "0")
+                                }
+                                className="bg-[#14304e] hover:bg-[#1a3d5c] text-[#2ae5b9] text-xs px-2 py-1 rounded transition-colors"
+                                disabled={
+                                  isLoadingBalance ||
+                                  !collateralBalance ||
+                                  collateralBalance === "-"
+                                }
+                              >
+                                MAX
+                              </button>
+                            </div>
                           )}
-                          <span className="text-white text-sm font-semibold">
-                            {selectedPair?.collateralAsset.symbol || "PT-USDe"}
-                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={collateralAmount}
+                            onChange={(e) =>
+                              setCollateralAmount(e.target.value)
+                            }
+                            className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                          />
+                          <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                            {selectedPair?.collateralAsset.imageUrl ? (
+                              <Image
+                                src={selectedPair.collateralAsset.imageUrl}
+                                alt={selectedPair.collateralAsset.symbol}
+                                width={20}
+                                height={20}
+                                className="w-5 h-5 rounded-full"
+                              />
+                            ) : (
+                              <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                            )}
+                            <span className="text-white text-sm font-semibold">
+                              {selectedPair?.collateralAsset.symbol ||
+                                "PT-USDe"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-[#a1acb8] text-sm mt-3">
+                          ~{" "}
+                          {calculateUSDValue(
+                            collateralAmount || "0",
+                            collateralPrice
+                          )}
                         </div>
                       </div>
-                      <div className="text-[#a1acb8] text-sm mt-3">
-                        ~{" "}
-                        {calculateUSDValue(
-                          collateralAmount || "0",
-                          collateralPrice
-                        )}
-                      </div>
-                    </div>
+                    )}
 
                     {/* Multiplier Section - Only for Multiply Tab */}
                     {activeTab === "multiply" && (
@@ -377,37 +387,89 @@ export default function Lending({ selectedPair }: LendingProps) {
                           <div className="text-white text-sm font-semibold">
                             Multiplier
                           </div>
-                          <div className="bg-[#0c1d2f] rounded px-3 py-1">
-                            <span className="text-white text-sm font-semibold">
-                              {multiplier.toFixed(2)}x
+                          <div className="bg-[#0c1d2f] rounded px-3 py-1 flex items-center">
+                            <input
+                              type="text"
+                              value={multiplierInput}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === "" || /^\d*\.?\d*$/.test(value)) {
+                                  setMultiplierInput(value);
+                                  if (value !== "") {
+                                    const numValue = parseFloat(value);
+                                    if (!Number.isNaN(numValue)) {
+                                      const clampedValue = Math.max(
+                                        1,
+                                        Math.min(maxLeverage, numValue)
+                                      );
+                                      setMultiplier(clampedValue);
+                                    }
+                                  } else {
+                                    setMultiplier(1);
+                                  }
+                                }
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              onBlur={() => {
+                                if (multiplierInput === "") {
+                                  setMultiplierInput("1.00");
+                                  setMultiplier(1);
+                                } else {
+                                  const numValue = parseFloat(multiplierInput);
+                                  if (!Number.isNaN(numValue)) {
+                                    const clampedValue = Math.max(
+                                      1,
+                                      Math.min(maxLeverage, numValue)
+                                    );
+                                    setMultiplier(clampedValue);
+                                    setMultiplierInput(clampedValue.toFixed(2));
+                                  }
+                                }
+                              }}
+                              className="text-white text-sm font-semibold bg-transparent w-12 text-right outline-none"
+                            />
+                            <span className="text-white text-sm font-semibold ml-0.5">
+                              x
                             </span>
                           </div>
                         </div>
                         <div className="relative mb-4">
-                          <input
-                            type="range"
-                            min="1"
+                          <Slider
+                            min={1}
                             max={maxLeverage}
-                            step="0.01"
+                            step={0.01}
                             value={multiplier}
-                            onChange={(e) =>
-                              setMultiplier(parseFloat(e.target.value))
-                            }
-                            className="w-full h-1.5 bg-[rgba(42,229,185,0.2)] rounded-lg appearance-none cursor-pointer slider"
+                            onChange={(value) => {
+                              setMultiplier(value);
+                              setMultiplierInput(value.toFixed(2));
+                            }}
+                            fillColor="rgba(42,229,185,0.6)"
+                            trackColor="rgba(42,229,185,0.2)"
                           />
                         </div>
                         <div className="flex justify-between text-xs text-[#728395]">
                           <span>1.00X</span>
                           <span className="text-[#435971]">
-                            {((maxLeverage - 1) * 0.25 + 1).toFixed(2)}X
+                            {isReady
+                              ? ((maxLeverage - 1) * 0.25 + 1).toFixed(2)
+                              : "-.-"}
+                            X
                           </span>
                           <span>
-                            {((maxLeverage - 1) * 0.5 + 1).toFixed(2)}X
+                            {isReady
+                              ? ((maxLeverage - 1) * 0.5 + 1).toFixed(2)
+                              : "-.-"}
+                            X
                           </span>
                           <span className="text-[#435971]">
-                            {((maxLeverage - 1) * 0.75 + 1).toFixed(2)}X
+                            {isReady
+                              ? ((maxLeverage - 1) * 0.75 + 1).toFixed(2)
+                              : "-.-"}
+                            X
                           </span>
-                          <span>Max ({maxLeverage.toFixed(2)}X)</span>
+                          <span>
+                            Max ({isReady ? maxLeverage.toFixed(2) : "-.-"}X)
+                          </span>
                         </div>
                       </div>
                     )}
@@ -499,115 +561,315 @@ export default function Lending({ selectedPair }: LendingProps) {
                       </div>
                     )}
 
-                    {/* Borrow Amount - Only for Borrow Tab */}
+                    {/* Borrow Interface - Only for Borrow Tab */}
                     {activeTab === "borrow" && (
-                      <div className="bg-[#08131f] rounded-lg p-4">
-                        <div className="text-[#728395] text-sm mb-2">
-                          Borrow Amount
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <input
-                            type="number"
-                            placeholder="0"
-                            className="bg-transparent text-white text-xl w-full outline-none"
-                          />
-                          <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
-                            {selectedPair?.debtAsset.imageUrl ? (
-                              <Image
-                                src={selectedPair.debtAsset.imageUrl}
-                                alt={selectedPair.debtAsset.symbol}
-                                width={20}
-                                height={20}
-                                className="w-5 h-5 rounded-full"
-                              />
-                            ) : (
-                              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
-                                {selectedPair?.debtAsset.symbol?.[0] || "U"}
+                      <div className="space-y-4">
+                        {/* Supply Section */}
+                        <div className="bg-[#040a10] rounded-lg p-6">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="text-[#a1acb8] text-sm">
+                              Supply{" "}
+                              {selectedPair?.collateralAsset.symbol || "USDC"}
+                            </div>
+                            <div className="text-xs text-[#728395]">
+                              <span className="mr-2">Market</span>
+                              <span>Euler Base</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <input
+                              type="number"
+                              placeholder="0"
+                              className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                            />
+                            <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                              {selectedPair?.collateralAsset.imageUrl ? (
+                                <Image
+                                  src={selectedPair.collateralAsset.imageUrl}
+                                  alt={selectedPair.collateralAsset.symbol}
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5 rounded-full"
+                                />
+                              ) : (
+                                <div className="w-5 h-5 bg-[#17e3c2] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                  {selectedPair?.collateralAsset.symbol?.[0] ||
+                                    "K"}
+                                </div>
+                              )}
+                              <span className="text-white text-sm font-semibold">
+                                {selectedPair?.collateralAsset.symbol || "USDC"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-sm mt-3">
+                            <div className="text-[#a1acb8]">~ $0.00</div>
+                            <div className="flex items-center space-x-2">
+                              <div className="text-[#728395]">
+                                <span>Balance: </span>
+                                <span className="tabular-nums font-mono">
+                                  {isLoadingBalance ? "..." : collateralBalance}
+                                </span>
+                                <span>
+                                  {" "}
+                                  {selectedPair?.collateralAsset.symbol ||
+                                    "USDC"}
+                                </span>
                               </div>
-                            )}
-                            <span className="text-white text-sm">
-                              {selectedPair?.debtAsset.symbol || "USDC"}
-                            </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setCollateralAmount(collateralBalance || "0")
+                                }
+                                className="px-2 py-1 bg-[#14304e] text-[#2ae5b9] text-xs font-semibold rounded hover:bg-[#1a3a5c] transition-colors"
+                              >
+                                MAX
+                              </button>
+                            </div>
                           </div>
                         </div>
-                        <div className="text-[#a1acb8] text-sm mt-2">
-                          Max:{" "}
-                          {(parseFloat(collateralAmount) * 0.88 || 0).toFixed(
-                            2
-                          )}{" "}
-                          {selectedPair?.debtAsset.symbol || "USDC"}
+
+                        {/* Borrow Section */}
+                        <div className="bg-[#040a10] rounded-lg p-6">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="text-[#a1acb8] text-sm">
+                              Borrow {selectedPair?.debtAsset.symbol || "USDS"}
+                            </div>
+                            <div className="text-xs text-[#728395]">
+                              <span className="mr-2">Market</span>
+                              <span>Euler Base</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <input
+                              type="number"
+                              placeholder="0"
+                              className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                            />
+                            <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                              {selectedPair?.debtAsset.imageUrl ? (
+                                <Image
+                                  src={selectedPair.debtAsset.imageUrl}
+                                  alt={selectedPair.debtAsset.symbol}
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5 rounded-full"
+                                />
+                              ) : (
+                                <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                  {selectedPair?.debtAsset.symbol?.[0] || "U"}
+                                </div>
+                              )}
+                              <span className="text-white text-sm font-semibold">
+                                {selectedPair?.debtAsset.symbol || "USDS"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-sm mt-3">
+                            <div className="text-[#a1acb8]">~ $0.00</div>
+                            <div className="text-[#728395]">Max borrow 0</div>
+                          </div>
+                        </div>
+
+                        {/* LTV Section */}
+                        <div className="bg-[#040a10] rounded-lg p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="text-white text-sm font-semibold">
+                              LTV
+                            </div>
+                            <div className="bg-[#0c1d2f] rounded px-3 py-1 flex items-center">
+                              <input
+                                type="text"
+                                value={ltvInput}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (
+                                    value === "" ||
+                                    /^\d*\.?\d*$/.test(value)
+                                  ) {
+                                    setLtvInput(value);
+                                    if (value !== "") {
+                                      const numValue = parseFloat(value);
+                                      if (!Number.isNaN(numValue)) {
+                                        const clampedValue = Math.max(
+                                          0,
+                                          Math.min(93, numValue)
+                                        );
+                                        setLtvValue(clampedValue);
+                                      }
+                                    } else {
+                                      setLtvValue(0);
+                                    }
+                                  }
+                                }}
+                                onFocus={(e) => e.target.select()}
+                                onBlur={() => {
+                                  if (ltvInput === "") {
+                                    setLtvInput("0.0");
+                                    setLtvValue(0);
+                                  } else {
+                                    const numValue = parseFloat(ltvInput);
+                                    if (!Number.isNaN(numValue)) {
+                                      const clampedValue = Math.max(
+                                        0,
+                                        Math.min(93, numValue)
+                                      );
+                                      setLtvValue(clampedValue);
+                                      setLtvInput(clampedValue.toFixed(1));
+                                    }
+                                  }
+                                }}
+                                className="text-white text-sm font-semibold bg-transparent w-10 text-right outline-none"
+                              />
+                              <span className="text-white text-sm font-semibold ml-0.5">
+                                %
+                              </span>
+                            </div>
+                          </div>
+                          <div className="relative mb-4">
+                            <Slider
+                              min={0}
+                              max={93}
+                              step={0.1}
+                              value={ltvValue}
+                              onChange={(value) => {
+                                setLtvValue(value);
+                                setLtvInput(value.toFixed(1));
+                              }}
+                              fillColor="rgba(42,229,185,0.6)"
+                              trackColor="rgba(42,229,185,0.2)"
+                              className="h-1.5"
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-[#728395]">
+                            <span>0.00%</span>
+                            <span>23.00%</span>
+                            <span>47.00%</span>
+                            <span>70.00%</span>
+                            <span>93.00%</span>
+                          </div>
+                        </div>
+
+                        {/* Details Section */}
+                        <div className="bg-[#040a10] rounded-lg p-6 space-y-3 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">Net APY ⚙️</span>
+                            <span className="text-white">0.00%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Current oracle price
+                            </span>
+                            <span className="text-white">
+                              $1.00{" "}
+                              <span className="text-[#a1acb8]">USDC ⇄</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Liquidation oracle price
+                            </span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Your LTV (LLTV)
+                            </span>
+                            <span className="text-white">∞ (∞)</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">Your health</span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Estimated gas fee
+                            </span>
+                            <div className="text-right">
+                              <div className="text-white">
+                                {"<0.000001 ETH"}
+                              </div>
+                              <div className="text-[#a1acb8] text-xs">
+                                {"<$0.01"}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
 
-                    {/* Trading Details/Stats Section */}
-                    <div className="bg-[#10263e] rounded-lg p-6 space-y-4 mt-4">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">ROE</span>
-                          <span className="text-white">0.00%</span>
+                    {/* Trading Details/Stats Section - Only for Multiply Tab */}
+                    {activeTab === "multiply" && (
+                      <div className="bg-[#10263e] rounded-lg p-6 space-y-4 mt-4">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">ROE</span>
+                            <span className="text-white">0.00%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Current price
+                            </span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Liquidation oracle price
+                            </span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Your LTV (LLTV)
+                            </span>
+                            <span className="text-white">
+                              ∞ <span className="text-[#a1acb8]">(∞)</span>
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">Your health</span>
+                            <span className="text-white">-</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">Current price</span>
-                          <span className="text-white">-</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">
-                            Liquidation oracle price
-                          </span>
-                          <span className="text-white">-</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">
-                            Your LTV (LLTV)
-                          </span>
-                          <span className="text-white">
-                            ∞ <span className="text-[#a1acb8]">(∞)</span>
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">Your health</span>
-                          <span className="text-white">-</span>
+
+                        <hr className="border-[#14304e]" />
+
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">Swap</span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">Price impact</span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Leveraged price impact
+                            </span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Slippage tolerance
+                            </span>
+                            <span className="text-white">0.1%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">Routed via</span>
+                            <span className="text-white">-</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-[#a1acb8]">
+                              Estimated gas fee
+                            </span>
+                            <span className="text-white">
+                              0 ETH <span className="text-[#a1acb8]">$0</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
-
-                      <hr className="border-[#14304e]" />
-
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">Swap</span>
-                          <span className="text-white">-</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">Price impact</span>
-                          <span className="text-white">-</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">
-                            Leveraged price impact
-                          </span>
-                          <span className="text-white">-</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">
-                            Slippage tolerance
-                          </span>
-                          <span className="text-white">0.1%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">Routed via</span>
-                          <span className="text-white">-</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-[#a1acb8]">
-                            Estimated gas fee
-                          </span>
-                          <span className="text-white">
-                            0 ETH <span className="text-[#a1acb8]">$0</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
