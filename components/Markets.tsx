@@ -4,11 +4,13 @@ import Image from "next/image";
 import { useState } from "react";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const { getPriceBySymbol } = useTokenPrices();
 
   // Calculate total pairs and assets
   const totalPairs = MARKET_GROUPS.reduce(
@@ -24,15 +26,34 @@ export default function Markets({ onSelectPair }: MarketsProps) {
     )
   ).size;
 
-  // Mock borrow positions for each asset (in practice, this would come from user's wallet/smart contract)
-  const borrowPositions = {
-    USDC: { amount: "1,234.56", usdValue: "$1,234.56" },
-    LBTC: { amount: "0.000161", usdValue: "$15.68" },
-    WKAIA: { amount: "523.45", usdValue: "$73.28" },
-    KAIA: { amount: "523.45", usdValue: "$73.28" },
-    "USD₮": { amount: "0", usdValue: "$0.00" },
-    USDT: { amount: "0", usdValue: "$0.00" },
+  // Mock borrow amounts with real-time price calculation
+  const borrowAmounts = {
+    USDC: "1,234.56",
+    LBTC: "0.000161",
+    WKAIA: "523.45",
+    KAIA: "523.45",
+    "USD₮": "0",
+    USDT: "0",
   };
+
+  // Calculate USD values using real prices
+  const calculateUsdValue = (symbol: string, amount: string): string => {
+    const price = getPriceBySymbol(symbol);
+    const numAmount = parseFloat(amount.replace(/,/g, ""));
+    const usdValue = price * numAmount;
+    return `$${usdValue.toFixed(2)}`;
+  };
+
+  // Dynamic borrow positions with real price calculation
+  const borrowPositions = Object.fromEntries(
+    Object.entries(borrowAmounts).map(([symbol, amount]) => [
+      symbol,
+      {
+        amount,
+        usdValue: calculateUsdValue(symbol, amount),
+      },
+    ])
+  );
 
   // Get unique debt assets from all pairs for borrow section
   // biome-ignore lint/suspicious/noExplicitAny: Market data structure is complex
