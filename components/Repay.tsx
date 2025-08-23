@@ -6,7 +6,11 @@ import NumberInput from "@/components/ui/NumberInput";
 import Slider from "@/components/ui/Slider";
 import { LAYOUT } from "@/constants/layout";
 
-export default function Repay() {
+interface RepayProps {
+  onGoBack?: () => void;
+}
+
+export default function Repay({ onGoBack }: RepayProps = {}) {
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("swap");
   const [repayPercent, setRepayPercent] = useState(0);
   const [collateralAmount, setCollateralAmount] = useState("");
@@ -34,6 +38,13 @@ export default function Repay() {
             iconBg: "from-orange-500 to-orange-600",
             imageUrl: null,
           },
+          collateralAsset: {
+            symbol: "USDC",
+            asset: "USDC",
+            icon: "$",
+            iconBg: "from-[#2775CA] to-[#1e5f9a]",
+            imageUrl: null,
+          },
         });
       }
     } else {
@@ -49,16 +60,26 @@ export default function Repay() {
           iconBg: "from-orange-500 to-orange-600",
           imageUrl: null,
         },
+        collateralAsset: {
+          symbol: "USDC",
+          asset: "USDC",
+          icon: "$",
+          iconBg: "from-[#2775CA] to-[#1e5f9a]",
+          imageUrl: null,
+        },
       });
     }
   }, []);
 
   return (
-    <div className="text-white p-6">
-      <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto`}>
-        {/* Back to position button */}
+    <div className="text-white">
+      <div
+        className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6 ${LAYOUT.CONTENT_PADDING_TOP_CLASS} pt-24`}
+      >
+        {/* Back to markets button */}
         <button
           type="button"
+          onClick={() => onGoBack?.()}
           className="flex items-center text-[#728395] hover:text-white transition-colors mb-6"
         >
           <svg
@@ -75,7 +96,7 @@ export default function Repay() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to position
+          Back to Markets
         </button>
 
         {/* Page title */}
@@ -110,44 +131,95 @@ export default function Repay() {
               </button>
             </div>
 
-            {/* Collateral to swap section - Updated design */}
-            <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-white font-medium">
-                  {activeTab === "wallet"
-                    ? "From Wallet"
-                    : "Collateral to Swap"}
-                </span>
-                <div className="flex items-center text-sm text-[#728395]">
-                  <span className="mr-2">Balance:</span>
-                  <span className="text-white font-medium">28.29 USDC</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#2775CA] to-[#1e5f9a] rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg">$</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold text-lg">USDC</div>
-                    <div className="text-[#728395] text-sm">USD Coin</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <NumberInput
-                    value={collateralAmount}
-                    onChange={setCollateralAmount}
-                    placeholder="0.00"
-                    className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
-                  />
-                  <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Debt to repay section - Updated design */}
+            {/* From wallet / Collateral to swap section - Updated design */}
             {repayAsset && (
+              <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-white font-medium">
+                    {activeTab === "wallet"
+                      ? "From Wallet"
+                      : "Collateral to Swap"}
+                  </span>
+                  <div className="flex items-center text-sm text-[#728395]">
+                    <span className="mr-2">Balance:</span>
+                    <span className="text-white font-medium">
+                      {activeTab === "wallet"
+                        ? `0 ${repayAsset.symbol}`
+                        : `28.29 ${repayAsset.collateralAsset?.symbol}`}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+                      {activeTab === "wallet" ? (
+                        // Show debt asset for wallet tab
+                        repayAsset.asset?.imageUrl ? (
+                          <Image
+                            src={repayAsset.asset.imageUrl}
+                            alt={repayAsset.symbol}
+                            width={48}
+                            height={48}
+                            className="object-cover rounded-full"
+                          />
+                        ) : (
+                          <div
+                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.asset?.iconBg || "from-orange-500 to-orange-600"}`}
+                          >
+                            <span className="text-white font-bold text-lg">
+                              {repayAsset.asset?.icon || repayAsset.symbol[0]}
+                            </span>
+                          </div>
+                        )
+                      ) : // Show collateral asset for swap tab
+                      repayAsset.collateralAsset?.imageUrl ? (
+                        <Image
+                          src={repayAsset.collateralAsset.imageUrl}
+                          alt={repayAsset.collateralAsset.symbol}
+                          width={48}
+                          height={48}
+                          className="object-cover rounded-full"
+                        />
+                      ) : (
+                        <div
+                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.collateralAsset?.iconBg || "from-[#2775CA] to-[#1e5f9a]"}`}
+                        >
+                          <span className="text-white font-bold text-lg">
+                            {repayAsset.collateralAsset?.icon ||
+                              repayAsset.collateralAsset?.symbol?.[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-lg">
+                        {activeTab === "wallet"
+                          ? repayAsset.symbol
+                          : repayAsset.collateralAsset?.symbol}
+                      </div>
+                      <div className="text-[#728395] text-sm">
+                        {activeTab === "wallet"
+                          ? repayAsset.asset?.asset || repayAsset.symbol
+                          : repayAsset.collateralAsset?.asset}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <NumberInput
+                      value={collateralAmount}
+                      onChange={setCollateralAmount}
+                      placeholder="0.00"
+                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
+                    />
+                    <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Debt to repay section - Only show for swap tab */}
+            {activeTab === "swap" && repayAsset && (
               <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-white font-medium">Debt to Repay</span>
@@ -267,26 +339,43 @@ export default function Repay() {
           <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 h-fit">
             {/* Current Position */}
             <div className="mb-6">
-              <h3 className="text-white font-semibold text-lg mb-4">
-                Position Summary
-              </h3>
-
               {/* Collateral */}
-              <div className="bg-[#08131f] rounded-lg p-4 mb-3">
-                <div className="text-[#728395] text-sm mb-2">Collateral</div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 bg-[#2775CA] rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-xs">$</span>
+              {repayAsset && (
+                <div className="bg-[#08131f] rounded-lg p-4 mb-3">
+                  <div className="text-[#728395] text-sm mb-2">Collateral</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
+                        {repayAsset.collateralAsset?.imageUrl ? (
+                          <Image
+                            src={repayAsset.collateralAsset.imageUrl}
+                            alt={repayAsset.collateralAsset.symbol}
+                            width={24}
+                            height={24}
+                            className="object-cover rounded-full"
+                          />
+                        ) : (
+                          <div
+                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.collateralAsset?.iconBg || "from-[#2775CA] to-[#1e5f9a]"}`}
+                          >
+                            <span className="text-white font-bold text-xs">
+                              {repayAsset.collateralAsset?.icon ||
+                                repayAsset.collateralAsset?.symbol?.[0]}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-semibold">
+                        {repayAsset.collateralAsset?.symbol}
+                      </span>
                     </div>
-                    <span className="font-semibold">USDC</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold">28.29</div>
-                    <div className="text-[#728395] text-xs">$28.29</div>
+                    <div className="text-right">
+                      <div className="font-semibold">28.29</div>
+                      <div className="text-[#728395] text-xs">$28.29</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Debt */}
               {repayAsset && (

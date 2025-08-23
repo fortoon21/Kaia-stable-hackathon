@@ -7,8 +7,8 @@ import { useWeb3 } from "@/lib/web3Provider";
 import WalletConnectorV2 from "./WalletConnectorV2";
 
 interface NavigationProps {
-  currentPage: "lending" | "markets" | "repay";
-  onPageChange: (page: "lending" | "markets" | "repay") => void;
+  currentPage: "lending" | "markets";
+  onPageChange: (page: "lending" | "markets") => void;
 }
 
 export default function Navigation({
@@ -42,17 +42,6 @@ export default function Navigation({
             <nav className="flex items-center space-x-6 flex-shrink-0">
               <button
                 type="button"
-                onClick={() => onPageChange("lending")}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
-                  currentPage === "lending"
-                    ? "text-[#ddfbf4] bg-[#14304e]"
-                    : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
-                }`}
-              >
-                Lending
-              </button>
-              <button
-                type="button"
                 onClick={() => onPageChange("markets")}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
                   currentPage === "markets"
@@ -64,14 +53,14 @@ export default function Navigation({
               </button>
               <button
                 type="button"
-                onClick={() => onPageChange("repay")}
+                onClick={() => onPageChange("lending")}
                 className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
-                  currentPage === "repay"
+                  currentPage === "lending"
                     ? "text-[#ddfbf4] bg-[#14304e]"
                     : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
                 }`}
               >
-                Repay
+                Lending
               </button>
             </nav>
           </div>

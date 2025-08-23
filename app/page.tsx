@@ -38,7 +38,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   const [currentPage, setCurrentPage] = useState<
     "lending" | "markets" | "repay"
-  >("lending");
+  >("markets");
   const [selectedPair, setSelectedPair] = useState<SelectedPair>({
     collateralAsset: {
       asset: "WKAIA",
@@ -149,7 +149,9 @@ export default function Home() {
               onPageChange={handlePageChange}
             />
           )}
-          {currentPage === "repay" && <Repay />}
+          {currentPage === "repay" && (
+            <Repay onGoBack={() => handlePageChange("markets")} />
+          )}
         </div>
 
         {/* Footer */}
