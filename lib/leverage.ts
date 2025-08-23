@@ -32,7 +32,7 @@ export interface CalculateMaxLeverageParams {
 
 /**
  * Calculates the maximum possible leverage for a given position and market conditions.
- * The calculation is based on the logic from the provided UI tester, using big.js for precision.
+ * Direct port from leverage_ui.html lines 578-594
  * @param params The parameters for the calculation.
  * @returns The maximum leverage multiplier, capped at 25 for safety. Returns 1 if leverage is not possible or calculation is invalid.
  */
@@ -48,71 +48,48 @@ export function calculateMaxLeverage({
   maxLTV,
 }: CalculateMaxLeverageParams): number {
   try {
-    // Convert string inputs to Big numbers
-    const pc = new Big(priceOfCollateral);
-    const pd = new Big(priceOfDebt);
-    const fl = new Big(flashloanPremium);
-    const maxLTV_dec = new Big(maxLTV);
-    const initialCollateral = new Big(initialCollateralAmount);
-    const additionalCollateral = new Big(additionalCollateralAmount);
-    const initialDebt = new Big(initialDebtAmount);
-
-    // To faithfully replicate the BigInt math from the example, we scale the decimal
-    // inputs to their fixed-point integer representations.
-    const pc_bi = pc.times(EXP18);
-    const pd_bi = pd.times(EXP18);
-    const fl_bi = fl.times(EXP18);
-    const maxLTV_bi = maxLTV_dec.times(EXP18);
-
+    // Convert inputs to Big numbers and scale to native decimals
     const collDecBI = new Big(10).pow(collateralDecimals);
     const debtDecBI = new Big(10).pow(debtDecimals);
 
-    const initialCollateralAmount_bi = initialCollateral.times(collDecBI);
-    const additionalCollateralAmount_bi = additionalCollateral.times(collDecBI);
-    const initialDebtAmount_bi = initialDebt.times(debtDecBI);
-
-    const totColl_bi = initialCollateralAmount_bi.plus(
-      additionalCollateralAmount_bi
+    const initialCollateral = new Big(initialCollateralAmount).times(collDecBI);
+    const additionalCollateral = new Big(additionalCollateralAmount).times(
+      collDecBI
     );
+    const initialDebt = new Big(initialDebtAmount).times(debtDecBI);
+    const totColl = initialCollateral.plus(additionalCollateral);
 
-    if (totColl_bi.eq(0)) {
-      return 1;
-    }
+    // Scale prices and parameters to 1e18
+    const pc = new Big(priceOfCollateral).times(EXP18);
+    const pd = new Big(priceOfDebt).times(EXP18);
+    const fl = new Big(flashloanPremium).times(EXP18);
+    const maxLTV_bi = new Big(maxLTV).times(EXP18);
 
-    // This formula is a direct translation of the BigInt logic from the UI tester's source.
-    // numerator = pc^2 * (1e18 + fl) - (pd^2 * initialDebtAmount * 1e18) / totColl
-    const term1_num = pc_bi.times(pc_bi).times(EXP18.plus(fl_bi));
-    const term2_num = pd_bi
-      .times(pd_bi)
-      .times(initialDebtAmount_bi)
-      .times(EXP18)
-      .div(totColl_bi);
-    const numerator = term1_num.minus(term2_num);
+    // Direct port from HTML lines 584-586
+    // const num1 = pc * (EXP18 + fl) * totColl * debtDecBI;
+    const num1 = pc.times(EXP18.plus(fl)).times(totColl).times(debtDecBI);
+    // const num2 = pd * initialDebtAmount * EXP18 * collDecBI;
+    const num2 = pd.times(initialDebt).times(EXP18).times(collDecBI);
+    const numerator = num1.minus(num2);
 
-    // denominator = pc^2 * (1e18 + fl - maxLTV)
-    const denominator = pc_bi
-      .times(pc_bi)
-      .times(EXP18.plus(fl_bi).minus(maxLTV_bi));
+    // const denominator = pc * totColl * (EXP18 + fl - maxLTV) * debtDecBI;
+    const denominator = pc
+      .times(totColl)
+      .times(EXP18.plus(fl).minus(maxLTV_bi))
+      .times(debtDecBI);
 
-    if (denominator.eq(0)) {
-      return 1;
-    }
+    if (denominator.eq(0)) return 1;
 
-    // maxLevBI = (numerator * 1e18) / denominator
+    // const maxLevBI = (numerator * EXP18) / denominator;
     const maxLevBI = numerator.times(EXP18).div(denominator);
-
-    // Convert back to a standard number for consumption
     const maxLev = maxLevBI.div(EXP18).toNumber();
 
-    if (!Number.isFinite(maxLev) || maxLev <= 1) {
-      return 1;
-    }
+    if (!Number.isFinite(maxLev) || maxLev <= 1) return 1;
 
-    // Cap for UI sanity, same as in original code
+    // Cap for UI sanity
     return Math.min(maxLev, 25);
   } catch (_error) {
-    // Error in calculateMaxLeverage
-    return 1; // Return a safe default value in case of input parsing errors
+    return 1;
   }
 }
 
@@ -156,7 +133,7 @@ export interface LeverageResult {
 
 /**
  * Calculates the leverage position details based on target leverage multiplier.
- * Direct port of calcLeverageParams from leverage_ui.html
+ * Direct port of calcLeverageParams from leverage_ui.html lines 691-738
  * @param params The parameters for the calculation.
  * @returns The leverage calculation results.
  */
@@ -172,94 +149,72 @@ export function calculateLeverageParams({
   flashloanPremium,
 }: CalculateLeverageParams): LeverageResult {
   try {
-    // Parse inputs to Big numbers with token decimals (exactly like HTML)
+    // Convert inputs to Big numbers with native decimals
     const collDecBI = new Big(10).pow(collateralDecimals);
     const debtDecBI = new Big(10).pow(debtDecimals);
 
-    const initialCollateralAmount_bi = new Big(initialCollateralAmount).times(
+    const initialCollateral = new Big(initialCollateralAmount).times(collDecBI);
+    const additionalCollateral = new Big(additionalCollateralAmount).times(
       collDecBI
     );
-    const initialDebtAmount_bi = new Big(initialDebtAmount).times(debtDecBI);
-    const collateralAmount_bi = new Big(additionalCollateralAmount).times(
-      collDecBI
-    );
+    const initialDebt = new Big(initialDebtAmount).times(debtDecBI);
+    const totColl = initialCollateral.plus(additionalCollateral);
 
-    // Scale prices and parameters to 1e18 (exactly like HTML)
+    // Scale prices and parameters to 1e18
     const pc = new Big(priceOfCollateral).times(EXP18);
     const pd = new Big(priceOfDebt).times(EXP18);
     const fl = new Big(flashloanPremium).times(EXP18);
     const tL = new Big(targetLeverage).times(EXP18);
 
-    const totColl = initialCollateralAmount_bi.plus(collateralAmount_bi);
-
-    // HTML formula works for all cases including initial 0,0
-    // Direct port from lines 700-712
-    // nom1 = (pc - (pd * tL) / EXP18) * initialDebtAmount * totColl
-    const nom1 = pc
-      .minus(pd.times(tL).div(EXP18))
-      .times(initialDebtAmount_bi)
-      .times(totColl);
-
-    // nom2 = ((((pc * pc * totColl) / pd) * totColl * (tL - EXP18)) / EXP18) * (EXP18 + fl) * debtDecBI / EXP18 / collDecBI
-    const nom2 = pc
+    // Direct port from HTML lines 696-703
+    // const flashloanDebtValueNeeded = ((tL - EXP18) * (collateralAmount + initialCollateralAmount) * pc * debtDecBI) / pd / EXP18 / collDecBI;
+    const flashloanDebtValueNeeded = tL
+      .minus(EXP18)
+      .times(totColl)
       .times(pc)
-      .times(totColl)
-      .div(pd.eq(0) ? new Big(1) : pd)
-      .times(totColl)
-      .times(tL.minus(EXP18))
-      .div(EXP18)
-      .times(EXP18.plus(fl))
       .times(debtDecBI)
+      .div(pd.eq(0) ? new Big(1) : pd)
       .div(EXP18)
       .div(collDecBI.eq(0) ? new Big(1) : collDecBI);
 
-    // denom = pc * ((totColl * (EXP18 + fl)) / EXP18) * debtDecBI - pd * initialDebtAmount * collDecBI
-    const denom = pc
-      .times(totColl.times(EXP18.plus(fl)).div(EXP18))
-      .times(debtDecBI)
-      .minus(pd.times(initialDebtAmount_bi).times(collDecBI));
-
-    if (denom.eq(0)) {
-      return {
-        flashloanAmount: "0",
-        ltv: "0",
-        collateralAmount: totColl.div(collDecBI).toFixed(6),
-        debtAmount: initialDebtAmount_bi.div(debtDecBI).toFixed(6),
-      };
+    if (flashloanDebtValueNeeded.lt(0)) {
+      throw new Error(
+        "Calculated flashloan debt value is negative. Target leverage is too low or initial debt too high for a leverage operation."
+      );
     }
 
-    const flashloanAmount = nom1.plus(nom2).div(denom);
-
-    // Calculate LTV from line 721-725
-    const ltvNumerator = pd
-      .times(initialDebtAmount_bi)
+    // Calculate flashloan collateral amount (line 711-712)
+    const calculatedFlashloanCollateralAmount = flashloanDebtValueNeeded
+      .times(pd)
       .times(collDecBI)
-      .plus(
-        pc
-          .times(totColl)
-          .times(tL.minus(EXP18))
-          .times(EXP18.plus(fl))
-          .times(debtDecBI)
-      );
-    const ltvDenominator = pc.times(totColl).times(tL).times(debtDecBI);
-    const ltv = ltvNumerator.div(ltvDenominator);
+      .div(pc)
+      .div(debtDecBI);
 
-    // For new positions, simplified calculation
-    // Long = initial collateral * leverage
-    // Short = flashloan amount (what we borrow)
-    const longPosition = new Big(additionalCollateralAmount).times(
-      new Big(targetLeverage)
-    );
-    const shortPosition = flashloanAmount;
+    // Adjust for premium (line 715-716) - not used in final flashloan amount
+    // const flashloanAmountWithPremium = flashloanDebtValueNeeded.times(EXP18.plus(fl)).div(EXP18);
+
+    // Calculate post-leverage amounts (line 722-726)
+    const postColl = initialCollateral
+      .plus(additionalCollateral)
+      .plus(calculatedFlashloanCollateralAmount);
+    const postDebt = initialDebt.plus(flashloanDebtValueNeeded);
+
+    // Calculate LTV (line 729-731)
+    const finalTotalCollateralValue = postColl.times(pc).div(collDecBI);
+    const finalTotalDebtValue = postDebt.times(pd).div(debtDecBI);
+    const ltv = finalTotalDebtValue
+      .times(EXP18)
+      .div(
+        finalTotalCollateralValue.eq(0) ? new Big(1) : finalTotalCollateralValue
+      );
 
     return {
-      flashloanAmount: flashloanAmount.toFixed(6),
-      ltv: ltv.toFixed(6),
-      collateralAmount: longPosition.toFixed(6), // Leveraged collateral
-      debtAmount: shortPosition.toFixed(6), // Debt amount
+      flashloanAmount: flashloanDebtValueNeeded.div(debtDecBI).toFixed(6),
+      ltv: ltv.div(EXP18).toFixed(6),
+      collateralAmount: postColl.div(collDecBI).toFixed(6),
+      debtAmount: postDebt.div(debtDecBI).toFixed(6),
     };
-  } catch (_error) {
-    // Error in calculateLeverageParams
+  } catch (error) {
     return {
       flashloanAmount: "0",
       ltv: "0",

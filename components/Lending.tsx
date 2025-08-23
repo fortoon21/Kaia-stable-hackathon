@@ -485,15 +485,20 @@ export default function Lending({ selectedPair }: LendingProps) {
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-white">
-                                {parseFloat(
-                                  leveragePosition.collateralAmount
+                                {/* Long = collateralAmount * multiplier */}
+                                {(
+                                  parseFloat(collateralAmount || "0") *
+                                  multiplier
                                 ).toFixed(2)}{" "}
                                 {selectedPair?.collateralAsset.symbol ||
                                   "PT-USDe"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
                                 {calculateUSDValue(
-                                  leveragePosition.collateralAmount,
+                                  (
+                                    parseFloat(collateralAmount || "0") *
+                                    multiplier
+                                  ).toString(),
                                   collateralPrice
                                 )}
                               </div>
@@ -526,14 +531,15 @@ export default function Lending({ selectedPair }: LendingProps) {
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-white">
+                                {/* Short = flashloan amount (borrowed debt) */}
                                 {parseFloat(
-                                  leveragePosition.debtAmount || "0"
+                                  leveragePosition.flashloanAmount || "0"
                                 ).toFixed(2)}{" "}
                                 {selectedPair?.debtAsset.symbol || "USDC"}
                               </div>
                               <div className="text-[#a1acb8] text-sm">
                                 {calculateUSDValue(
-                                  leveragePosition.debtAmount || "0",
+                                  leveragePosition.flashloanAmount || "0",
                                   debtPrice
                                 )}
                               </div>
