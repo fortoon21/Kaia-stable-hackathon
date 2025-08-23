@@ -296,91 +296,93 @@ export default function Markets({ onSelectPair }: MarketsProps) {
                       </button>
                     ))}
 
-                    {/* Borrow Section */}
+                    {/* Your Borrowed Assets - Single Row */}
                     <div className="bg-[#08131f] border-t-2 border-[#14304e]">
-                      {/* Borrow Header */}
-                      <div className="px-6 py-4 bg-gradient-to-r from-[#0c1d2f] to-[#0a1420]">
-                        <h3 className="text-[#f59e0b] font-semibold text-lg flex items-center">
-                          <svg
-                            className="w-5 h-5 mr-2"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <title>Borrowed Assets</title>
-                            <path
-                              fillRule="evenodd"
-                              d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12z"
-                              clipRule="evenodd"
-                            />
-                            <path
-                              fillRule="evenodd"
-                              d="M5 12a1 1 0 011 1v1.586l2.293-2.293a1 1 0 011.414 1.414L7.414 16H9a1 1 0 110 2H5a1 1 0 01-1-1v-4a1 1 0 011-1zm10 0a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17.586 15V13a1 1 0 011-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          Your Borrowed Assets
-                        </h3>
-                        <p className="text-[#728395] text-sm mt-1">
-                          Manage your outstanding debt positions
-                        </p>
-                      </div>
+                      {(() => {
+                        // Get the collateral asset symbol to match debt
+                        const collateralSymbol =
+                          group.tradingPairs[0]?.collateralAsset?.symbol;
+                        const matchingDebt =
+                          collateralSymbol === "WKAIA"
+                            ? "WKAIA"
+                            : collateralSymbol;
 
-                      {/* Borrow Assets List */}
-                      <div className="px-6 pb-4">
-                        {getUniqueDebtAssets(group).map((asset) => {
-                          const position = borrowPositions[
-                            asset.symbol as keyof typeof borrowPositions
-                          ] || { amount: "0", usdValue: "$0.00" };
-                          const hasDebt = position.amount !== "0";
+                        const position = borrowPositions[
+                          matchingDebt as keyof typeof borrowPositions
+                        ] || { amount: "0", usdValue: "$0.00" };
+                        const hasDebt = position.amount !== "0";
 
-                          return (
-                            <div
-                              key={`borrow-${asset.symbol}`}
-                              className="flex items-center justify-between py-3 border-b border-[#14304e]/30 last:border-b-0"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
-                                  {asset.imageUrl ? (
-                                    <Image
-                                      src={asset.imageUrl}
-                                      alt={asset.symbol}
-                                      width={40}
-                                      height={40}
-                                      className="object-cover rounded-full"
-                                    />
-                                  ) : (
-                                    <div
-                                      className="w-full h-full flex items-center justify-center rounded-full"
-                                      style={{ backgroundColor: asset.iconBg }}
-                                    >
-                                      {asset.icon}
-                                    </div>
-                                  )}
-                                </div>
-                                <div>
-                                  <div className="font-semibold">
-                                    {asset.asset}
-                                  </div>
-                                  <div className="text-[#728395] text-sm">
-                                    {asset.protocol}
-                                  </div>
-                                </div>
+                        // Get asset info for display
+                        const collateralAsset =
+                          group.tradingPairs[0]?.collateralAsset;
+
+                        return (
+                          <div className="bg-[#0a1420] px-6 py-4 border-b border-[#14304e]">
+                            <div className="flex items-center justify-between">
+                              <div className="text-[#f59e0b] flex items-center text-sm font-semibold">
+                                <svg
+                                  className="w-4 h-4 mr-2"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <title>Borrowed Assets</title>
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 110-2h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12z"
+                                    clipRule="evenodd"
+                                  />
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5 12a1 1 0 011 1v1.586l2.293-2.293a1 1 0 011.414 1.414L7.414 16H9a1 1 0 110 2H5a1 1 0 01-1-1v-4a1 1 0 011-1zm10 0a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L17.586 15V13a1 1 0 011-1z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                Your Borrowed Assets
                               </div>
 
+                              {/* Right side - Asset info and Repay button grouped */}
                               <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden">
+                                    {collateralAsset?.imageUrl ? (
+                                      <Image
+                                        src={collateralAsset.imageUrl}
+                                        alt={collateralAsset.symbol}
+                                        width={24}
+                                        height={24}
+                                        className="object-cover rounded-full"
+                                      />
+                                    ) : (
+                                      <div
+                                        className="w-full h-full flex items-center justify-center rounded-full"
+                                        style={{
+                                          backgroundColor:
+                                            collateralAsset?.iconBg,
+                                        }}
+                                      >
+                                        {collateralAsset?.icon}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="text-white font-semibold text-sm">
+                                    {collateralAsset?.symbol}
+                                  </div>
+                                </div>
+
                                 <div className="text-right">
                                   <div
-                                    className={`font-semibold ${hasDebt ? "text-[#f59e0b]" : "text-[#728395]"}`}
+                                    className={`font-semibold text-sm ${hasDebt ? "text-[#f59e0b]" : "text-[#728395]"}`}
                                   >
-                                    {position.amount} {asset.symbol}
+                                    {position.amount}
                                   </div>
-                                  <div className="text-[#728395] text-sm">
+                                  <div className="text-[#728395] text-xs">
                                     {position.usdValue}
                                   </div>
                                 </div>
+
                                 <button
                                   type="button"
-                                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                                  className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200 ${
                                     hasDebt
                                       ? "bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white hover:from-[#d97706] hover:to-[#b45309] shadow-lg hover:shadow-xl"
                                       : "bg-[#14304e] text-[#728395] cursor-not-allowed"
@@ -388,7 +390,7 @@ export default function Markets({ onSelectPair }: MarketsProps) {
                                   disabled={!hasDebt}
                                   onClick={() => {
                                     if (hasDebt) {
-                                      window.location.href = `/repay?asset=${asset.symbol}`;
+                                      window.location.href = `/repay?asset=${matchingDebt}`;
                                     }
                                   }}
                                 >
@@ -396,9 +398,9 @@ export default function Markets({ onSelectPair }: MarketsProps) {
                                 </button>
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}

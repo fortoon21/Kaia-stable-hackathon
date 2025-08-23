@@ -7,8 +7,8 @@ import { useWeb3 } from "@/lib/web3Provider";
 import WalletConnectorV2 from "./WalletConnectorV2";
 
 interface NavigationProps {
-  currentPage: "lending" | "markets" | "swap";
-  onPageChange: (page: "lending" | "markets" | "swap") => void;
+  currentPage: "lending" | "markets" | "repay";
+  onPageChange: (page: "lending" | "markets" | "repay") => void;
 }
 
 export default function Navigation({
@@ -62,31 +62,17 @@ export default function Navigation({
               >
                 Markets
               </button>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => onPageChange("swap")}
-                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap flex items-center space-x-2 ${
-                    currentPage === "swap"
-                      ? "text-[#ddfbf4] bg-[#14304e]"
-                      : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
-                  }`}
-                >
-                  <span>Swap Collateral</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <title>Swap</title>
-                    <path
-                      fillRule="evenodd"
-                      d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.707.293l2.828 2.829a1 1 0 11-1.414 1.414L13 5.414V9a1 1 0 11-2 0V5.414L9.879 6.536a1 1 0 01-1.414-1.414l2.828-2.829A1 1 0 0112 2zm0 10a1 1 0 01.707.293l2.828 2.829a1 1 0 11-1.414 1.414L13 15.414V19a1 1 0 11-2 0v-3.586l-1.121 1.122a1 1 0 01-1.414-1.414l2.828-2.829A1 1 0 0112 12z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => onPageChange("repay")}
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
+                  currentPage === "repay"
+                    ? "text-[#ddfbf4] bg-[#14304e]"
+                    : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
+                }`}
+              >
+                Repay
+              </button>
             </nav>
           </div>
 
