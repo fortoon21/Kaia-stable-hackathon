@@ -344,14 +344,14 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 const hasDebt = position.amount !== "0";
 
                                 return (
-                                  <button
-                                    type="button"
-                                    className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200 ${
+                                  <div
+                                    className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200 cursor-pointer ${
                                       hasDebt
                                         ? "bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white hover:from-[#d97706] hover:to-[#b45309] shadow-lg hover:shadow-xl"
                                         : "bg-[#14304e] text-[#728395] cursor-not-allowed"
                                     }`}
-                                    disabled={!hasDebt}
+                                    role="button"
+                                    tabIndex={hasDebt ? 0 : -1}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (hasDebt && onPageChange) {
@@ -371,9 +371,33 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                         onPageChange("repay");
                                       }
                                     }}
+                                    onKeyDown={(e) => {
+                                      if (
+                                        (e.key === "Enter" || e.key === " ") &&
+                                        hasDebt
+                                      ) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (onPageChange) {
+                                          const repayAssetInfo = {
+                                            symbol: debtAsset,
+                                            amount: position.amount,
+                                            usdValue: position.usdValue,
+                                            asset: pair.debtAsset,
+                                            collateralAsset:
+                                              pair.collateralAsset,
+                                          };
+                                          localStorage.setItem(
+                                            "repayAsset",
+                                            JSON.stringify(repayAssetInfo)
+                                          );
+                                          onPageChange("repay");
+                                        }
+                                      }
+                                    }}
                                   >
                                     {hasDebt ? "Repay" : "No Debt"}
-                                  </button>
+                                  </div>
                                 );
                               })()}
                             </div>
