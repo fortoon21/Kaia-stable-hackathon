@@ -1,19 +1,87 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MarketStatsOverview } from "@/components/markets/MarketStatsOverview";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
+import { TOKEN_DECIMALS } from "@/constants/tokens";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useMarketCalculations } from "@/hooks/useMarketCalculations";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
+import { calculateMaxLeverage } from "@/lib/leverage";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
-  const { getSupplyAPY, getBorrowAPY, getLTV, getLLTV, getLiquidity, getTotalLiquidity } = useAaveData();
-  const { calculateBorrowPositions, getPositionData } = useMarketCalculations();
+  const { getSupplyAPY, getBorrowAPY, getLTV, getLLTV, getLiquidity, getTotalLiquidity, getFlashloanPremium } = useAaveData();
+  const { calculateBorrowPositions, getPositionData, getPriceBySymbol } = useMarketCalculations();
+  const { loading: pricesLoading } = useTokenPrices();
+
+  // Get all unique pairs for calculation
+  const allPairs = MARKET_GROUPS.flatMap(group => group.tradingPairs);
+
+  // Calculate max multipliers for all pairs
+  const maxMultipliers = useMemo(() => {
+    const multipliers: Record<string, number> = {};
+    
+    // Wait for all data to be ready
+    if (pricesLoading) {
+      return multipliers; // Return empty object while loading
+    }
+    
+    const flashloanPremium = getFlashloanPremium();
+    if (!flashloanPremium) {
+      return multipliers; // Return empty object while loading
+    }
+    
+    for (const pair of allPairs) {
+      const pairKey = `${pair.collateralAsset.symbol}-${pair.debtAsset.symbol}`;
+      
+      try {
+        const ltv = getLTV(pair.collateralAsset.symbol);
+        
+        if (!ltv) {
+          multipliers[pairKey] = 1; // Default fallback
+          continue;
+        }
+        
+        // Get actual prices for this specific pair
+        const collateralPrice = getPriceBySymbol(pair.collateralAsset.symbol);
+        const debtPrice = getPriceBySymbol(pair.debtAsset.symbol);
+        
+        if (collateralPrice === 0 || debtPrice === 0) {
+          multipliers[pairKey] = 1; // Default fallback
+          continue;
+        }
+        
+        // Convert LTV percentage to decimal (e.g., "20.00%" -> "0.20")
+        const ltvDecimal = (parseFloat(ltv.replace('%', '')) / 100).toString();
+        
+        const collateralDecimals = TOKEN_DECIMALS[pair.collateralAsset.symbol] || 18;
+        const debtDecimals = TOKEN_DECIMALS[pair.debtAsset.symbol] || 6;
+        
+        const maxLeverage = calculateMaxLeverage({
+          collateralDecimals,
+          debtDecimals,
+          initialCollateralAmount: "0",
+          initialDebtAmount: "0", 
+          additionalCollateralAmount: "1",
+          priceOfCollateral: collateralPrice.toString(),
+          priceOfDebt: debtPrice.toString(),
+          flashloanPremium,
+          maxLTV: ltvDecimal,
+        });
+        
+        multipliers[pairKey] = maxLeverage;
+      } catch (error) {
+        multipliers[pairKey] = 1; // Fallback
+      }
+    }
+    
+    return multipliers;
+  }, [allPairs, getFlashloanPremium, getLTV, getPriceBySymbol, pricesLoading]);
 
   // Calculate total pairs and assets
   const totalPairs = MARKET_GROUPS.reduce(
@@ -256,7 +324,17 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Max Multiplier */}
                             <div className="text-right">
                               <div className="font-semibold">
-                                {pair.maxMultiplier}
+                                {(() => {
+                                  const pairKey = `${pair.collateralAsset.symbol}-${pair.debtAsset.symbol}`;
+                                  const maxLev = maxMultipliers[pairKey];
+                                  
+                                  // Show loading state while data is not ready
+                                  if (pricesLoading || !getFlashloanPremium()) {
+                                    return "Loading...";
+                                  }
+                                  
+                                  return maxLev && maxLev > 1 ? `${maxLev.toFixed(2)}x` : "-";
+                                })()}
                               </div>
                             </div>
 

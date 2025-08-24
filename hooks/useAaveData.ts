@@ -9,10 +9,10 @@ import { getTokenAddress } from "@/utils/tokenHelpers";
 
 /**
  * Custom hook for fetching and formatting Aave V3 data
- * Provides real-time APY, LLTV, and liquidity data
+ * Provides real-time APY, LLTV, liquidity data, and flashloan premium
  */
 export function useAaveData() {
-  const { aaveParamsV3Index, aaveStatesV3 } = useWeb3();
+  const { aaveParamsV3Index, aaveStatesV3, aaveParamsV3 } = useWeb3();
 
   /**
    * Get Supply APY for a collateral asset
@@ -57,6 +57,42 @@ export function useAaveData() {
     if (!param?.[8]) return null;
 
     return toPercentFromBps(param[8]);
+  };
+
+  /**
+   * Get flashloan premium from Aave V3 protocol
+   * Returns as decimal string (e.g., "0.0009" for 9 bps)
+   */
+  const getFlashloanPremium = (): string | null => {
+    if (!aaveParamsV3) return null;
+
+    try {
+      let root: unknown = aaveParamsV3;
+      
+      // Handle nested response structure
+      if (
+        typeof aaveParamsV3 === "object" &&
+        aaveParamsV3 !== null &&
+        "response" in (aaveParamsV3 as Record<string, unknown>)
+      ) {
+        root = (aaveParamsV3 as Record<string, unknown>).response;
+      }
+
+      const params = root as { flashloanPremium?: bigint | number | string };
+      if (!params?.flashloanPremium) return null;
+
+      // Convert from basis points to decimal with proper precision
+      const premium = typeof params.flashloanPremium === "bigint" 
+        ? Number(params.flashloanPremium) 
+        : Number(params.flashloanPremium);
+      
+      
+      // Convert from basis points and format to 4 decimal places (e.g., 9 bps = 0.0009)
+      const decimalValue = premium / 10000;
+      return decimalValue.toFixed(4);
+    } catch (error) {
+      return null;
+    }
   };
 
   /**
@@ -165,5 +201,6 @@ export function useAaveData() {
     getLLTV,
     getLiquidity,
     getTotalLiquidity,
+    getFlashloanPremium,
   };
 }
