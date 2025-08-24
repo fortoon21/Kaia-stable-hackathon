@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
+import { useAaveData } from "@/hooks/useAaveData";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useWeb3 } from "@/lib/web3Provider";
@@ -20,8 +21,26 @@ export default function Lending({ selectedPair }: LendingProps) {
   const [multiplierInput, setMultiplierInput] = useState("1.00");
   const { isConnected } = useWeb3();
   const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
-  const { maxLeverage, leveragePosition, collateralPrice, debtPrice, isReady } =
+  const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
     useLeverageCalculations(selectedPair, collateralAmount, multiplier);
+  const {
+    getSupplyAPY,
+    getBorrowAPY,
+    getLTV,
+    getLLTV,
+    getLiquidity,
+    getMaxROE,
+  } = useAaveData();
+
+  // Calculate real max multiplier from Markets logic
+  const realMaxMultiplier = selectedPair?.collateralAsset?.symbol
+    ? (() => {
+        const ltv = getLTV(selectedPair.collateralAsset.symbol);
+        if (!ltv) return maxLeverage; // fallback to leverage calculation
+        const ltvDecimal = parseFloat(ltv.replace("%", "")) / 100;
+        return ltvDecimal >= 1 ? 1 : 1 / (1 - ltvDecimal);
+      })()
+    : maxLeverage;
 
   return (
     <div
@@ -150,7 +169,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:22"
                 >
                   <p className="block leading-[42.67px]">
-                    {selectedPair?.liquidity?.replace("$", "") || "22.84M"}
+                    {selectedPair?.debtAsset?.symbol
+                      ? getLiquidity(selectedPair.debtAsset.symbol)?.usdValue?.replace("$", "") || "22.84M"
+                      : "22.84M"}
                   </p>
                 </div>
                 <div
@@ -158,7 +179,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:23"
                 >
                   <p className="block leading-[20px]">
-                    {selectedPair?.liquidity?.replace("$", "") || "22.85M"}{" "}
+                    {selectedPair?.debtAsset?.symbol
+                      ? getLiquidity(selectedPair.debtAsset.symbol)?.amount || "22.85M"
+                      : "22.85M"}{" "}
                     {selectedPair?.debtAsset.symbol || "USDC"}
                   </p>
                 </div>
@@ -179,7 +202,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:26"
                 >
                   <p className="block leading-[42.67px]">
-                    {maxLeverage > 1 ? maxLeverage.toFixed(2) : "--"}
+                    {realMaxMultiplier > 1 ? realMaxMultiplier.toFixed(2) : "--"}
                   </p>
                 </div>
                 <div
@@ -207,7 +230,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:30"
                 >
                   <p className="block leading-[42.67px]">
-                    {selectedPair?.maxROE?.replace("%", "") || "39.41"}
+                    {selectedPair?.collateralAsset?.symbol && selectedPair?.debtAsset?.symbol
+                      ? getMaxROE(selectedPair.collateralAsset.symbol, selectedPair.debtAsset.symbol)?.replace("%", "") || "39.41"
+                      : "39.41"}
                   </p>
                 </div>
                 <div
@@ -400,7 +425,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                                     if (!Number.isNaN(numValue)) {
                                       const clampedValue = Math.max(
                                         1,
-                                        Math.min(maxLeverage, numValue)
+                                        Math.min(realMaxMultiplier, numValue)
                                       );
                                       setMultiplier(clampedValue);
                                     }
@@ -419,7 +444,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                                   if (!Number.isNaN(numValue)) {
                                     const clampedValue = Math.max(
                                       1,
-                                      Math.min(maxLeverage, numValue)
+                                      Math.min(realMaxMultiplier, numValue)
                                     );
                                     setMultiplier(clampedValue);
                                     setMultiplierInput(clampedValue.toFixed(2));
@@ -436,7 +461,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                         <div className="relative mb-4">
                           <Slider
                             min={1}
-                            max={maxLeverage}
+                            max={realMaxMultiplier}
                             step={0.01}
                             value={multiplier}
                             onChange={(value) => {
@@ -450,25 +475,25 @@ export default function Lending({ selectedPair }: LendingProps) {
                         <div className="flex justify-between text-xs text-[#728395]">
                           <span>1.00X</span>
                           <span className="text-[#435971]">
-                            {isReady
-                              ? ((maxLeverage - 1) * 0.25 + 1).toFixed(2)
+                            {realMaxMultiplier > 1
+                              ? ((realMaxMultiplier - 1) * 0.25 + 1).toFixed(2)
                               : "-.-"}
                             X
                           </span>
                           <span>
-                            {isReady
-                              ? ((maxLeverage - 1) * 0.5 + 1).toFixed(2)
+                            {realMaxMultiplier > 1
+                              ? ((realMaxMultiplier - 1) * 0.5 + 1).toFixed(2)
                               : "-.-"}
                             X
                           </span>
                           <span className="text-[#435971]">
-                            {isReady
-                              ? ((maxLeverage - 1) * 0.75 + 1).toFixed(2)
+                            {realMaxMultiplier > 1
+                              ? ((realMaxMultiplier - 1) * 0.75 + 1).toFixed(2)
                               : "-.-"}
                             X
                           </span>
                           <span>
-                            Max ({isReady ? maxLeverage.toFixed(2) : "-.-"}X)
+                            Max ({realMaxMultiplier > 1 ? realMaxMultiplier.toFixed(2) : "-.-"}X)
                           </span>
                         </div>
                       </div>
@@ -1029,7 +1054,14 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Supply APY
                       </div>
                       <div className="text-white text-lg font-medium">
-                        {selectedPair?.supplyAPY || "13.45%"}
+                        {bottomTab === "collateral" 
+                          ? (selectedPair?.collateralAsset?.symbol
+                              ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "13.45%"
+                              : "13.45%")
+                          : (selectedPair?.debtAsset?.symbol
+                              ? getSupplyAPY(selectedPair.debtAsset.symbol) || "13.45%"
+                              : "13.45%")
+                        }
                       </div>
                     </div>
 
@@ -1038,7 +1070,14 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Borrow APY
                       </div>
                       <div className="text-white text-lg font-medium">
-                        {selectedPair?.borrowAPY || "9.90%"}
+                        {bottomTab === "collateral" 
+                          ? (selectedPair?.collateralAsset?.symbol
+                              ? getBorrowAPY(selectedPair.collateralAsset.symbol) || "9.90%"
+                              : "9.90%")
+                          : (selectedPair?.debtAsset?.symbol
+                              ? getBorrowAPY(selectedPair.debtAsset.symbol) || "9.90%"
+                              : "9.90%")
+                        }
                       </div>
                     </div>
                   </div>
@@ -1048,20 +1087,27 @@ export default function Lending({ selectedPair }: LendingProps) {
                       <div className="text-[#728395] text-sm mb-2">
                         Correlated assets
                       </div>
-                      <div className="text-white text-lg">Yes</div>
+                      <div className="text-white text-lg">
+                        {selectedPair?.collateralAsset?.symbol === "WKAIA" || 
+                         selectedPair?.debtAsset?.symbol === "WKAIA" ? "No" : "Yes"}
+                      </div>
                     </div>
 
                     <div>
                       <div className="text-[#728395] text-sm mb-2">Max LTV</div>
                       <div className="text-white text-lg font-medium">
-                        88.00%
+                        {selectedPair?.collateralAsset?.symbol
+                          ? getLTV(selectedPair.collateralAsset.symbol) || "88.00%"
+                          : "88.00%"}
                       </div>
                     </div>
 
                     <div>
                       <div className="text-[#728395] text-sm mb-2">LLTV</div>
                       <div className="text-white text-lg font-medium">
-                        {selectedPair?.lltv || "90.00%"}
+                        {selectedPair?.collateralAsset?.symbol
+                          ? getLLTV(selectedPair.collateralAsset.symbol) || "90.00%"
+                          : "90.00%"}
                       </div>
                     </div>
                   </div>
@@ -1108,23 +1154,38 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Available liquidity
                         </div>
                         <div className="text-white text-lg font-medium">
-                          {selectedPair?.liquidity || "$506.7K"}
+                          {selectedPair?.debtAsset?.symbol
+                            ? getLiquidity(selectedPair.debtAsset.symbol)?.usdValue || "$506.7K"
+                            : "$506.7K"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
-                          {selectedPair?.liquidityAmount}{" "}
-                          {selectedPair?.liquidityToken}
+                          {selectedPair?.debtAsset?.symbol
+                            ? getLiquidity(selectedPair.debtAsset.symbol)?.amount
+                            : selectedPair?.liquidityAmount}{" "}
+                          {selectedPair?.debtAsset?.symbol || selectedPair?.liquidityToken}
                         </div>
                       </div>
                     </div>
 
-                    {/* Second row - Supply APY, Borrow APY, Utilization */}
+                    {/* Second row - Supply APY, Borrow APY, Empty */}
                     <div className="grid grid-cols-3 gap-8">
                       <div>
                         <div className="text-[#728395] text-sm mb-2">
                           Supply APY
                         </div>
                         <div className="text-[#2ae5b9] text-lg font-medium">
-                          {selectedPair?.supplyAPY || "8.83%"}
+                          {bottomTab === "pair"
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "8.83%"
+                                : "8.83%")
+                            : bottomTab === "collateral" 
+                              ? (selectedPair?.collateralAsset?.symbol
+                                  ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "8.83%"
+                                  : "8.83%")
+                              : (selectedPair?.debtAsset?.symbol
+                                  ? getSupplyAPY(selectedPair.debtAsset.symbol) || "8.83%"
+                                  : "8.83%")
+                          }
                         </div>
                       </div>
 
@@ -1133,17 +1194,23 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Borrow APY
                         </div>
                         <div className="text-orange-400 text-lg font-medium">
-                          {selectedPair?.borrowAPY || "5.40%"}
+                          {bottomTab === "pair"
+                            ? (selectedPair?.debtAsset?.symbol
+                                ? getBorrowAPY(selectedPair.debtAsset.symbol) || "5.40%"
+                                : "5.40%")
+                            : bottomTab === "collateral" 
+                              ? (selectedPair?.collateralAsset?.symbol
+                                  ? getBorrowAPY(selectedPair.collateralAsset.symbol) || "5.40%"
+                                  : "5.40%")
+                              : (selectedPair?.debtAsset?.symbol
+                                  ? getBorrowAPY(selectedPair.debtAsset.symbol) || "5.40%"
+                                  : "5.40%")
+                          }
                         </div>
                       </div>
 
                       <div>
-                        <div className="text-[#728395] text-sm mb-2">
-                          Utilization
-                        </div>
-                        <div className="text-white text-lg font-medium">
-                          {bottomTab === "collateral" ? "82.1%" : "72.3%"}
-                        </div>
+                        {/* Empty space for alignment */}
                       </div>
                     </div>
                   </div>
