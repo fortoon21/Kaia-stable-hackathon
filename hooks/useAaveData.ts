@@ -247,13 +247,15 @@ export function useAaveData() {
   /**
    * Get Total Supply for a token (Total Borrowed + Available Liquidity)
    */
-  const getTotalSupply = (tokenSymbol: string): {
+  const getTotalSupply = (
+    tokenSymbol: string
+  ): {
     amount: string | null;
     usdValue: string | null;
   } => {
     const totalBorrowed = getTotalBorrowed(tokenSymbol);
     const availableLiquidity = getLiquidity(tokenSymbol);
-    
+
     if (!totalBorrowed.amount || !availableLiquidity.amount) {
       return { amount: null, usdValue: null };
     }
@@ -261,30 +263,49 @@ export function useAaveData() {
     try {
       // Parse amounts (remove commas and convert to numbers)
       const borrowedAmount = parseFloat(totalBorrowed.amount.replace(/,/g, ""));
-      const liquidityAmount = parseFloat(availableLiquidity.amount.replace(/,/g, ""));
-      
+      const liquidityAmount = parseFloat(
+        availableLiquidity.amount.replace(/,/g, "")
+      );
+
       // Calculate total supply
       const totalSupplyAmount = borrowedAmount + liquidityAmount;
       const formattedAmount = totalSupplyAmount.toLocaleString();
-      
+
       // Calculate USD value
-      const borrowedUsd = totalBorrowed.usdValue ? parseFloat(totalBorrowed.usdValue.replace(/[$,KM]/g, "")) : 0;
-      const liquidityUsd = availableLiquidity.usdValue ? parseFloat(availableLiquidity.usdValue.replace(/[$,KM]/g, "")) : 0;
-      
+      const borrowedUsd = totalBorrowed.usdValue
+        ? parseFloat(totalBorrowed.usdValue.replace(/[$,KM]/g, ""))
+        : 0;
+      const liquidityUsd = availableLiquidity.usdValue
+        ? parseFloat(availableLiquidity.usdValue.replace(/[$,KM]/g, ""))
+        : 0;
+
       // Handle K/M suffixes
-      const borrowedMultiplier = totalBorrowed.usdValue?.includes("M") ? 1000000 : 
-                                totalBorrowed.usdValue?.includes("K") ? 1000 : 1;
-      const liquidityMultiplier = availableLiquidity.usdValue?.includes("M") ? 1000000 : 
-                                 availableLiquidity.usdValue?.includes("K") ? 1000 : 1;
-      
-      const totalUsdValue = (borrowedUsd * borrowedMultiplier) + (liquidityUsd * liquidityMultiplier);
-      const formattedUsdValue = totalUsdValue >= 1000000 ? `$${(totalUsdValue / 1000000).toFixed(2)}M` :
-                               totalUsdValue >= 1000 ? `$${(totalUsdValue / 1000).toFixed(1)}K` :
-                               `$${totalUsdValue.toFixed(2)}`;
+      const borrowedMultiplier = totalBorrowed.usdValue?.includes("M")
+        ? 1000000
+        : totalBorrowed.usdValue?.includes("K")
+          ? 1000
+          : 1;
+      const liquidityMultiplier = availableLiquidity.usdValue?.includes("M")
+        ? 1000000
+        : availableLiquidity.usdValue?.includes("K")
+          ? 1000
+          : 1;
+
+      const totalUsdValue =
+        borrowedUsd * borrowedMultiplier + liquidityUsd * liquidityMultiplier;
+      const formattedUsdValue =
+        totalUsdValue >= 1000000
+          ? `$${(totalUsdValue / 1000000).toFixed(2)}M`
+          : totalUsdValue >= 1000
+            ? `$${(totalUsdValue / 1000).toFixed(1)}K`
+            : `$${totalUsdValue.toFixed(2)}`;
 
       return { amount: formattedAmount, usdValue: formattedUsdValue };
     } catch (error) {
-      console.error(`Error calculating total supply for ${tokenSymbol}:`, error);
+      console.error(
+        `Error calculating total supply for ${tokenSymbol}:`,
+        error
+      );
       return { amount: null, usdValue: null };
     }
   };
@@ -292,7 +313,9 @@ export function useAaveData() {
   /**
    * Get Total Borrowed for a token from debtToken totalSupply in aaveStatesV3
    */
-  const getTotalBorrowed = (tokenSymbol: string): {
+  const getTotalBorrowed = (
+    tokenSymbol: string
+  ): {
     amount: string | null;
     usdValue: string | null;
   } => {
@@ -319,7 +342,10 @@ export function useAaveData() {
     // Format the amount using correct decimals
     const amount = formatLiquidity(totalBorrowedBigInt, tokenSymbol);
     const originalTokenAddr = getTokenAddress(tokenSymbol);
-    const usdValue = amount && originalTokenAddr ? formatUsdValue(amount, originalTokenAddr) : null;
+    const usdValue =
+      amount && originalTokenAddr
+        ? formatUsdValue(amount, originalTokenAddr)
+        : null;
 
     return { amount, usdValue };
   };

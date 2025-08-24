@@ -172,7 +172,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                 >
                   <p className="block leading-[42.67px]">
                     {selectedPair?.debtAsset?.symbol
-                      ? getLiquidity(selectedPair.debtAsset.symbol)?.usdValue?.replace("$", "") || "22.84M"
+                      ? getLiquidity(
+                          selectedPair.debtAsset.symbol
+                        )?.usdValue?.replace("$", "") || "22.84M"
                       : "22.84M"}
                   </p>
                 </div>
@@ -182,7 +184,8 @@ export default function Lending({ selectedPair }: LendingProps) {
                 >
                   <p className="block leading-[20px]">
                     {selectedPair?.debtAsset?.symbol
-                      ? getLiquidity(selectedPair.debtAsset.symbol)?.amount || "22.85M"
+                      ? getLiquidity(selectedPair.debtAsset.symbol)?.amount ||
+                        "22.85M"
                       : "22.85M"}{" "}
                     {selectedPair?.debtAsset.symbol || "USDC"}
                   </p>
@@ -204,7 +207,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:26"
                 >
                   <p className="block leading-[42.67px]">
-                    {realMaxMultiplier > 1 ? realMaxMultiplier.toFixed(2) : "--"}
+                    {realMaxMultiplier > 1
+                      ? realMaxMultiplier.toFixed(2)
+                      : "--"}
                   </p>
                 </div>
                 <div
@@ -232,8 +237,12 @@ export default function Lending({ selectedPair }: LendingProps) {
                   data-node-id="1:30"
                 >
                   <p className="block leading-[42.67px]">
-                    {selectedPair?.collateralAsset?.symbol && selectedPair?.debtAsset?.symbol
-                      ? getMaxROE(selectedPair.collateralAsset.symbol, selectedPair.debtAsset.symbol)?.replace("%", "") || "39.41"
+                    {selectedPair?.collateralAsset?.symbol &&
+                    selectedPair?.debtAsset?.symbol
+                      ? getMaxROE(
+                          selectedPair.collateralAsset.symbol,
+                          selectedPair.debtAsset.symbol
+                        )?.replace("%", "") || "39.41"
                       : "39.41"}
                   </p>
                 </div>
@@ -495,7 +504,11 @@ export default function Lending({ selectedPair }: LendingProps) {
                             X
                           </span>
                           <span>
-                            Max ({realMaxMultiplier > 1 ? realMaxMultiplier.toFixed(2) : "-.-"}X)
+                            Max (
+                            {realMaxMultiplier > 1
+                              ? realMaxMultiplier.toFixed(2)
+                              : "-.-"}
+                            X)
                           </span>
                         </div>
                       </div>
@@ -1056,14 +1069,16 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Supply APY
                       </div>
                       <div className="text-white text-lg font-medium">
-                        {bottomTab === "collateral" 
-                          ? (selectedPair?.collateralAsset?.symbol
-                              ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "13.45%"
-                              : "13.45%")
-                          : (selectedPair?.debtAsset?.symbol
-                              ? getSupplyAPY(selectedPair.debtAsset.symbol) || "13.45%"
-                              : "13.45%")
-                        }
+                        {bottomTab === "collateral"
+                          ? selectedPair?.collateralAsset?.symbol
+                            ? getSupplyAPY(
+                                selectedPair.collateralAsset.symbol
+                              ) || "13.45%"
+                            : "13.45%"
+                          : selectedPair?.debtAsset?.symbol
+                            ? getSupplyAPY(selectedPair.debtAsset.symbol) ||
+                              "13.45%"
+                            : "13.45%"}
                       </div>
                     </div>
 
@@ -1072,14 +1087,16 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Borrow APY
                       </div>
                       <div className="text-white text-lg font-medium">
-                        {bottomTab === "collateral" 
-                          ? (selectedPair?.collateralAsset?.symbol
-                              ? getBorrowAPY(selectedPair.collateralAsset.symbol) || "9.90%"
-                              : "9.90%")
-                          : (selectedPair?.debtAsset?.symbol
-                              ? getBorrowAPY(selectedPair.debtAsset.symbol) || "9.90%"
-                              : "9.90%")
-                        }
+                        {bottomTab === "collateral"
+                          ? selectedPair?.collateralAsset?.symbol
+                            ? getBorrowAPY(
+                                selectedPair.collateralAsset.symbol
+                              ) || "9.90%"
+                            : "9.90%"
+                          : selectedPair?.debtAsset?.symbol
+                            ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
+                              "9.90%"
+                            : "9.90%"}
                       </div>
                     </div>
                   </div>
@@ -1090,8 +1107,10 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Correlated assets
                       </div>
                       <div className="text-white text-lg">
-                        {selectedPair?.collateralAsset?.symbol === "WKAIA" || 
-                         selectedPair?.debtAsset?.symbol === "WKAIA" ? "No" : "Yes"}
+                        {selectedPair?.collateralAsset?.symbol === "WKAIA" ||
+                        selectedPair?.debtAsset?.symbol === "WKAIA"
+                          ? "No"
+                          : "Yes"}
                       </div>
                     </div>
 
@@ -1099,7 +1118,8 @@ export default function Lending({ selectedPair }: LendingProps) {
                       <div className="text-[#728395] text-sm mb-2">Max LTV</div>
                       <div className="text-white text-lg font-medium">
                         {selectedPair?.collateralAsset?.symbol
-                          ? getLTV(selectedPair.collateralAsset.symbol) || "88.00%"
+                          ? getLTV(selectedPair.collateralAsset.symbol) ||
+                            "88.00%"
                           : "88.00%"}
                       </div>
                     </div>
@@ -1108,7 +1128,8 @@ export default function Lending({ selectedPair }: LendingProps) {
                       <div className="text-[#728395] text-sm mb-2">LLTV</div>
                       <div className="text-white text-lg font-medium">
                         {selectedPair?.collateralAsset?.symbol
-                          ? getLLTV(selectedPair.collateralAsset.symbol) || "90.00%"
+                          ? getLLTV(selectedPair.collateralAsset.symbol) ||
+                            "90.00%"
                           : "90.00%"}
                       </div>
                     </div>
@@ -1129,23 +1150,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                         <div className="text-white text-lg font-medium">
                           {bottomTab === "collateral"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? getTotalSupply(selectedPair.collateralAsset.symbol)?.usdValue || "$2.85M"
-                                : "$2.85M")
-                            : (selectedPair?.debtAsset?.symbol
-                                ? getTotalSupply(selectedPair.debtAsset.symbol)?.usdValue || "$1.24M"
-                                : "$1.24M")
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? getTotalSupply(
+                                  selectedPair.collateralAsset.symbol
+                                )?.usdValue || "$2.85M"
+                              : "$2.85M"
+                            : selectedPair?.debtAsset?.symbol
+                              ? getTotalSupply(selectedPair.debtAsset.symbol)
+                                  ?.usdValue || "$1.24M"
+                              : "$1.24M"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? `${getTotalSupply(selectedPair.collateralAsset.symbol)?.amount || "20,357,142"} ${selectedPair.collateralAsset.symbol}`
-                                : `20,357,142 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`)
-                            : (selectedPair?.debtAsset?.symbol
-                                ? `${getTotalSupply(selectedPair.debtAsset.symbol)?.amount || "1,240,000"} ${selectedPair.debtAsset.symbol}`
-                                : `1,240,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`)
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? `${getTotalSupply(selectedPair.collateralAsset.symbol)?.amount || "20,357,142"} ${selectedPair.collateralAsset.symbol}`
+                              : `20,357,142 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`
+                            : selectedPair?.debtAsset?.symbol
+                              ? `${getTotalSupply(selectedPair.debtAsset.symbol)?.amount || "1,240,000"} ${selectedPair.debtAsset.symbol}`
+                              : `1,240,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`}
                         </div>
                       </div>
 
@@ -1155,23 +1177,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                         <div className="text-white text-lg font-medium">
                           {bottomTab === "collateral"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? getTotalBorrowed(selectedPair.collateralAsset.symbol)?.usdValue || "$2.34M"
-                                : "$2.34M")
-                            : (selectedPair?.debtAsset?.symbol
-                                ? getTotalBorrowed(selectedPair.debtAsset.symbol)?.usdValue || "$896K"
-                                : "$896K")
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? getTotalBorrowed(
+                                  selectedPair.collateralAsset.symbol
+                                )?.usdValue || "$2.34M"
+                              : "$2.34M"
+                            : selectedPair?.debtAsset?.symbol
+                              ? getTotalBorrowed(selectedPair.debtAsset.symbol)
+                                  ?.usdValue || "$896K"
+                              : "$896K"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? `${getTotalBorrowed(selectedPair.collateralAsset.symbol)?.amount || "16,714,285"} ${selectedPair.collateralAsset.symbol}`
-                                : `16,714,285 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`)
-                            : (selectedPair?.debtAsset?.symbol
-                                ? `${getTotalBorrowed(selectedPair.debtAsset.symbol)?.amount || "896,000"} ${selectedPair.debtAsset.symbol}`
-                                : `896,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`)
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? `${getTotalBorrowed(selectedPair.collateralAsset.symbol)?.amount || "16,714,285"} ${selectedPair.collateralAsset.symbol}`
+                              : `16,714,285 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`
+                            : selectedPair?.debtAsset?.symbol
+                              ? `${getTotalBorrowed(selectedPair.debtAsset.symbol)?.amount || "896,000"} ${selectedPair.debtAsset.symbol}`
+                              : `896,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`}
                         </div>
                       </div>
 
@@ -1181,23 +1204,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                         <div className="text-white text-lg font-medium">
                           {bottomTab === "collateral"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? getLiquidity(selectedPair.collateralAsset.symbol)?.usdValue || "$506.7K"
-                                : "$506.7K")
-                            : (selectedPair?.debtAsset?.symbol
-                                ? getLiquidity(selectedPair.debtAsset.symbol)?.usdValue || "$506.7K"
-                                : "$506.7K")
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? getLiquidity(
+                                  selectedPair.collateralAsset.symbol
+                                )?.usdValue || "$506.7K"
+                              : "$506.7K"
+                            : selectedPair?.debtAsset?.symbol
+                              ? getLiquidity(selectedPair.debtAsset.symbol)
+                                  ?.usdValue || "$506.7K"
+                              : "$506.7K"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? `${getLiquidity(selectedPair.collateralAsset.symbol)?.amount || "506.7K"} ${selectedPair.collateralAsset.symbol}`
-                                : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "WKAIA"}`)
-                            : (selectedPair?.debtAsset?.symbol
-                                ? `${getLiquidity(selectedPair.debtAsset.symbol)?.amount || "506.7K"} ${selectedPair.debtAsset.symbol}`
-                                : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "USDT"}`)
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? `${getLiquidity(selectedPair.collateralAsset.symbol)?.amount || "506.7K"} ${selectedPair.collateralAsset.symbol}`
+                              : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "WKAIA"}`
+                            : selectedPair?.debtAsset?.symbol
+                              ? `${getLiquidity(selectedPair.debtAsset.symbol)?.amount || "506.7K"} ${selectedPair.debtAsset.symbol}`
+                              : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "USDT"}`}
                         </div>
                       </div>
                     </div>
@@ -1210,17 +1234,21 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                         <div className="text-[#2ae5b9] text-lg font-medium">
                           {bottomTab === "pair"
-                            ? (selectedPair?.collateralAsset?.symbol
-                                ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "8.83%"
-                                : "8.83%")
-                            : bottomTab === "collateral" 
-                              ? (selectedPair?.collateralAsset?.symbol
-                                  ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "8.83%"
-                                  : "8.83%")
-                              : (selectedPair?.debtAsset?.symbol
-                                  ? getSupplyAPY(selectedPair.debtAsset.symbol) || "8.83%"
-                                  : "8.83%")
-                          }
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? getSupplyAPY(
+                                  selectedPair.collateralAsset.symbol
+                                ) || "8.83%"
+                              : "8.83%"
+                            : bottomTab === "collateral"
+                              ? selectedPair?.collateralAsset?.symbol
+                                ? getSupplyAPY(
+                                    selectedPair.collateralAsset.symbol
+                                  ) || "8.83%"
+                                : "8.83%"
+                              : selectedPair?.debtAsset?.symbol
+                                ? getSupplyAPY(selectedPair.debtAsset.symbol) ||
+                                  "8.83%"
+                                : "8.83%"}
                         </div>
                       </div>
 
@@ -1230,23 +1258,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                         </div>
                         <div className="text-orange-400 text-lg font-medium">
                           {bottomTab === "pair"
-                            ? (selectedPair?.debtAsset?.symbol
-                                ? getBorrowAPY(selectedPair.debtAsset.symbol) || "5.40%"
-                                : "5.40%")
-                            : bottomTab === "collateral" 
-                              ? (selectedPair?.collateralAsset?.symbol
-                                  ? getBorrowAPY(selectedPair.collateralAsset.symbol) || "5.40%"
-                                  : "5.40%")
-                              : (selectedPair?.debtAsset?.symbol
-                                  ? getBorrowAPY(selectedPair.debtAsset.symbol) || "5.40%"
-                                  : "5.40%")
-                          }
+                            ? selectedPair?.debtAsset?.symbol
+                              ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
+                                "5.40%"
+                              : "5.40%"
+                            : bottomTab === "collateral"
+                              ? selectedPair?.collateralAsset?.symbol
+                                ? getBorrowAPY(
+                                    selectedPair.collateralAsset.symbol
+                                  ) || "5.40%"
+                                : "5.40%"
+                              : selectedPair?.debtAsset?.symbol
+                                ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
+                                  "5.40%"
+                                : "5.40%"}
                         </div>
                       </div>
 
-                      <div>
-                        {/* Empty space for alignment */}
-                      </div>
+                      <div>{/* Empty space for alignment */}</div>
                     </div>
                   </div>
                 </>
