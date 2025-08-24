@@ -451,7 +451,6 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );

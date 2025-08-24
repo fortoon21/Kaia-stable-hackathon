@@ -1,5 +1,5 @@
-import { LendingProps } from "@/types/lending";
 import { useAaveData } from "@/hooks/useAaveData";
+import { LendingProps } from "@/types/lending";
 
 /**
  * Market statistics overview cards
@@ -19,22 +19,25 @@ export function MarketStatsOverview({
   const { getMaxROE } = useAaveData();
 
   // Calculate best ROE from all pairs
-  const bestROEData = pairs.reduce((best, pair) => {
-    const roe = getMaxROE(pair.collateralAsset.symbol, pair.debtAsset.symbol);
-    
-    if (!roe || roe === "-") return best;
-    
-    const roeValue = parseFloat(roe.replace("%", ""));
-    if (roeValue > best.value) {
-      return {
-        value: roeValue,
-        roe: roe,
-        pairName: `${pair.collateralAsset.symbol}/${pair.debtAsset.symbol}`,
-      };
-    }
-    
-    return best;
-  }, { value: 0, roe: "-", pairName: "-" });
+  const bestROEData = pairs.reduce(
+    (best, pair) => {
+      const roe = getMaxROE(pair.collateralAsset.symbol, pair.debtAsset.symbol);
+
+      if (!roe || roe === "-") return best;
+
+      const roeValue = parseFloat(roe.replace("%", ""));
+      if (roeValue > best.value) {
+        return {
+          value: roeValue,
+          roe: roe,
+          pairName: `${pair.collateralAsset.symbol}/${pair.debtAsset.symbol}`,
+        };
+      }
+
+      return best;
+    },
+    { value: 0, roe: "-", pairName: "-" }
+  );
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-4">
