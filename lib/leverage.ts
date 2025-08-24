@@ -253,3 +253,44 @@ export function calculateCurrentLTV({
     return 0;
   }
 }
+
+/**
+ * Computes the maximum Return on Equity (ROE) at max LTV using supply/borrow APYs.
+ * Inputs are decimals (e.g., 0.065 for 6.5%).
+ * Formula (multiplied position): ROE_max = (supplyAPY − maxLTV × borrowAPY_eff) × maxMultiplier
+ * where borrowAPY_eff = borrowAPY × (1 + flashloanPremium) and
+ * maxMultiplier defaults to 1 / (1 − maxLTV) if not provided.
+ * If leveraged ROE is not better than unlevered, returns supplyAPY.
+ */
+export function computeMaxROE({
+  supplyAPY,
+  borrowAPY,
+  flashloanPremium,
+  maxLTV,
+  maxMultiplier,
+}: {
+  supplyAPY: number;
+  borrowAPY: number;
+  flashloanPremium: number; // e.g. 0.0009 for 9 bps
+  maxLTV: number; // e.g. 0.9
+  maxMultiplier?: number; // defaults to 1 / (1 - maxLTV)
+}): number {
+  try {
+    const s = Number(supplyAPY) || 0;
+    const b = Number(borrowAPY) || 0;
+    const fl = Math.max(0, Number(flashloanPremium) || 0);
+    const Lraw = Number(maxLTV) || 0;
+    const L = Math.min(Math.max(Lraw, 0), 0.999999); // clamp and avoid div-by-zero
+    const M = Number.isFinite(maxMultiplier as number)
+      ? (maxMultiplier as number)
+      : 1 / (1 - L);
+
+    const bEff = b * (1 + fl);
+    const spreadAtMax = s - L * bEff;
+    const leveraged = spreadAtMax * M;
+    const out = Math.max(s, leveraged);
+    return Number.isFinite(out) ? out : s;
+  } catch (_) {
+    return supplyAPY;
+  }
+}

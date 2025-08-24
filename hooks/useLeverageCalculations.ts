@@ -16,7 +16,7 @@ export function useLeverageCalculations(
     selectedPair?.collateralAsset.symbol || "",
     selectedPair?.debtAsset.symbol || ""
   );
-  
+
   // Get real-time flashloan premium
   const { getFlashloanPremium } = useAaveData();
   // Calculate max leverage using the leverage library
@@ -42,10 +42,18 @@ export function useLeverageCalculations(
       additionalCollateralAmount: amount,
       priceOfCollateral: collateralPrice.toString(),
       priceOfDebt: debtPrice.toString(),
-      flashloanPremium: getFlashloanPremium() || MOCK_PRICES.FLASHLOAN_PREMIUM.toString(),
+      flashloanPremium:
+        getFlashloanPremium() || MOCK_PRICES.FLASHLOAN_PREMIUM.toString(),
       maxLTV: MOCK_PRICES.MAX_LTV.toString(),
     });
-  }, [collateralAmount, selectedPair, isReady, collateralPrice, debtPrice, getFlashloanPremium]);
+  }, [
+    collateralAmount,
+    selectedPair,
+    isReady,
+    collateralPrice,
+    debtPrice,
+    getFlashloanPremium,
+  ]);
 
   // Calculate actual leverage position details using HTML tester logic
   const leveragePosition = useMemo(() => {
@@ -77,7 +85,8 @@ export function useLeverageCalculations(
       targetLeverage: multiplier.toString(),
       priceOfCollateral: collateralPrice.toString(),
       priceOfDebt: debtPrice.toString(),
-      flashloanPremium: getFlashloanPremium() || MOCK_PRICES.FLASHLOAN_PREMIUM.toString(),
+      flashloanPremium:
+        getFlashloanPremium() || MOCK_PRICES.FLASHLOAN_PREMIUM.toString(),
     });
 
     return result;

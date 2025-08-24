@@ -351,49 +351,82 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }
     }
 
-    // States V3 for provided assets
+    // States V3 for provided assets - batch processing
     const assets = AAVE_ASSETS;
-
     const nextStates: Record<string, unknown> = {};
-    await Promise.all(
-      assets.map(async (asset) => {
+
+    try {
+      const iface = new ethers.Interface(
+        (AaveFacet as { abi: ethers.InterfaceAbi }).abi
+      );
+      const rp =
+        signer?.provider ??
+        provider ??
+        new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
+
+      // Prepare batch calls for all assets
+      const batchCalls: Array<{
+        asset: string;
+        data: string;
+        stateKey: string;
+      }> = [];
+
+      for (const asset of assets) {
         const assetLc = asset.toLowerCase();
         const stateKey = `${cachePrefix}:state:${assetLc}`;
-        let state = AAVE_DEBUG ? null : cacheGet(stateKey);
+        const state = AAVE_DEBUG ? null : cacheGet(stateKey);
+
         if (!state) {
-          try {
-            const iface = new ethers.Interface(
-              (AaveFacet as { abi: ethers.InterfaceAbi }).abi
-            );
-            const data = iface.encodeFunctionData("aavePoolStateV3", [
-              resolvedPool,
-              asset,
-            ]);
-            const rp =
-              signer?.provider ??
-              provider ??
-              new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
-            const rawHex = await rp.call({
-              to: AAVE_CONFIG.FACET_ADDRESS,
-              data,
-            });
-            const decoded = iface.decodeFunctionResult(
-              "aavePoolStateV3",
-              rawHex
-            );
-            // decoded is an array; first element should be the tuple
-            const tuple =
-              Array.isArray(decoded) && decoded.length ? decoded[0] : decoded;
-            const normalized = coerceAaveStateV3(tuple);
-            state = (normalized as {}) ?? {};
-            cacheSet(stateKey, state);
-          } catch (_e) {
-            // ignore
-          }
+          const data = iface.encodeFunctionData("aavePoolStateV3", [
+            resolvedPool,
+            asset,
+          ]);
+          batchCalls.push({ asset, data, stateKey });
+        } else {
+          nextStates[assetLc] = state;
         }
-        if (state) nextStates[assetLc] = state;
-      })
-    );
+      }
+
+      // Execute batch calls if any needed
+      if (batchCalls.length > 0) {
+        const batchPromises = batchCalls.map(
+          async ({ asset, data, stateKey }) => {
+            try {
+              const rawHex = await rp.call({
+                to: AAVE_CONFIG.FACET_ADDRESS,
+                data,
+              });
+              const decoded = iface.decodeFunctionResult(
+                "aavePoolStateV3",
+                rawHex
+              );
+              const tuple =
+                Array.isArray(decoded) && decoded.length ? decoded[0] : decoded;
+              const normalized = coerceAaveStateV3(tuple);
+              const state = (normalized as {}) ?? {};
+
+              cacheSet(stateKey, state);
+              return { asset: asset.toLowerCase(), state };
+            } catch (error) {
+              console.warn(`Failed to fetch state for asset ${asset}:`, error);
+              return null;
+            }
+          }
+        );
+
+        // Execute all calls in parallel
+        const results = await Promise.all(batchPromises);
+
+        // Process results
+        results.forEach((result) => {
+          if (result && result.state) {
+            nextStates[result.asset] = result.state;
+          }
+        });
+      }
+    } catch (error) {
+      console.warn("Failed to batch fetch Aave states:", error);
+    }
 
     if (Object.keys(nextStates).length) setAaveStatesV3(nextStates);
   }, [
