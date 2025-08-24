@@ -163,7 +163,7 @@ export function calculateLeverageParams({
     // Scale prices and parameters to 1e18
     const pc = new Big(priceOfCollateral).times(EXP18);
     const pd = new Big(priceOfDebt).times(EXP18);
-    const fl = new Big(flashloanPremium).times(EXP18);
+    const _fl = new Big(flashloanPremium).times(EXP18);
     const tL = new Big(targetLeverage).times(EXP18);
 
     // Direct port from HTML lines 696-703

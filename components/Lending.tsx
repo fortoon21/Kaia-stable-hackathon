@@ -1,15 +1,20 @@
 "use client";
 
+import { ethers } from "ethers";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
+import { LOOP_CONFIG, TOKEN_DECIMALS } from "@/constants/tokens";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { encodeBorrowToCollateralSwap } from "@/lib/eisen";
+import { calculateLeverageParams, calculateMaxLeverage } from "@/lib/leverage";
 import { useWeb3 } from "@/lib/web3Provider";
 import type { BottomTabType, LendingProps, TabType } from "@/types/lending";
 import { calculateUSDValue } from "@/utils/formatters";
+import { getTokenAddress } from "@/utils/tokenHelpers";
 
 export default function Lending({ selectedPair }: LendingProps) {
   const [activeTab, setActiveTab] = useState<TabType>("multiply");
@@ -19,7 +24,15 @@ export default function Lending({ selectedPair }: LendingProps) {
   const [ltvValue, setLtvValue] = useState(0);
   const [ltvInput, setLtvInput] = useState("0.0");
   const [multiplierInput, setMultiplierInput] = useState("1.00");
-  const { isConnected } = useWeb3();
+  const {
+    isConnected,
+    signer,
+    address,
+    chainId,
+    aaveParamsV3Index,
+    aaveParamsV3,
+    aaveUserBalances,
+  } = useWeb3();
   const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
   const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
     useLeverageCalculations(selectedPair, collateralAmount, multiplier);
@@ -43,6 +56,196 @@ export default function Lending({ selectedPair }: LendingProps) {
         return ltvDecimal >= 1 ? 1 : 1 / (1 - ltvDecimal);
       })()
     : maxLeverage;
+
+  const handleOpenMultiply = useCallback(async () => {
+    try {
+      if (!signer || !address) throw new Error("Connect wallet first");
+      if (!selectedPair) throw new Error("No pair selected");
+
+      // Resolve addresses
+      const collateralUnderlying = getTokenAddress(
+        selectedPair.collateralAsset.symbol
+      );
+      const borrowUnderlying = getTokenAddress(selectedPair.debtAsset.symbol);
+      if (!collateralUnderlying || !borrowUnderlying) {
+        throw new Error("Unsupported asset addresses");
+      }
+
+      const paramsIndex = aaveParamsV3Index as Record<
+        string,
+        {
+          aTokenAddress?: string;
+          variableDebtTokenAddress?: string;
+        }
+      >;
+      const params = paramsIndex[collateralUnderlying];
+      if (!params?.aTokenAddress || !params?.variableDebtTokenAddress) {
+        throw new Error("Missing Aave asset params");
+      }
+
+      const aToken = params.aTokenAddress;
+      const variableDebtAsset = params.variableDebtTokenAddress;
+      const collateralDecimals =
+        TOKEN_DECIMALS[selectedPair.collateralAsset.symbol] ?? 18;
+
+      // Amounts from UI (wei)
+      const collAmtWei = ethers.parseUnits(
+        (collateralAmount || "0").replace(/,/g, ""),
+        collateralDecimals
+      );
+      if (collAmtWei === (0 as unknown as bigint)) {
+        throw new Error("Collateral amount must be greater than 0");
+      }
+
+      // Compute multiplier extra via calculateMaxLeverage using cached Aave values
+      const debtDecimals = TOKEN_DECIMALS[selectedPair.debtAsset.symbol] ?? 18;
+      const poolRoot = aaveParamsV3 as unknown as {
+        response?: { flashloanPremium?: unknown };
+      };
+      const root = poolRoot?.response ?? poolRoot;
+      const flBps = Number(
+        (root as { flashloanPremium?: unknown })?.flashloanPremium ?? 0
+      );
+      const flashloanPremiumDec = Number.isFinite(flBps)
+        ? (flBps / 10000).toString()
+        : "0.0009";
+      const idxParams = (
+        aaveParamsV3Index as Record<
+          string,
+          { baseLTVasCollateral?: number | bigint }
+        >
+      )[collateralUnderlying];
+      const Lbps = idxParams?.baseLTVasCollateral;
+      const maxLtvDec =
+        Lbps !== undefined
+          ? (
+              (typeof Lbps === "bigint" ? Number(Lbps) : Number(Lbps)) / 10000
+            ).toString()
+          : "0.93";
+
+      // Initial balances (human units) from cache: aToken for collateral; variable debt for debt asset
+      const balances = aaveUserBalances as Record<
+        string,
+        { aTokenBalance?: string; variableDebtBalance?: string }
+      >;
+      const initialCollateralHuman =
+        balances[collateralUnderlying]?.aTokenBalance || "0";
+      const initialDebtHuman =
+        balances[borrowUnderlying]?.variableDebtBalance || "0";
+
+      const targetLev = Math.max(1, Math.min(multiplier, 25));
+      const maxLev = calculateMaxLeverage({
+        collateralDecimals,
+        debtDecimals,
+        // Pass human-readable units; helper scales to 1e18 internally
+        initialCollateralAmount: initialCollateralHuman,
+        initialDebtAmount: initialDebtHuman,
+        additionalCollateralAmount: collateralAmount || "0",
+        priceOfCollateral: collateralPrice.toString(),
+        priceOfDebt: debtPrice.toString(),
+        // flashloanPremium and maxLTV are decimals; helper scales to 1e18 internally
+        flashloanPremium: flashloanPremiumDec,
+        maxLTV: maxLtvDec,
+      });
+
+      const clampedTarget = Math.min(targetLev, maxLev);
+      const leverageCalc = calculateLeverageParams({
+        collateralDecimals,
+        debtDecimals,
+        initialCollateralAmount: initialCollateralHuman,
+        initialDebtAmount: initialDebtHuman,
+        additionalCollateralAmount: collateralAmount || "0",
+        targetLeverage: clampedTarget.toString(),
+        priceOfCollateral: collateralPrice.toString(),
+        priceOfDebt: debtPrice.toString(),
+        flashloanPremium: flashloanPremiumDec,
+      });
+      const flashloanAmtWei = ethers.parseUnits(
+        leverageCalc.flashloanAmount || "0",
+        debtDecimals
+      );
+
+      // 1) Approval: collateral underlying -> LeverageLoop contract
+      const loopAddress = LOOP_CONFIG.LEVERAGE_LOOP_ADDRESS;
+      if (!ethers.isAddress(loopAddress)) {
+        throw new Error("Missing NEXT_PUBLIC_LEVERAGE_LOOP_ADDRESS");
+      }
+      const erc20Abi: ethers.InterfaceAbi = [
+        "function allowance(address owner, address spender) view returns (uint256)",
+        "function approve(address spender, uint256 amount) returns (bool)",
+      ];
+      const collateralErc20 = new ethers.Contract(
+        collateralUnderlying,
+        erc20Abi,
+        signer
+      );
+      const currentAllowance: bigint = await collateralErc20.allowance(
+        address,
+        loopAddress
+      );
+      if (currentAllowance < collAmtWei) {
+        const txApprove = await collateralErc20.approve(
+          loopAddress,
+          ethers.MaxUint256
+        );
+        await txApprove.wait();
+      }
+
+      // 2) Get encoded swap path from Eisen router API (borrow -> collateral)
+      const { encoded: swapPathData } = await encodeBorrowToCollateralSwap({
+        fromToken: borrowUnderlying,
+        toToken: collateralUnderlying,
+        amountIn: flashloanAmtWei.toString(),
+        slippageBps: 50,
+        fromAddress: loopAddress,
+        toAddress: loopAddress,
+        chainId: chainId ?? 8217,
+      });
+
+      // 3) Call LeverageLoop.openMultiply with LeverageParams
+      const leverageLoopAbi: ethers.InterfaceAbi = [
+        "function executeLeverageLoop((address,address,address,address,uint256,uint256,bytes)) payable",
+      ];
+
+      const loop = new ethers.Contract(loopAddress, leverageLoopAbi, signer);
+      const paramsTuple: [
+        string,
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        string,
+      ] = [
+        aToken,
+        variableDebtAsset,
+        collateralUnderlying,
+        borrowUnderlying,
+        collAmtWei,
+        flashloanAmtWei,
+        swapPathData,
+      ];
+      const tx = await loop.executeLeverageLoop(paramsTuple);
+      await tx.wait();
+      // Optionally refresh state here
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("Open multiply failed:", e);
+      alert((e as Error).message || "Open multiply failed");
+    }
+  }, [
+    signer,
+    address,
+    selectedPair,
+    aaveParamsV3Index,
+    aaveParamsV3,
+    aaveUserBalances,
+    chainId,
+    collateralAmount,
+    multiplier,
+    collateralPrice,
+    debtPrice,
+  ]);
 
   return (
     <div
@@ -928,6 +1131,9 @@ export default function Lending({ selectedPair }: LendingProps) {
                   <button
                     type="button"
                     className="w-full bg-[#2ae5b9] text-black py-4 rounded-full font-semibold hover:bg-[#17e3c2] transition-colors"
+                    onClick={
+                      activeTab === "multiply" ? handleOpenMultiply : undefined
+                    }
                   >
                     {activeTab === "multiply"
                       ? "Open Multiply Position"

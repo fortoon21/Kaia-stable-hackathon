@@ -21,6 +21,14 @@ export const AAVE_CONFIG = {
   LENDING_POOL_V3: "0xcf1af042f2a071df60a64ed4bdc9c7dee40780be",
 } as const;
 
+export const LOOP_CONFIG = {
+  LEVERAGE_LOOP_ADDRESS: "0x265af8AC750f9c67418d8f684432dFD35a89f39d",
+} as const;
+
+export const EISEN_CONFIG = {
+  EISEN_API_KEY: "ZWlzZW5fYmE3MGU5N2ItMDAxMy00NDE5LWJjN2MtZmU2NWIwMjFjMGVm",
+} as const;
+
 // aToken and debtToken addresses
 export const ATOKEN_ADDRESSES = {
   WKAIA: "0x75879754040101f831ccbf13b3d5a785612051cb", // aKLAYWKLAY
