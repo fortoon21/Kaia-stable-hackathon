@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TOKEN_ADDRESSES } from "@/constants/tokens";
 import {
   createPriceMap,
@@ -28,8 +28,16 @@ export function useTokenPrices(): UseTokenPricesReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [priceMap, setPriceMap] = useState<Map<string, number>>(new Map());
+  const isFetchingRef = useRef(false);
 
   const fetchPrices = useCallback(async () => {
+    // Prevent concurrent calls using ref
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+
     try {
       setLoading(true);
       setError(null);
@@ -59,17 +67,17 @@ export function useTokenPrices(): UseTokenPricesReturn {
       });
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   }, []);
 
-  // Initial fetch
+  // Initial fetch and setup 15-second interval
   useEffect(() => {
+    // Initial fetch
     fetchPrices();
-  }, [fetchPrices]);
 
-  // Refresh prices every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(fetchPrices, 30000);
+    // Set up interval for subsequent fetches
+    const interval = setInterval(fetchPrices, 15000); // 15 seconds
     return () => clearInterval(interval);
   }, [fetchPrices]);
 

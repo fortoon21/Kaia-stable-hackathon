@@ -276,32 +276,129 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     const contract = getAaveContract();
     if (!contract) return;
 
-    const resolvedPool = await resolveAavePoolAddress(
-      AAVE_CONFIG.LENDING_POOL_V3
-    );
+    // Execute all three operations in parallel
+    const [resolvedPool, paramsResult, statesResult] = await Promise.all([
+      resolveAavePoolAddress(AAVE_CONFIG.LENDING_POOL_V3),
+      (async () => {
+        const effectiveChainId = chainId ?? 8217;
+        const tempCachePrefix = `aave:v3:${effectiveChainId}:${AAVE_CONFIG.LENDING_POOL_V3}`;
+        const paramsKey = `${tempCachePrefix}:params`;
+        let params = cacheGet(paramsKey);
+        if (!params) {
+          try {
+            const p = await contract.aavePoolParamsV3(
+              AAVE_CONFIG.LENDING_POOL_V3
+            );
+            let normalized: unknown = p as unknown;
+            if (
+              typeof p === "object" &&
+              p !== null &&
+              "response" in (p as Record<string, unknown>)
+            ) {
+              normalized = (p as Record<string, unknown>).response as unknown;
+            }
+            params = (normalized as {}) ?? {};
+            cacheSet(paramsKey, params);
+          } catch (_e) {
+            // ignore
+          }
+        }
+        return params;
+      })(),
+      (async () => {
+        // States V3 for provided assets - batch processing
+        const assets = AAVE_ASSETS;
+        const nextStates: Record<string, unknown> = {};
+        const effectiveChainId = chainId ?? 8217;
+        const tempCachePrefix = `aave:v3:${effectiveChainId}:${AAVE_CONFIG.LENDING_POOL_V3}`;
+
+        try {
+          const iface = new ethers.Interface(
+            (AaveFacet as { abi: ethers.InterfaceAbi }).abi
+          );
+          const rp =
+            signer?.provider ??
+            provider ??
+            new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
+
+          // Prepare batch calls for all assets
+          const batchCalls: Array<{
+            asset: string;
+            data: string;
+            stateKey: string;
+          }> = [];
+
+          for (const asset of assets) {
+            const assetLc = asset.toLowerCase();
+            const stateKey = `${tempCachePrefix}:state:${assetLc}`;
+            const state = AAVE_DEBUG ? null : cacheGet(stateKey);
+
+            if (!state) {
+              const data = iface.encodeFunctionData("aavePoolStateV3", [
+                AAVE_CONFIG.LENDING_POOL_V3,
+                asset,
+              ]);
+              batchCalls.push({ asset, data, stateKey });
+            } else {
+              nextStates[assetLc] = state;
+            }
+          }
+
+          // Execute batch calls if any needed
+          if (batchCalls.length > 0) {
+            const batchPromises = batchCalls.map(
+              async ({ asset, data, stateKey }) => {
+                try {
+                  const rawHex = await rp.call({
+                    to: AAVE_CONFIG.FACET_ADDRESS,
+                    data,
+                  });
+                  const decoded = iface.decodeFunctionResult(
+                    "aavePoolStateV3",
+                    rawHex
+                  );
+                  const tuple =
+                    Array.isArray(decoded) && decoded.length
+                      ? decoded[0]
+                      : decoded;
+                  const normalized = coerceAaveStateV3(tuple);
+                  const state = (normalized as {}) ?? {};
+
+                  cacheSet(stateKey, state);
+                  return { asset: asset.toLowerCase(), state };
+                } catch (error) {
+                  console.warn(
+                    `Failed to fetch state for asset ${asset}:`,
+                    error
+                  );
+                  return null;
+                }
+              }
+            );
+
+            // Execute all calls in parallel
+            const results = await Promise.all(batchPromises);
+
+            // Process results
+            results.forEach((result) => {
+              if (result && result.state) {
+                nextStates[result.asset] = result.state;
+              }
+            });
+          }
+        } catch (error) {
+          console.warn("Failed to batch fetch Aave states:", error);
+        }
+
+        return nextStates;
+      })(),
+    ]);
+
     const effectiveChainId = chainId ?? 8217;
     const cachePrefix = `aave:v3:${effectiveChainId}:${resolvedPool}`;
 
-    // Params V3
-    const paramsKey = `${cachePrefix}:params`;
-    let params = cacheGet(paramsKey);
-    if (!params) {
-      try {
-        const p = await contract.aavePoolParamsV3(resolvedPool);
-        let normalized: unknown = p as unknown;
-        if (
-          typeof p === "object" &&
-          p !== null &&
-          "response" in (p as Record<string, unknown>)
-        ) {
-          normalized = (p as Record<string, unknown>).response as unknown;
-        }
-        params = (normalized as {}) ?? {};
-        cacheSet(paramsKey, params);
-      } catch (_e) {
-        // ignore
-      }
-    }
+    // Use the params result from parallel execution
+    const params = paramsResult;
     if (params) {
       setAaveParamsV3(params);
       // Build index by underlyingAsset (lowercased), handling tuple/array return shapes
@@ -351,84 +448,8 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }
     }
 
-    // States V3 for provided assets - batch processing
-    const assets = AAVE_ASSETS;
-    const nextStates: Record<string, unknown> = {};
-
-    try {
-      const iface = new ethers.Interface(
-        (AaveFacet as { abi: ethers.InterfaceAbi }).abi
-      );
-      const rp =
-        signer?.provider ??
-        provider ??
-        new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
-
-      // Prepare batch calls for all assets
-      const batchCalls: Array<{
-        asset: string;
-        data: string;
-        stateKey: string;
-      }> = [];
-
-      for (const asset of assets) {
-        const assetLc = asset.toLowerCase();
-        const stateKey = `${cachePrefix}:state:${assetLc}`;
-        const state = AAVE_DEBUG ? null : cacheGet(stateKey);
-
-        if (!state) {
-          const data = iface.encodeFunctionData("aavePoolStateV3", [
-            resolvedPool,
-            asset,
-          ]);
-          batchCalls.push({ asset, data, stateKey });
-        } else {
-          nextStates[assetLc] = state;
-        }
-      }
-
-      // Execute batch calls if any needed
-      if (batchCalls.length > 0) {
-        const batchPromises = batchCalls.map(
-          async ({ asset, data, stateKey }) => {
-            try {
-              const rawHex = await rp.call({
-                to: AAVE_CONFIG.FACET_ADDRESS,
-                data,
-              });
-              const decoded = iface.decodeFunctionResult(
-                "aavePoolStateV3",
-                rawHex
-              );
-              const tuple =
-                Array.isArray(decoded) && decoded.length ? decoded[0] : decoded;
-              const normalized = coerceAaveStateV3(tuple);
-              const state = (normalized as {}) ?? {};
-
-              cacheSet(stateKey, state);
-              return { asset: asset.toLowerCase(), state };
-            } catch (error) {
-              console.warn(`Failed to fetch state for asset ${asset}:`, error);
-              return null;
-            }
-          }
-        );
-
-        // Execute all calls in parallel
-        const results = await Promise.all(batchPromises);
-
-        // Process results
-        results.forEach((result) => {
-          if (result && result.state) {
-            nextStates[result.asset] = result.state;
-          }
-        });
-      }
-    } catch (error) {
-      console.warn("Failed to batch fetch Aave states:", error);
-    }
-
-    if (Object.keys(nextStates).length) setAaveStatesV3(nextStates);
+    // Use the states result from parallel execution
+    if (Object.keys(statesResult).length) setAaveStatesV3(statesResult);
   }, [
     cacheGet,
     cacheSet,
