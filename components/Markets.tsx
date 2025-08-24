@@ -452,21 +452,6 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
           </div>
         </div>
 
-        {/* Bottom Actions */}
-        <div className="mt-8 flex justify-center space-x-4">
-          <button
-            type="button"
-            className="px-6 py-3 bg-[#2ae5b9] text-black font-semibold rounded-lg hover:bg-[#2ae5b9]/90 transition-colors"
-          >
-            Start Trading
-          </button>
-          <button
-            type="button"
-            className="px-6 py-3 bg-[#0c1d2f] border border-[#14304e] text-white font-semibold rounded-lg hover:bg-[#14304e]/30 transition-colors"
-          >
-            Learn More
-          </button>
-        </div>
       </div>
     </div>
   );
