@@ -12,7 +12,7 @@ import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
-  const { getSupplyAPY, getBorrowAPY, getLLTV, getLiquidity, getTotalLiquidity } = useAaveData();
+  const { getSupplyAPY, getBorrowAPY, getLTV, getLLTV, getLiquidity, getTotalLiquidity } = useAaveData();
   const { calculateBorrowPositions, getPositionData } = useMarketCalculations();
 
   // Calculate total pairs and assets

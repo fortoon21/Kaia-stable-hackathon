@@ -46,6 +46,20 @@ export function useAaveData() {
   };
 
   /**
+   * Get LTV (Loan-to-Value) for a collateral asset
+   */
+  const getLTV = (collateralSymbol: string): string | null => {
+    const addr = getTokenAddress(collateralSymbol);
+    if (!addr) return null;
+
+    const params = aaveParamsV3Index as Record<string, any>;
+    const param = params[addr];
+    if (!param?.[8]) return null;
+
+    return toPercentFromBps(param[8]);
+  };
+
+  /**
    * Get LLTV (Liquidation Loan-to-Value) for a collateral asset
    */
   const getLLTV = (collateralSymbol: string): string | null => {
@@ -147,6 +161,7 @@ export function useAaveData() {
   return {
     getSupplyAPY,
     getBorrowAPY,
+    getLTV,
     getLLTV,
     getLiquidity,
     getTotalLiquidity,
