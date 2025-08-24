@@ -12,7 +12,7 @@ import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
-  const { getSupplyAPY, getBorrowAPY, getLLTV, getLiquidity } = useAaveData();
+  const { getSupplyAPY, getBorrowAPY, getLLTV, getLiquidity, getTotalLiquidity } = useAaveData();
   const { calculateBorrowPositions, getPositionData } = useMarketCalculations();
 
   // Calculate total pairs and assets
@@ -73,6 +73,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
         <MarketStatsOverview
           totalPairs={totalPairs}
           totalAssets={totalAssets}
+          totalLiquidity={getTotalLiquidity()}
         />
 
         {/* Markets Table */}
@@ -137,14 +138,14 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                               "1fr 1fr 0.8fr 0.8fr 0.6fr 0.8fr 0.5fr 0.8fr 0.8fr 0.6fr",
                           }}
                         >
-                          <div>Collateral asset ↑↓</div>
-                          <div>Debt asset ↑↓</div>
-                          <div className="text-right">Supply APY ↑↓</div>
-                          <div className="text-right">Borrow APY ↑↓</div>
-                          <div className="text-right">Max ROE ↓</div>
-                          <div className="text-right">Max multiplier ↑↓</div>
-                          <div className="text-right">LLTV ↑↓</div>
-                          <div className="text-right">Liquidity ↑↓</div>
+                          <div>Collateral asset</div>
+                          <div>Debt asset</div>
+                          <div className="text-right">Supply APY</div>
+                          <div className="text-right">Borrow APY</div>
+                          <div className="text-right">Max ROE</div>
+                          <div className="text-right">Max multiplier</div>
+                          <div className="text-right">LLTV</div>
+                          <div className="text-right">Liquidity</div>
                           <div className="text-right">Your Debt</div>
                           <div className="text-center">Action</div>
                         </div>
@@ -234,16 +235,14 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Supply APY */}
                             <div className="text-right">
                               <div className="text-[#23c09b] font-semibold">
-                                {getSupplyAPY(pair.collateralAsset.symbol) ??
-                                  pair.supplyAPY}
+                                {getSupplyAPY(pair.collateralAsset.symbol) ?? "-"}
                               </div>
                             </div>
 
                             {/* Borrow APY */}
                             <div className="text-right">
                               <div className="text-orange-400 font-semibold">
-                                {getBorrowAPY(pair.debtAsset.symbol) ??
-                                  pair.borrowAPY}
+                                {getBorrowAPY(pair.debtAsset.symbol) ?? "-"}
                               </div>
                             </div>
 
@@ -264,8 +263,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* LLTV */}
                             <div className="text-right">
                               <div className="font-semibold">
-                                {getLLTV(pair.collateralAsset.symbol) ??
-                                  pair.lltv}
+                                {getLLTV(pair.collateralAsset.symbol) ?? "-"}
                               </div>
                             </div>
 
@@ -278,12 +276,12 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 return (
                                   <>
                                     <div className="font-semibold">
-                                      {usdValue || pair.liquidity}
+                                      {usdValue || "-"}
                                     </div>
                                     <div className="text-[#728395] text-xs">
                                       {amount
                                         ? `${amount} ${pair.debtAsset.symbol}`
-                                        : `${pair.liquidityAmount} ${pair.liquidityToken}`}
+                                        : "-"}
                                     </div>
                                   </>
                                 );

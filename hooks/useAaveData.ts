@@ -89,10 +89,66 @@ export function useAaveData() {
     return { amount, usdValue };
   };
 
+  /**
+   * Calculate total liquidity across all 4 assets (WKAIA, USDT, USDC, USDT0)
+   */
+  const getTotalLiquidity = (): { totalUSD: string | null; hasData: boolean } => {
+    const assets = ["WKAIA", "USDT", "USDC", "USDT0"];
+    let totalValue = 0;
+    let hasValidData = false;
+
+    for (const symbol of assets) {
+      const { amount, usdValue } = getLiquidity(symbol);
+      if (usdValue) {
+        // Extract numeric value from usdValue (e.g., "$37.4K" -> 37400)
+        const numericValue = parseUsdValue(usdValue);
+        if (numericValue > 0) {
+          totalValue += numericValue;
+          hasValidData = true;
+        }
+      }
+    }
+
+    if (!hasValidData) {
+      return { totalUSD: null, hasData: false };
+    }
+
+    // Format total value
+    if (totalValue >= 1000000) {
+      return { 
+        totalUSD: `$${(totalValue / 1000000).toFixed(2)}M`, 
+        hasData: true 
+      };
+    } else if (totalValue >= 1000) {
+      return { 
+        totalUSD: `$${(totalValue / 1000).toFixed(1)}K`, 
+        hasData: true 
+      };
+    } else {
+      return { 
+        totalUSD: `$${totalValue.toFixed(2)}`, 
+        hasData: true 
+      };
+    }
+  };
+
+  // Helper function to parse USD values back to numbers
+  const parseUsdValue = (usdString: string): number => {
+    const cleaned = usdString.replace('$', '');
+    if (cleaned.endsWith('M')) {
+      return parseFloat(cleaned.replace('M', '')) * 1000000;
+    } else if (cleaned.endsWith('K')) {
+      return parseFloat(cleaned.replace('K', '')) * 1000;
+    } else {
+      return parseFloat(cleaned) || 0;
+    }
+  };
+
   return {
     getSupplyAPY,
     getBorrowAPY,
     getLLTV,
     getLiquidity,
+    getTotalLiquidity,
   };
 }
