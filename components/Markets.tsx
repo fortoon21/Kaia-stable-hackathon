@@ -49,7 +49,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
         const maxLeverage = ltvDecimal >= 1 ? 1 : 1 / (1 - ltvDecimal);
 
         multipliers[pairKey] = maxLeverage;
-      } catch (error) {
+      } catch (_error) {
         multipliers[pairKey] = 1; // Fallback
       }
     }

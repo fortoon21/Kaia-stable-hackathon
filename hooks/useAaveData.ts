@@ -70,7 +70,7 @@ export function useAaveData() {
       }
 
       return `${(maxROE * 100).toFixed(2)}%`;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   };
@@ -137,7 +137,7 @@ export function useAaveData() {
       // Convert from basis points and format to 4 decimal places (e.g., 9 bps = 0.0009)
       const decimalValue = premium / 10000;
       return decimalValue.toFixed(4);
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   };

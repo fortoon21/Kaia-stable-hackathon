@@ -55,7 +55,7 @@ export function useTokenPrices(): UseTokenPricesReturn {
       }
 
       setPrices(symbolPrices);
-    } catch (err) {
+    } catch (_err) {
       setError("Failed to fetch token prices");
       // Set fallback prices if API fails
       setPrices({
@@ -109,7 +109,7 @@ export function useTokenPrices(): UseTokenPricesReturn {
  * Hook to get prices for a specific trading pair
  */
 export function usePairPrices(collateralSymbol: string, debtSymbol: string) {
-  const { prices, loading, error, getPriceBySymbol } = useTokenPrices();
+  const { loading, error, getPriceBySymbol } = useTokenPrices();
 
   const collateralPrice = getPriceBySymbol(collateralSymbol);
   const debtPrice = getPriceBySymbol(debtSymbol);

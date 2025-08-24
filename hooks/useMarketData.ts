@@ -48,7 +48,7 @@ export function useMarketData(): UseMarketDataReturn {
       const mockData: MarketData[] = [
         {
           symbol: "PT-USDe-25SEP2025",
-          price: prices["USDC"] || 1.0,
+          price: prices.USDC || 1.0,
           change24h: 2.5,
           volume24h: 5440000,
           liquidity: 22840000,
@@ -58,7 +58,7 @@ export function useMarketData(): UseMarketDataReturn {
         },
         {
           symbol: "USDC",
-          price: prices["USDC"] || 1.0,
+          price: prices.USDC || 1.0,
           change24h: 0.02,
           volume24h: 119260000,
           liquidity: 102500000,
@@ -68,7 +68,7 @@ export function useMarketData(): UseMarketDataReturn {
         },
         {
           symbol: "KAIA",
-          price: prices["WKAIA"] || 0.14,
+          price: prices.WKAIA || 0.14,
           change24h: -1.23,
           volume24h: 45200000,
           liquidity: 89300000,

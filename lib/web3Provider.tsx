@@ -381,7 +381,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
             // Process results
             results.forEach((result) => {
-              if (result && result.state) {
+              if (result?.state) {
                 nextStates[result.asset] = result.state;
               }
             });
@@ -395,7 +395,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     ]);
 
     const effectiveChainId = chainId ?? 8217;
-    const cachePrefix = `aave:v3:${effectiveChainId}:${resolvedPool}`;
+    const _cachePrefix = `aave:v3:${effectiveChainId}:${resolvedPool}`;
 
     // Use the params result from parallel execution
     const params = paramsResult;

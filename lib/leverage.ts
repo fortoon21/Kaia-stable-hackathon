@@ -214,7 +214,7 @@ export function calculateLeverageParams({
       collateralAmount: postColl.div(collDecBI).toFixed(6),
       debtAmount: postDebt.div(debtDecBI).toFixed(6),
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       flashloanAmount: "0",
       ltv: "0",
