@@ -116,6 +116,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
           totalPairs={totalPairs}
           totalAssets={totalAssets}
           totalLiquidity={getTotalLiquidity()}
+          pairs={allPairs}
         />
 
         {/* Markets Table */}
