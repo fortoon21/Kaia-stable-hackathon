@@ -6,11 +6,11 @@ interface PriceResponse {
   }>;
 }
 
-interface TokenPrice {
-  address: string;
-  price: number;
-  symbol?: string;
-}
+// interface TokenPrice {
+//   address: string;
+//   price: number;
+//   symbol?: string;
+// }
 
 // Mock price data for TOKEN_ADDRESSES (will be updated with real data)
 const CACHED_PRICE_DATA: PriceResponse = {

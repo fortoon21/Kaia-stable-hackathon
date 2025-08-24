@@ -53,8 +53,8 @@ const Slider = forwardRef<HTMLInputElement, SliderProps>(
                 ? `linear-gradient(to right, ${fillColor} 0%, ${fillColor} ${percentage}%, ${trackColor} ${percentage}%, ${trackColor} 100%)`
                 : trackColor,
             // Custom CSS variables for thumb color
-            ["--webkit-slider-thumb-bg" as any]: thumbColor,
-            ["--moz-range-thumb-bg" as any]: thumbColor,
+            "--webkit-slider-thumb-bg": thumbColor,
+            "--moz-range-thumb-bg": thumbColor,
           } as React.CSSProperties & Record<string, string>
         }
       />

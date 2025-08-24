@@ -15,7 +15,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
   const [repayPercent, setRepayPercent] = useState(0);
   const [collateralAmount, setCollateralAmount] = useState("");
   const [debtAmount, setDebtAmount] = useState("");
-  const [repayAsset, setRepayAsset] = useState<any>(null);
+  const [repayAsset, setRepayAsset] = useState<unknown>(null);
 
   // Load repay asset info from localStorage
   useEffect(() => {
