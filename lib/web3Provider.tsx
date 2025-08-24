@@ -9,7 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { AAVE_ASSETS, AAVE_CONFIG } from "@/constants/tokens";
+import { AAVE_ASSETS, AAVE_CONFIG, ATOKEN_ASSETS, DEBT_TOKEN_ASSETS } from "@/constants/tokens";
 import AaveFacet from "@/lib/abi/AaveFacet.json";
 
 interface WindowWithWallets extends Window {
@@ -448,8 +448,53 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Use the states result from parallel execution
-    if (Object.keys(statesResult).length) setAaveStatesV3(statesResult);
+    // Use the states result from parallel execution and add aToken/debtToken totalSupply data
+    if (Object.keys(statesResult).length) {
+      const combinedStates = { ...statesResult };
+      
+      // Fetch totalSupply for aTokens and debtTokens
+      try {
+        const rp = signer?.provider ?? provider ?? new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
+        const erc20Abi = ["function totalSupply() view returns (uint256)"];
+        
+        const aTokenPromises = ATOKEN_ASSETS.map(async (aTokenAddress) => {
+          try {
+            const aToken = new ethers.Contract(aTokenAddress, erc20Abi, rp);
+            const totalSupply = await aToken.totalSupply();
+            return { address: aTokenAddress.toLowerCase(), totalSupply };
+          } catch (_error) {
+            return { address: aTokenAddress.toLowerCase(), totalSupply: null };
+          }
+        });
+
+        const debtTokenPromises = DEBT_TOKEN_ASSETS.map(async (debtTokenAddress) => {
+          try {
+            const debtToken = new ethers.Contract(debtTokenAddress, erc20Abi, rp);
+            const totalSupply = await debtToken.totalSupply();
+            return { address: debtTokenAddress.toLowerCase(), totalSupply };
+          } catch (_error) {
+            return { address: debtTokenAddress.toLowerCase(), totalSupply: null };
+          }
+        });
+
+        const [aTokenResults, debtTokenResults] = await Promise.all([
+          Promise.all(aTokenPromises),
+          Promise.all(debtTokenPromises)
+        ]);
+
+        // Add totalSupply data to combinedStates
+        [...aTokenResults, ...debtTokenResults].forEach(({ address, totalSupply }) => {
+          if (totalSupply !== null) {
+            combinedStates[address] = { totalSupply };
+          }
+        });
+
+      } catch (_error) {
+        // Silent error handling
+      }
+      
+      setAaveStatesV3(combinedStates);
+    }
   }, [
     cacheGet,
     cacheSet,
@@ -663,6 +708,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
       const erc20Abi = [
         "function balanceOf(address owner) view returns (uint256)",
+        "function totalSupply() view returns (uint256)",
       ];
       const results: Record<
         string,

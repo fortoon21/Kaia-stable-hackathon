@@ -21,10 +21,40 @@ export const AAVE_CONFIG = {
   LENDING_POOL_V3: "0xcf1af042f2a071df60a64ed4bdc9c7dee40780be",
 } as const;
 
-// Generate Aave assets list from TOKEN_ADDRESSES
+// aToken and debtToken addresses
+export const ATOKEN_ADDRESSES = {
+  WKAIA: "0x75879754040101f831ccbf13b3d5a785612051cb", // aKLAYWKLAY
+  USDT: "0x03d111e76c70e5003f0e30dc732aa1bab1ea119d", // aKLAYUSD₮
+  USDT0: "0xf79305376841810112d1a37ba4d1f6fe5fd610ec", // aKLAYUSDT
+  USDC: "0x9503482f84b07b487b6001433d2f2f685769e8b9", // aKLAYUSDC
+} as const;
+
+export const DEBT_TOKEN_ADDRESSES = {
+  WKAIA: "0xada27a9e7fc5e5256adf1225bc94e30973fac274", // variableDebtKLAYWKLAY
+  USDT: "0x3a5724329f807eef8f2a069e66c9aa34982afbec", // variableDebtKLAYUSD₮
+  USDT0: "0xa9f23143c38fbfb2fa299b604a2402bab1e541fc", // variableDebtKLAYUSDT
+  USDC: "0x4880c4b5a3d83965c78faed3373154610b39046b", // variableDebtKLAYUSDC
+} as const;
+
+// Generate Aave assets list from TOKEN_ADDRESSES (original tokens only)
 export const AAVE_ASSETS = [
   TOKEN_ADDRESSES.WKAIA,
   TOKEN_ADDRESSES.USDT0,
   TOKEN_ADDRESSES.USDC,
   TOKEN_ADDRESSES.USDT,
+] as const;
+
+// Separate arrays for aTokens and debtTokens that need totalSupply() calls
+export const ATOKEN_ASSETS = [
+  ATOKEN_ADDRESSES.WKAIA,
+  ATOKEN_ADDRESSES.USDT,
+  ATOKEN_ADDRESSES.USDT0,
+  ATOKEN_ADDRESSES.USDC,
+] as const;
+
+export const DEBT_TOKEN_ASSETS = [
+  DEBT_TOKEN_ADDRESSES.WKAIA,
+  DEBT_TOKEN_ADDRESSES.USDT,
+  DEBT_TOKEN_ADDRESSES.USDT0,
+  DEBT_TOKEN_ADDRESSES.USDC,
 ] as const;

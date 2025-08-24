@@ -30,6 +30,8 @@ export default function Lending({ selectedPair }: LendingProps) {
     getLLTV,
     getLiquidity,
     getMaxROE,
+    getTotalSupply,
+    getTotalBorrowed,
   } = useAaveData();
 
   // Calculate real max multiplier from Markets logic
@@ -1126,12 +1128,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Total supply
                         </div>
                         <div className="text-white text-lg font-medium">
-                          ${bottomTab === "collateral" ? "2.85M" : "1.24M"}
+                          {bottomTab === "collateral"
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? getTotalSupply(selectedPair.collateralAsset.symbol)?.usdValue || "$2.85M"
+                                : "$2.85M")
+                            : (selectedPair?.debtAsset?.symbol
+                                ? getTotalSupply(selectedPair.debtAsset.symbol)?.usdValue || "$1.24M"
+                                : "$1.24M")
+                          }
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
-                            ? `${(2850000 / collateralPrice).toLocaleString()} ${selectedPair?.collateralAsset.symbol || "WKAIA"}`
-                            : `${(1240000 / debtPrice).toLocaleString()} ${selectedPair?.debtAsset.symbol || "USDT0"}`}
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? `${getTotalSupply(selectedPair.collateralAsset.symbol)?.amount || "20,357,142"} ${selectedPair.collateralAsset.symbol}`
+                                : `20,357,142 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`)
+                            : (selectedPair?.debtAsset?.symbol
+                                ? `${getTotalSupply(selectedPair.debtAsset.symbol)?.amount || "1,240,000"} ${selectedPair.debtAsset.symbol}`
+                                : `1,240,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`)
+                          }
                         </div>
                       </div>
 
@@ -1140,12 +1154,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Total borrowed
                         </div>
                         <div className="text-white text-lg font-medium">
-                          ${bottomTab === "collateral" ? "2.34M" : "896K"}
+                          {bottomTab === "collateral"
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? getTotalBorrowed(selectedPair.collateralAsset.symbol)?.usdValue || "$2.34M"
+                                : "$2.34M")
+                            : (selectedPair?.debtAsset?.symbol
+                                ? getTotalBorrowed(selectedPair.debtAsset.symbol)?.usdValue || "$896K"
+                                : "$896K")
+                          }
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
-                            ? `${(2340000 / collateralPrice).toLocaleString()} ${selectedPair?.collateralAsset.symbol || "WKAIA"}`
-                            : `${(896000 / debtPrice).toLocaleString()} ${selectedPair?.debtAsset.symbol || "USDT0"}`}
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? `${getTotalBorrowed(selectedPair.collateralAsset.symbol)?.amount || "16,714,285"} ${selectedPair.collateralAsset.symbol}`
+                                : `16,714,285 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`)
+                            : (selectedPair?.debtAsset?.symbol
+                                ? `${getTotalBorrowed(selectedPair.debtAsset.symbol)?.amount || "896,000"} ${selectedPair.debtAsset.symbol}`
+                                : `896,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`)
+                          }
                         </div>
                       </div>
 

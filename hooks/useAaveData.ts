@@ -244,6 +244,86 @@ export function useAaveData() {
     }
   };
 
+  /**
+   * Get Total Supply for a token (Total Borrowed + Available Liquidity)
+   */
+  const getTotalSupply = (tokenSymbol: string): {
+    amount: string | null;
+    usdValue: string | null;
+  } => {
+    const totalBorrowed = getTotalBorrowed(tokenSymbol);
+    const availableLiquidity = getLiquidity(tokenSymbol);
+    
+    if (!totalBorrowed.amount || !availableLiquidity.amount) {
+      return { amount: null, usdValue: null };
+    }
+
+    try {
+      // Parse amounts (remove commas and convert to numbers)
+      const borrowedAmount = parseFloat(totalBorrowed.amount.replace(/,/g, ""));
+      const liquidityAmount = parseFloat(availableLiquidity.amount.replace(/,/g, ""));
+      
+      // Calculate total supply
+      const totalSupplyAmount = borrowedAmount + liquidityAmount;
+      const formattedAmount = totalSupplyAmount.toLocaleString();
+      
+      // Calculate USD value
+      const borrowedUsd = totalBorrowed.usdValue ? parseFloat(totalBorrowed.usdValue.replace(/[$,KM]/g, "")) : 0;
+      const liquidityUsd = availableLiquidity.usdValue ? parseFloat(availableLiquidity.usdValue.replace(/[$,KM]/g, "")) : 0;
+      
+      // Handle K/M suffixes
+      const borrowedMultiplier = totalBorrowed.usdValue?.includes("M") ? 1000000 : 
+                                totalBorrowed.usdValue?.includes("K") ? 1000 : 1;
+      const liquidityMultiplier = availableLiquidity.usdValue?.includes("M") ? 1000000 : 
+                                 availableLiquidity.usdValue?.includes("K") ? 1000 : 1;
+      
+      const totalUsdValue = (borrowedUsd * borrowedMultiplier) + (liquidityUsd * liquidityMultiplier);
+      const formattedUsdValue = totalUsdValue >= 1000000 ? `$${(totalUsdValue / 1000000).toFixed(2)}M` :
+                               totalUsdValue >= 1000 ? `$${(totalUsdValue / 1000).toFixed(1)}K` :
+                               `$${totalUsdValue.toFixed(2)}`;
+
+      return { amount: formattedAmount, usdValue: formattedUsdValue };
+    } catch (error) {
+      console.error(`Error calculating total supply for ${tokenSymbol}:`, error);
+      return { amount: null, usdValue: null };
+    }
+  };
+
+  /**
+   * Get Total Borrowed for a token from debtToken totalSupply in aaveStatesV3
+   */
+  const getTotalBorrowed = (tokenSymbol: string): {
+    amount: string | null;
+    usdValue: string | null;
+  } => {
+    // variableDebtToken addresses for each token
+    const debtTokenAddresses: Record<string, string> = {
+      WKAIA: "0xada27a9e7fc5e5256adf1225bc94e30973fac274",
+      USDT: "0x3a5724329f807eef8f2a069e66c9aa34982afbec",
+      USDT0: "0xa9f23143c38fbfb2fa299b604a2402bab1e541fc",
+      USDC: "0x4880c4b5a3d83965c78faed3373154610b39046b",
+    };
+
+    const debtTokenAddress = debtTokenAddresses[tokenSymbol];
+    if (!debtTokenAddress) {
+      return { amount: null, usdValue: null };
+    }
+
+    const state = aaveStatesV3 as Record<string, { totalSupply?: bigint }>;
+    const st = state[debtTokenAddress.toLowerCase()];
+    const totalBorrowedBigInt = st?.totalSupply;
+    if (!totalBorrowedBigInt) {
+      return { amount: null, usdValue: null };
+    }
+
+    // Format the amount using correct decimals
+    const amount = formatLiquidity(totalBorrowedBigInt, tokenSymbol);
+    const originalTokenAddr = getTokenAddress(tokenSymbol);
+    const usdValue = amount && originalTokenAddr ? formatUsdValue(amount, originalTokenAddr) : null;
+
+    return { amount, usdValue };
+  };
+
   return {
     getSupplyAPY,
     getBorrowAPY,
@@ -253,5 +333,7 @@ export function useAaveData() {
     getTotalLiquidity,
     getFlashloanPremium,
     getMaxROE,
+    getTotalSupply,
+    getTotalBorrowed,
   };
 }
