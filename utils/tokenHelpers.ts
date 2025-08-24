@@ -11,6 +11,6 @@ export const getTokenAddress = (symbol: string): string | undefined => {
     USDC: TOKEN_ADDRESSES.USDC,
     USDT0: TOKEN_ADDRESSES.USDT0,
   } as const;
-  
+
   return addressMap[symbol as keyof typeof addressMap]?.toLowerCase();
 };

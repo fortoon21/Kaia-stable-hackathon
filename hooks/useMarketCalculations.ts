@@ -32,7 +32,10 @@ export function useMarketCalculations() {
     };
 
     // Convert to position format
-    const borrowPositions: Record<string, { amount: string; usdValue: string }> = {};
+    const borrowPositions: Record<
+      string,
+      { amount: string; usdValue: string }
+    > = {};
     Object.entries(borrowAmounts).forEach(([symbol, amount]) => {
       borrowPositions[symbol] = {
         amount,

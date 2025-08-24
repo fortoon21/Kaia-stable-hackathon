@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { MarketStatsOverview } from "@/components/markets/MarketStatsOverview";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useMarketCalculations } from "@/hooks/useMarketCalculations";
-import { MarketStatsOverview } from "@/components/markets/MarketStatsOverview";
-import { MarketGroupHeader } from "@/components/markets/MarketGroupHeader";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
@@ -15,7 +14,6 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const { getSupplyAPY, getBorrowAPY, getLLTV, getLiquidity } = useAaveData();
   const { calculateBorrowPositions, getPositionData } = useMarketCalculations();
-
 
   // Calculate total pairs and assets
   const totalPairs = MARKET_GROUPS.reduce(
@@ -30,7 +28,6 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
       ])
     )
   ).size;
-
 
   // Get borrow positions for all assets
   const borrowPositions = calculateBorrowPositions();
@@ -73,7 +70,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
         </div>
 
         {/* Market Stats Overview */}
-        <MarketStatsOverview totalPairs={totalPairs} totalAssets={totalAssets} />
+        <MarketStatsOverview
+          totalPairs={totalPairs}
+          totalAssets={totalAssets}
+        />
 
         {/* Markets Table */}
         <div className="bg-[#0c1d2f] border border-[#14304e] rounded-2xl overflow-hidden">
@@ -234,14 +234,16 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Supply APY */}
                             <div className="text-right">
                               <div className="text-[#23c09b] font-semibold">
-                                {getSupplyAPY(pair.collateralAsset.symbol) ?? pair.supplyAPY}
+                                {getSupplyAPY(pair.collateralAsset.symbol) ??
+                                  pair.supplyAPY}
                               </div>
                             </div>
 
                             {/* Borrow APY */}
                             <div className="text-right">
                               <div className="text-orange-400 font-semibold">
-                                {getBorrowAPY(pair.debtAsset.symbol) ?? pair.borrowAPY}
+                                {getBorrowAPY(pair.debtAsset.symbol) ??
+                                  pair.borrowAPY}
                               </div>
                             </div>
 
@@ -262,21 +264,26 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* LLTV */}
                             <div className="text-right">
                               <div className="font-semibold">
-                                {getLLTV(pair.collateralAsset.symbol) ?? pair.lltv}
+                                {getLLTV(pair.collateralAsset.symbol) ??
+                                  pair.lltv}
                               </div>
                             </div>
 
                             {/* Liquidity */}
                             <div className="text-right">
                               {(() => {
-                                const { amount, usdValue } = getLiquidity(pair.debtAsset.symbol);
+                                const { amount, usdValue } = getLiquidity(
+                                  pair.debtAsset.symbol
+                                );
                                 return (
                                   <>
                                     <div className="font-semibold">
                                       {usdValue || pair.liquidity}
                                     </div>
                                     <div className="text-[#728395] text-xs">
-                                      {amount ? `${amount} ${pair.debtAsset.symbol}` : `${pair.liquidityAmount} ${pair.liquidityToken}`}
+                                      {amount
+                                        ? `${amount} ${pair.debtAsset.symbol}`
+                                        : `${pair.liquidityAmount} ${pair.liquidityToken}`}
                                     </div>
                                   </>
                                 );
@@ -286,7 +293,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Your Debt */}
                             <div className="text-right">
                               {(() => {
-                                const position = getPositionData(pair.debtAsset.symbol, borrowPositions);
+                                const position = getPositionData(
+                                  pair.debtAsset.symbol,
+                                  borrowPositions
+                                );
                                 const hasDebt = position.amount !== "0";
 
                                 return (
@@ -307,7 +317,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Action */}
                             <div className="text-center">
                               {(() => {
-                                const position = getPositionData(pair.debtAsset.symbol, borrowPositions);
+                                const position = getPositionData(
+                                  pair.debtAsset.symbol,
+                                  borrowPositions
+                                );
                                 const hasDebt = position.amount !== "0";
 
                                 return (

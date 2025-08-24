@@ -9,8 +9,8 @@ import {
   useEffect,
   useState,
 } from "react";
+import { AAVE_ASSETS, AAVE_CONFIG } from "@/constants/tokens";
 import AaveFacet from "@/lib/abi/AaveFacet.json";
-import { AAVE_CONFIG, AAVE_ASSETS } from "@/constants/tokens";
 
 interface WindowWithWallets extends Window {
   kaia?: {
@@ -276,7 +276,9 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     const contract = getAaveContract();
     if (!contract) return;
 
-    const resolvedPool = await resolveAavePoolAddress(AAVE_CONFIG.LENDING_POOL_V3);
+    const resolvedPool = await resolveAavePoolAddress(
+      AAVE_CONFIG.LENDING_POOL_V3
+    );
     const effectiveChainId = chainId ?? 8217;
     const cachePrefix = `aave:v3:${effectiveChainId}:${resolvedPool}`;
 
@@ -371,7 +373,10 @@ export function Web3Provider({ children }: { children: ReactNode }) {
               signer?.provider ??
               provider ??
               new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
-            const rawHex = await rp.call({ to: AAVE_CONFIG.FACET_ADDRESS, data });
+            const rawHex = await rp.call({
+              to: AAVE_CONFIG.FACET_ADDRESS,
+              data,
+            });
             const decoded = iface.decodeFunctionResult(
               "aavePoolStateV3",
               rawHex

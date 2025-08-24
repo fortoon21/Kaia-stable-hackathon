@@ -24,7 +24,7 @@ export const AAVE_CONFIG = {
 // Generate Aave assets list from TOKEN_ADDRESSES
 export const AAVE_ASSETS = [
   TOKEN_ADDRESSES.WKAIA,
-  TOKEN_ADDRESSES.USDT0, 
+  TOKEN_ADDRESSES.USDT0,
   TOKEN_ADDRESSES.USDC,
   TOKEN_ADDRESSES.USDT,
 ] as const;

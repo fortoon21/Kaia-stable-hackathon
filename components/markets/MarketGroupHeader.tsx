@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { getMarketImage } from "@/utils/formatters";
 import { MARKET_ASSET_IMAGES } from "@/constants/marketData";
+import { getMarketImage } from "@/utils/formatters";
 
 interface MarketGroupHeaderProps {
   groupName: string;
@@ -43,9 +43,7 @@ export function MarketGroupHeader({
             className="rounded-full"
           />
         )}
-        <span className="font-semibold text-lg">
-          {groupName}
-        </span>
+        <span className="font-semibold text-lg">{groupName}</span>
         <span className="text-[#728395] text-sm">
           ({pairCount} {pairCount === 1 ? "pair" : "pairs"})
         </span>

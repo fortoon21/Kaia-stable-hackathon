@@ -25,7 +25,8 @@ export const toPercentFromRay = (value: unknown): string | null => {
 export const toPercentFromBps = (value: unknown): string | null => {
   try {
     if (value === undefined || value === null) return null;
-    const num = typeof value === "bigint" ? Number(value) : Number(value as number);
+    const num =
+      typeof value === "bigint" ? Number(value) : Number(value as number);
     if (!Number.isFinite(num)) return null;
     return `${(num / 100).toFixed(2)}%`;
   } catch {
@@ -37,7 +38,10 @@ export const toPercentFromBps = (value: unknown): string | null => {
  * Format liquidity amount with proper decimals
  * Handles different token decimal places
  */
-export const formatLiquidity = (value: unknown, symbol: string): string | null => {
+export const formatLiquidity = (
+  value: unknown,
+  symbol: string
+): string | null => {
   try {
     if (value === undefined || value === null) return null;
     const decimals = TOKEN_DECIMALS[symbol] || 18;
@@ -53,13 +57,17 @@ export const formatLiquidity = (value: unknown, symbol: string): string | null =
  * Format token amount to USD value using price API
  * Returns formatted string with proper units (K, M, etc.)
  */
-export const formatUsdValue = (amount: string | number, tokenAddress: string): string | null => {
+export const formatUsdValue = (
+  amount: string | number,
+  tokenAddress: string
+): string | null => {
   const priceData = getCachedPrices();
   const price = getPriceByAddress(priceData, tokenAddress);
-  const numAmount = typeof amount === 'string' ? parseFloat(amount.replace(/,/g, '')) : amount;
-  
+  const numAmount =
+    typeof amount === "string" ? parseFloat(amount.replace(/,/g, "")) : amount;
+
   if (!price || !Number.isFinite(numAmount)) return null;
-  
+
   const usdValue = numAmount * price;
   if (usdValue >= 1000000) {
     return `$${(usdValue / 1000000).toFixed(2)}M`;
