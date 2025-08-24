@@ -1,28 +1,53 @@
 "use client";
 
+import { ethers } from "ethers";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NumberInput from "@/components/ui/NumberInput";
 import Slider from "@/components/ui/Slider";
 import { LAYOUT } from "@/constants/layout";
+import {
+  AAVE_CONFIG,
+  TOKEN_ADDRESSES,
+  TOKEN_DECIMALS,
+} from "@/constants/tokens";
+import { useWeb3 } from "@/lib/web3Provider";
 
 interface RepayProps {
   onGoBack?: () => void;
 }
 
+type AssetInfo = {
+  symbol: string;
+  asset: string;
+  icon: string;
+  iconBg: string;
+  imageUrl: string | null;
+};
+
+type RepayAsset = {
+  symbol: string;
+  amount: string;
+  usdValue: string;
+  asset: AssetInfo;
+  collateralAsset: AssetInfo;
+} | null;
+
 export default function Repay({ onGoBack }: RepayProps = {}) {
+  const { signer, address, refreshAaveData } = useWeb3();
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("swap");
   const [repayPercent, setRepayPercent] = useState(0);
   const [collateralAmount, setCollateralAmount] = useState("");
   const [debtAmount, setDebtAmount] = useState("");
-  const [repayAsset, setRepayAsset] = useState<unknown>(null);
+  const [repayAsset, setRepayAsset] = useState<RepayAsset>(null);
+  const [isRepaying, setIsRepaying] = useState(false);
 
   // Load repay asset info from localStorage
   useEffect(() => {
     const storedAsset = localStorage.getItem("repayAsset");
     if (storedAsset) {
       try {
-        const assetInfo = JSON.parse(storedAsset);
+        const assetInfo = JSON.parse(storedAsset) as NonNullable<RepayAsset>;
         setRepayAsset(assetInfo);
       } catch (error) {
         console.error("Failed to parse repay asset info:", error);
@@ -70,6 +95,82 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
       });
     }
   }, []);
+
+  const handleRepay = useCallback(async () => {
+    try {
+      if (!signer || !address) throw new Error("Connect wallet first");
+      if (!repayAsset) throw new Error("No repay asset selected");
+
+      const symbol = repayAsset.symbol as keyof typeof TOKEN_ADDRESSES;
+      const tokenAddress = TOKEN_ADDRESSES[symbol];
+      const decimals = TOKEN_DECIMALS[symbol] ?? 18;
+      if (!tokenAddress) throw new Error("Unsupported token");
+
+      // Determine amount to repay (input overrides preset)
+      const rawAmount =
+        debtAmount && debtAmount.trim().length > 0
+          ? debtAmount
+          : repayAsset.amount || "0";
+      const cleanedAmount = rawAmount.replace(/,/g, "");
+      const amountWei = ethers.parseUnits(cleanedAmount || "0", decimals);
+      if (amountWei === (0 as unknown as bigint)) {
+        throw new Error("Amount must be greater than 0");
+      }
+
+      setIsRepaying(true);
+
+      // Resolve pool address (handles AddressesProvider)
+      let pool: string = AAVE_CONFIG.LENDING_POOL_V3 as unknown as string;
+      try {
+        const providerProbeAbi: ethers.InterfaceAbi = [
+          "function getPool() view returns (address)",
+        ];
+        const probe = new ethers.Contract(pool, providerProbeAbi, signer);
+        const maybePool: string = await probe.getPool();
+        if (ethers.isAddress(maybePool) && maybePool !== ethers.ZeroAddress) {
+          pool = maybePool;
+        }
+      } catch {}
+
+      // 1) Check allowance to Aave V3 pool, approve max if insufficient
+      const erc20Abi: ethers.InterfaceAbi = [
+        "function allowance(address owner, address spender) view returns (uint256)",
+        "function approve(address spender, uint256 amount) returns (bool)",
+      ];
+      const erc20 = new ethers.Contract(tokenAddress, erc20Abi, signer);
+      const currentAllowance: bigint = await erc20.allowance(address, pool);
+      if (currentAllowance < amountWei) {
+        const txApprove = await erc20.approve(pool, ethers.MaxUint256);
+        await txApprove.wait();
+      }
+
+      // 2) Call Aave Pool repay(asset, amount, rateMode=2, onBehalfOf)
+      const aavePoolAbi: ethers.InterfaceAbi = [
+        "function repay(address asset, uint256 amount, uint256 interestRateMode, address onBehalfOf) returns (uint256)",
+      ];
+      const poolContract = new ethers.Contract(pool, aavePoolAbi, signer);
+      const rateMode = 2; // variable debt
+      const tx = await poolContract.repay(
+        tokenAddress,
+        amountWei,
+        rateMode,
+        address
+      );
+      await tx.wait();
+
+      // Refresh on-chain data
+      await refreshAaveData?.();
+
+      // Reset local UI state minimally
+      setDebtAmount("");
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("Repay failed:", e);
+      alert((e as Error).message || "Repay failed");
+    } finally {
+      setIsRepaying(false);
+    }
+  }, [signer, address, repayAsset, debtAmount, refreshAaveData]);
 
   return (
     <div className="text-white">
@@ -165,7 +266,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           />
                         ) : (
                           <div
-                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.asset?.iconBg || "from-orange-500 to-orange-600"}`}
+                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                              repayAsset.asset?.iconBg ||
+                              "from-orange-500 to-orange-600"
+                            }`}
                           >
                             <span className="text-white font-bold text-lg">
                               {repayAsset.asset?.icon || repayAsset.symbol[0]}
@@ -183,7 +287,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                         />
                       ) : (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.collateralAsset?.iconBg || "from-[#2775CA] to-[#1e5f9a]"}`}
+                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                            repayAsset.collateralAsset?.iconBg ||
+                            "from-[#2775CA] to-[#1e5f9a]"
+                          }`}
                         >
                           <span className="text-white font-bold text-lg">
                             {repayAsset.collateralAsset?.icon ||
@@ -244,7 +351,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                         />
                       ) : (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.asset?.iconBg || "from-orange-500 to-orange-600"}`}
+                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                            repayAsset.asset?.iconBg ||
+                            "from-orange-500 to-orange-600"
+                          }`}
                         >
                           <span className="text-white font-bold text-sm">
                             {repayAsset.asset?.icon || repayAsset.symbol[0]}
@@ -329,8 +439,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
               <button
                 type="button"
                 className="flex-1 py-4 px-6 bg-gradient-to-r from-[#2ae5b9] to-[#22c09b] text-black font-semibold rounded-lg hover:from-[#22c09b] hover:to-[#1ea87a] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                disabled={isRepaying || !repayAsset}
+                onClick={handleRepay}
               >
-                Repay Debt
+                {isRepaying ? "Repaying..." : "Repay Debt"}
               </button>
             </div>
           </div>
@@ -356,7 +468,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           />
                         ) : (
                           <div
-                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.collateralAsset?.iconBg || "from-[#2775CA] to-[#1e5f9a]"}`}
+                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                              repayAsset.collateralAsset?.iconBg ||
+                              "from-[#2775CA] to-[#1e5f9a]"
+                            }`}
                           >
                             <span className="text-white font-bold text-xs">
                               {repayAsset.collateralAsset?.icon ||
@@ -394,7 +509,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           />
                         ) : (
                           <div
-                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${repayAsset.asset?.iconBg || "from-orange-500 to-orange-600"}`}
+                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                              repayAsset.asset?.iconBg ||
+                              "from-orange-500 to-orange-600"
+                            }`}
                           >
                             <span className="text-white font-bold text-xs">
                               {repayAsset.asset?.icon || repayAsset.symbol[0]}
