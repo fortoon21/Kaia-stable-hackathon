@@ -1,0 +1,752 @@
+{
+  "abi": [
+    {
+      "type": "function",
+      "name": "aaveBorrow",
+      "inputs": [
+        { "name": "amount", "type": "uint256", "internalType": "uint256" },
+        { "name": "lendingPool", "type": "address", "internalType": "address" },
+        { "name": "asset", "type": "address", "internalType": "address" },
+        { "name": "debtAsset", "type": "address", "internalType": "address" },
+        {
+          "name": "interestRateMode",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        { "name": "recipient", "type": "address", "internalType": "Recipient" }
+      ],
+      "outputs": [
+        { "name": "inputToken", "type": "address", "internalType": "address" },
+        { "name": "outputToken", "type": "address", "internalType": "address" },
+        { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "aaveExecute",
+      "inputs": [
+        { "name": "amount", "type": "uint256", "internalType": "uint256" },
+        {
+          "name": "aaveExecuteParams",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        { "name": "recipient", "type": "address", "internalType": "Recipient" },
+        { "name": "payer", "type": "address", "internalType": "Payer" }
+      ],
+      "outputs": [
+        { "name": "inputToken", "type": "address", "internalType": "address" },
+        { "name": "outputToken", "type": "address", "internalType": "address" },
+        { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "aavePoolParamsV2",
+      "inputs": [
+        { "name": "lendingPool", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [
+        {
+          "name": "response",
+          "type": "tuple",
+          "internalType": "struct IAaveViewer.AavePoolParamsResponseV2",
+          "components": [
+            {
+              "name": "flashloanPremium",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "assetParams",
+              "type": "tuple[]",
+              "internalType": "struct IAaveViewer.AaveAssetParams[]",
+              "components": [
+                {
+                  "name": "underlyingAsset",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                { "name": "name", "type": "string", "internalType": "string" },
+                {
+                  "name": "symbol",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                { "name": "id", "type": "uint16", "internalType": "uint16" },
+                {
+                  "name": "aTokenAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "stableDebtTokenAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "variableDebtTokenAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "interestRateStrategyAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "baseLTVasCollateral",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "reserveLiquidationThreshold",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "reserveLiquidationBonus",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "decimals",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "reserveFactor",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "eModeCategoryId",
+                  "type": "uint8",
+                  "internalType": "uint8"
+                },
+                {
+                  "name": "usageAsCollateralEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                { "name": "isActive", "type": "bool", "internalType": "bool" },
+                { "name": "isFrozen", "type": "bool", "internalType": "bool" },
+                {
+                  "name": "borrowingEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "stableBorrowRateEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                { "name": "paused", "type": "bool", "internalType": "bool" },
+                {
+                  "name": "variableRateSlope1",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "variableRateSlope2",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "stableRateSlope1",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "stableRateSlope2",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "baseStableBorrowRate",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "baseVariableBorrowRate",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "optimalUsageRatio",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "debtCeiling",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "debtCeilingDecimals",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "borrowCap",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "supplyCap",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "flashLoanEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "isSiloedBorrowing",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "accruedToTreasury",
+                  "type": "uint128",
+                  "internalType": "uint128"
+                },
+                {
+                  "name": "unbacked",
+                  "type": "uint128",
+                  "internalType": "uint128"
+                },
+                {
+                  "name": "isolationModeTotalDebt",
+                  "type": "uint128",
+                  "internalType": "uint128"
+                },
+                {
+                  "name": "eModeLtv",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "eModeLiquidationThreshold",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "eModeLiquidationBonus",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "borrowableInIsolation",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "eModePriceSource",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "priceOracle",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "eModeLabel",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "aavePoolParamsV3",
+      "inputs": [
+        { "name": "lendingPool", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [
+        {
+          "name": "response",
+          "type": "tuple",
+          "internalType": "struct IAaveViewer.AavePoolParamsResponseV3",
+          "components": [
+            {
+              "name": "flashloanPremium",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "assetParams",
+              "type": "tuple[]",
+              "internalType": "struct IAaveViewer.AaveAssetParams[]",
+              "components": [
+                {
+                  "name": "underlyingAsset",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                { "name": "name", "type": "string", "internalType": "string" },
+                {
+                  "name": "symbol",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                { "name": "id", "type": "uint16", "internalType": "uint16" },
+                {
+                  "name": "aTokenAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "stableDebtTokenAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "variableDebtTokenAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "interestRateStrategyAddress",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "baseLTVasCollateral",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "reserveLiquidationThreshold",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "reserveLiquidationBonus",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "decimals",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "reserveFactor",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "eModeCategoryId",
+                  "type": "uint8",
+                  "internalType": "uint8"
+                },
+                {
+                  "name": "usageAsCollateralEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                { "name": "isActive", "type": "bool", "internalType": "bool" },
+                { "name": "isFrozen", "type": "bool", "internalType": "bool" },
+                {
+                  "name": "borrowingEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "stableBorrowRateEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                { "name": "paused", "type": "bool", "internalType": "bool" },
+                {
+                  "name": "variableRateSlope1",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "variableRateSlope2",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "stableRateSlope1",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "stableRateSlope2",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "baseStableBorrowRate",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "baseVariableBorrowRate",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "optimalUsageRatio",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "debtCeiling",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "debtCeilingDecimals",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "borrowCap",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "supplyCap",
+                  "type": "uint256",
+                  "internalType": "uint256"
+                },
+                {
+                  "name": "flashLoanEnabled",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "isSiloedBorrowing",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "accruedToTreasury",
+                  "type": "uint128",
+                  "internalType": "uint128"
+                },
+                {
+                  "name": "unbacked",
+                  "type": "uint128",
+                  "internalType": "uint128"
+                },
+                {
+                  "name": "isolationModeTotalDebt",
+                  "type": "uint128",
+                  "internalType": "uint128"
+                },
+                {
+                  "name": "eModeLtv",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "eModeLiquidationThreshold",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "eModeLiquidationBonus",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "borrowableInIsolation",
+                  "type": "bool",
+                  "internalType": "bool"
+                },
+                {
+                  "name": "eModePriceSource",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "priceOracle",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "eModeLabel",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "aavePoolStateV2",
+      "inputs": [
+        { "name": "lendingPool", "type": "address", "internalType": "address" },
+        { "name": "asset", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [
+        {
+          "name": "response",
+          "type": "tuple",
+          "internalType": "struct IAaveViewer.AavePoolStateResponseV2",
+          "components": [
+            {
+              "name": "underlyingAsset",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "stableDebtLastUpdateTimestamp",
+              "type": "uint40",
+              "internalType": "uint40"
+            },
+            {
+              "name": "liquidityIndex",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "variableBorrowIndex",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "liquidityRate",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "variableBorrowRate",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "stableBorrowRate",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "lastUpdateTimestamp",
+              "type": "uint40",
+              "internalType": "uint40"
+            },
+            {
+              "name": "availableLiquidity",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "priceInMarketReferenceCurrency",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "principalStableDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "totalPrincipalStableDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "averageStableRate",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "totalScaledVariableDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "aavePoolStateV3",
+      "inputs": [
+        { "name": "lendingPool", "type": "address", "internalType": "address" },
+        { "name": "asset", "type": "address", "internalType": "address" }
+      ],
+      "outputs": [
+        {
+          "name": "response",
+          "type": "tuple",
+          "internalType": "struct IAaveViewer.AavePoolStateResponseV3",
+          "components": [
+            {
+              "name": "underlyingAsset",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "stableDebtLastUpdateTimestamp",
+              "type": "uint40",
+              "internalType": "uint40"
+            },
+            {
+              "name": "liquidityIndex",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "variableBorrowIndex",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "liquidityRate",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "variableBorrowRate",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "stableBorrowRate",
+              "type": "uint128",
+              "internalType": "uint128"
+            },
+            {
+              "name": "lastUpdateTimestamp",
+              "type": "uint40",
+              "internalType": "uint40"
+            },
+            {
+              "name": "availableLiquidity",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "priceInMarketReferenceCurrency",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "principalStableDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "totalPrincipalStableDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "averageStableRate",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "totalScaledVariableDebt",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "aaveRepay",
+      "inputs": [
+        { "name": "amount", "type": "uint256", "internalType": "uint256" },
+        { "name": "lendingPool", "type": "address", "internalType": "address" },
+        { "name": "asset", "type": "address", "internalType": "address" },
+        { "name": "rateMode", "type": "uint256", "internalType": "uint256" },
+        { "name": "payer", "type": "address", "internalType": "Payer" }
+      ],
+      "outputs": [
+        { "name": "inputToken", "type": "address", "internalType": "address" },
+        { "name": "outputToken", "type": "address", "internalType": "address" },
+        { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "executeOperation",
+      "inputs": [
+        { "name": "assets", "type": "address[]", "internalType": "address[]" },
+        { "name": "amounts", "type": "uint256[]", "internalType": "uint256[]" },
+        {
+          "name": "premiums",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        },
+        { "name": "initiator", "type": "address", "internalType": "address" },
+        { "name": "params", "type": "bytes", "internalType": "bytes" }
+      ],
+      "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "flashloan",
+      "inputs": [
+        { "name": "lendingPool", "type": "address", "internalType": "address" },
+        { "name": "assets", "type": "address[]", "internalType": "address[]" },
+        { "name": "amounts", "type": "uint256[]", "internalType": "uint256[]" },
+        { "name": "modes", "type": "uint256[]", "internalType": "uint256[]" },
+        { "name": "params", "type": "bytes", "internalType": "bytes" }
+      ],
+      "outputs": [
+        { "name": "inputToken", "type": "address", "internalType": "address" },
+        { "name": "outputToken", "type": "address", "internalType": "address" },
+        { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "liquidationCall",
+      "inputs": [
+        { "name": "debtToCover", "type": "uint256", "internalType": "uint256" },
+        { "name": "lendingPool", "type": "address", "internalType": "address" },
+        {
+          "name": "collateralAsset",
+          "type": "address",
+          "internalType": "address"
+        },
+        { "name": "debtAsset", "type": "address", "internalType": "address" },
+        { "name": "user", "type": "address", "internalType": "address" },
+        { "name": "payer", "type": "address", "internalType": "Payer" },
+        { "name": "receiveAToken", "type": "bool", "internalType": "bool" }
+      ],
+      "outputs": [
+        { "name": "inputToken", "type": "address", "internalType": "address" },
+        { "name": "outputToken", "type": "address", "internalType": "address" },
+        { "name": "amountOut", "type": "uint256", "internalType": "uint256" }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "error",
+      "name": "GenericError",
+      "inputs": [
+        { "name": "errorCode", "type": "uint256", "internalType": "uint256" }
+      ]
+    },
+    { "type": "error", "name": "UnsafeCast", "inputs": [] }
+  ]
+}

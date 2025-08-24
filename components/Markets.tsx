@@ -12,6 +12,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const { getPriceBySymbol } = useTokenPrices();
 
+
   // Calculate total pairs and assets
   const totalPairs = MARKET_GROUPS.reduce(
     (sum, group) => sum + group.tradingPairs.length,

@@ -9,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import AaveFacet from "@/lib/abi/AaveFacet.json";
 
 interface WindowWithWallets extends Window {
   kaia?: {
@@ -43,6 +44,19 @@ interface Web3ContextType {
   disconnectWallet: () => void;
   switchNetwork: (chainId: number) => Promise<void>;
   getTokenBalance: (tokenAddress: string, decimals?: number) => Promise<string>;
+  aaveParamsV3: unknown | null;
+  aaveParamsV3Index: Record<string, unknown>;
+  aaveStatesV3: Record<string, unknown>;
+  aaveUserBalances: Record<
+    string,
+    {
+      aTokenAddress: string;
+      variableDebtTokenAddress: string;
+      aTokenBalance: string;
+      variableDebtBalance: string;
+    }
+  >;
+  refreshAaveData: () => Promise<void>;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -74,6 +88,22 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [aaveParamsV3, setAaveParamsV3] = useState<unknown | null>(null);
+  const [aaveParamsV3Index, setAaveParamsV3Index] = useState<
+    Record<string, unknown>
+  >({});
+  const [aaveStatesV3, setAaveStatesV3] = useState<Record<string, unknown>>({});
+  const [aaveUserBalances, setAaveUserBalances] = useState<
+    Record<
+      string,
+      {
+        aTokenAddress: string;
+        variableDebtTokenAddress: string;
+        aTokenBalance: string;
+        variableDebtBalance: string;
+      }
+    >
+  >({});
 
   // Prevent hydration issues by ensuring client-side only rendering
   useEffect(() => {
@@ -132,6 +162,255 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     },
     [provider, address]
   );
+
+  // ---------------- Aave helpers (ABI + caching) ----------------
+  const AAVE_FACET_ADDRESS = "0xE661BE01F9e42Dc3Ed93909aA3c559A36187300d";
+  const AAVE_LENDING_POOL_V3 = "0xcf1af042f2a071df60a64ed4bdc9c7dee40780be";
+  const AAVE_ASSETS_CSV = "0x19aac5f612f524b754ca7e7c41cbfa2e981a4432,0x5c13e303a62fc5dedf5b52d66873f2e59fedadc2,0x608792deb376cce1c9fa4d0e6b7b44f507cffa6a,0xd077a400968890eacc75cdc901f0356c943e4fdb";
+  const AAVE_DEBUG = false;
+
+  // Normalize Aave V3 state tuple (ethers Result) into a plain object
+  const coerceAaveStateV3 = useCallback((raw: unknown) => {
+    let r: unknown = raw;
+    if (
+      typeof raw === "object" &&
+      raw !== null &&
+      "response" in (raw as Record<string, unknown>)
+    ) {
+      r = (raw as Record<string, unknown>).response as unknown;
+    }
+    if (
+      typeof r === "object" &&
+      r !== null &&
+      !Array.isArray(r) &&
+      "underlyingAsset" in (r as Record<string, unknown>)
+    ) {
+      return r as Record<string, unknown>;
+    }
+    if (Array.isArray(r) && r.length >= 14) {
+      return {
+        underlyingAsset: (r as unknown[])[0],
+        stableDebtLastUpdateTimestamp: (r as unknown[])[1],
+        liquidityIndex: (r as unknown[])[2],
+        variableBorrowIndex: (r as unknown[])[3],
+        liquidityRate: (r as unknown[])[4],
+        variableBorrowRate: (r as unknown[])[5],
+        stableBorrowRate: (r as unknown[])[6],
+        lastUpdateTimestamp: (r as unknown[])[7],
+        availableLiquidity: (r as unknown[])[8],
+        priceInMarketReferenceCurrency: (r as unknown[])[9],
+        principalStableDebt: (r as unknown[])[10],
+        totalPrincipalStableDebt: (r as unknown[])[11],
+        averageStableRate: (r as unknown[])[12],
+        totalScaledVariableDebt: (r as unknown[])[13],
+      } as Record<string, unknown>;
+    }
+    return r;
+  }, []);
+
+  const getAaveContract = useCallback(() => {
+    if (!AAVE_FACET_ADDRESS) return null;
+    try {
+      const readonly = new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
+      const read = signer ?? provider ?? readonly;
+      return new ethers.Contract(
+        AAVE_FACET_ADDRESS,
+        (AaveFacet as { abi: ethers.InterfaceAbi }).abi,
+        read
+      );
+    } catch {
+      return null;
+    }
+  }, [provider, signer]);
+
+  const resolveAavePoolAddress = useCallback(
+    async (maybeProviderOrPool: string) => {
+      try {
+        if (!maybeProviderOrPool) return maybeProviderOrPool;
+        const readonly = new ethers.JsonRpcProvider(
+          KAIA_NETWORKS.mainnet.rpcUrl
+        );
+        const providerContract = new ethers.Contract(
+          maybeProviderOrPool,
+          ["function getPool() view returns (address)"],
+          readonly
+        );
+        const poolAddr: string = await providerContract.getPool();
+        if (ethers.isAddress(poolAddr) && poolAddr !== ethers.ZeroAddress) {
+          return poolAddr;
+        }
+      } catch {
+        // not a provider; treat input as pool
+      }
+      return maybeProviderOrPool;
+    },
+    []
+  );
+
+  const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+  const cacheGet = useCallback((key: string) => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { ts: number; data: unknown };
+      if (
+        typeof parsed.ts === "number" &&
+        Date.now() - parsed.ts > CACHE_TTL_MS
+      ) {
+        return null;
+      }
+      return parsed.data ?? null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const cacheSet = useCallback((key: string, data: unknown) => {
+    try {
+      localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+    } catch {}
+  }, []);
+
+  const fetchAaveParamsAndStates = useCallback(async () => {
+    if (!AAVE_FACET_ADDRESS || !AAVE_LENDING_POOL_V3) return;
+
+    const contract = getAaveContract();
+    if (!contract) return;
+
+    const resolvedPool = await resolveAavePoolAddress(AAVE_LENDING_POOL_V3);
+    const effectiveChainId = chainId ?? 8217;
+    const cachePrefix = `aave:v3:${effectiveChainId}:${resolvedPool}`;
+
+    // Params V3
+    const paramsKey = `${cachePrefix}:params`;
+    let params = cacheGet(paramsKey);
+    if (!params) {
+      try {
+        const p = await contract.aavePoolParamsV3(resolvedPool);
+        let normalized: unknown = p as unknown;
+        if (
+          typeof p === "object" &&
+          p !== null &&
+          "response" in (p as Record<string, unknown>)
+        ) {
+          normalized = (p as Record<string, unknown>).response as unknown;
+        }
+        params = (normalized as {}) ?? {};
+        cacheSet(paramsKey, params);
+      } catch (_e) {
+        // ignore
+      }
+    }
+    if (params) {
+      setAaveParamsV3(params);
+      // Build index by underlyingAsset (lowercased), handling tuple/array return shapes
+      try {
+        let root: unknown = params as unknown;
+        if (
+          typeof params === "object" &&
+          params !== null &&
+          "response" in (params as Record<string, unknown>)
+        ) {
+          root = (params as Record<string, unknown>).response as unknown;
+        }
+        let assetParams: unknown[] = [];
+        if (
+          typeof root === "object" &&
+          root !== null &&
+          "assetParams" in (root as Record<string, unknown>) &&
+          Array.isArray((root as Record<string, unknown>).assetParams)
+        ) {
+          assetParams = (root as { assetParams: unknown[] }).assetParams;
+        } else if (Array.isArray(root)) {
+          const arr = root as unknown[];
+          if (Array.isArray(arr[1])) assetParams = arr[1] as unknown[];
+        }
+        const idx: Record<string, unknown> = {};
+        const getUnderlying = (p: unknown): string | undefined => {
+          if (
+            typeof p === "object" &&
+            p !== null &&
+            "underlyingAsset" in (p as Record<string, unknown>)
+          ) {
+            const v = (p as Record<string, unknown>).underlyingAsset;
+            return typeof v === "string" ? v : undefined;
+          }
+          if (Array.isArray(p) && typeof (p as unknown[])[0] === "string") {
+            return (p as unknown[])[0] as string;
+          }
+          return undefined;
+        };
+        for (const p of assetParams) {
+          const addr = getUnderlying(p);
+          if (addr) idx[addr.toLowerCase()] = p as Record<string, unknown>;
+        }
+        if (Object.keys(idx).length) setAaveParamsV3Index(idx);
+      } catch {
+        // ignore index build errors
+      }
+    }
+
+    // States V3 for provided assets
+    const assets = AAVE_ASSETS_CSV
+      ? AAVE_ASSETS_CSV.split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    const nextStates: Record<string, unknown> = {};
+    await Promise.all(
+      assets.map(async (asset) => {
+        const assetLc = asset.toLowerCase();
+        const stateKey = `${cachePrefix}:state:${assetLc}`;
+        let state = AAVE_DEBUG ? null : cacheGet(stateKey);
+        if (!state) {
+          try {
+            const iface = new ethers.Interface(
+              (AaveFacet as { abi: ethers.InterfaceAbi }).abi
+            );
+            const data = iface.encodeFunctionData("aavePoolStateV3", [
+              resolvedPool,
+              asset,
+            ]);
+            const rp =
+              signer?.provider ??
+              provider ??
+              new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
+            const rawHex = await rp.call({ to: AAVE_FACET_ADDRESS, data });
+            const decoded = iface.decodeFunctionResult(
+              "aavePoolStateV3",
+              rawHex
+            );
+            // decoded is an array; first element should be the tuple
+            const tuple =
+              Array.isArray(decoded) && decoded.length ? decoded[0] : decoded;
+            const normalized = coerceAaveStateV3(tuple);
+            state = (normalized as {}) ?? {};
+            cacheSet(stateKey, state);
+          } catch (_e) {
+            // ignore
+          }
+        }
+        if (state) nextStates[assetLc] = state;
+      })
+    );
+
+    if (Object.keys(nextStates).length) setAaveStatesV3(nextStates);
+  }, [
+    cacheGet,
+    cacheSet,
+    chainId,
+    getAaveContract,
+    provider,
+    resolveAavePoolAddress,
+    coerceAaveStateV3,
+    signer?.provider,
+  ]);
+
+  const refreshAaveData = useCallback(async () => {
+    await fetchAaveParamsAndStates();
+  }, [fetchAaveParamsAndStates]);
 
   const disconnectWallet = useCallback(() => {
     setProvider(null);
@@ -323,6 +602,91 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     }
   }, [checkAndSwitchToKaia, disconnectWallet, isKaiaNetwork, updateBalance]);
 
+  // Fetch user's aToken and variableDebt balances for configured assets
+  useEffect(() => {
+    const run = async () => {
+      if (!address) return;
+      const assets = AAVE_ASSETS_CSV
+        ? AAVE_ASSETS_CSV.split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
+      if (assets.length === 0) return;
+
+      const erc20Abi = [
+        "function balanceOf(address owner) view returns (uint256)",
+      ];
+      const results: Record<
+        string,
+        {
+          aTokenAddress: string;
+          variableDebtTokenAddress: string;
+          aTokenBalance: string;
+          variableDebtBalance: string;
+        }
+      > = {};
+
+      await Promise.all(
+        assets.map(async (asset) => {
+          const key = asset.toLowerCase();
+          const params = (
+            aaveParamsV3Index as Record<
+              string,
+              {
+                aTokenAddress: string;
+                variableDebtTokenAddress: string;
+                decimals?: number;
+              }
+            >
+          )[key];
+          if (!params) return;
+          const aTokenAddress: string = params.aTokenAddress;
+          const variableDebtTokenAddress: string =
+            params.variableDebtTokenAddress;
+          const decimalsNum: number = Number(params.decimals ?? 18);
+          if (
+            !ethers.isAddress(aTokenAddress) ||
+            !ethers.isAddress(variableDebtTokenAddress)
+          )
+            return;
+          try {
+            const rp =
+              signer ??
+              provider ??
+              new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
+            const aToken = new ethers.Contract(aTokenAddress, erc20Abi, rp);
+            const vDebt = new ethers.Contract(
+              variableDebtTokenAddress,
+              erc20Abi,
+              rp
+            );
+            const [aBal, vBal] = await Promise.all([
+              aToken.balanceOf(address),
+              vDebt.balanceOf(address),
+            ]);
+            results[key] = {
+              aTokenAddress,
+              variableDebtTokenAddress,
+              aTokenBalance: ethers.formatUnits(aBal, decimalsNum),
+              variableDebtBalance: ethers.formatUnits(vBal, decimalsNum),
+            };
+          } catch {
+            // ignore per-asset errors
+          }
+        })
+      );
+
+      if (Object.keys(results).length) setAaveUserBalances(results);
+    };
+    run();
+  }, [aaveParamsV3Index, address, provider, signer]);
+
+  // Fetch Aave V3 params/state once per page load (and cached to localStorage)
+  useEffect(() => {
+    if (!mounted) return;
+    fetchAaveParamsAndStates();
+  }, [mounted, fetchAaveParamsAndStates]);
+
   // Auto-reconnect on mount if previously connected
   useEffect(() => {
     if (!mounted) return;
@@ -372,6 +736,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     disconnectWallet,
     switchNetwork,
     getTokenBalance,
+    aaveParamsV3,
+    aaveParamsV3Index,
+    aaveStatesV3,
+    aaveUserBalances,
+    refreshAaveData,
   };
 
   // Prevent hydration mismatches by only rendering after client mount
