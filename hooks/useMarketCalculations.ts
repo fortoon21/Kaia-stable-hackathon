@@ -1,4 +1,6 @@
 import { useTokenPrices } from "@/hooks/useTokenPrices";
+import { useWeb3 } from "@/lib/web3Provider";
+import { getTokenAddress } from "@/utils/tokenHelpers";
 
 /**
  * Custom hook for market-related calculations
@@ -6,41 +8,68 @@ import { useTokenPrices } from "@/hooks/useTokenPrices";
  */
 export function useMarketCalculations() {
   const { getPriceBySymbol } = useTokenPrices();
+  const { aaveUserBalances, isConnected } = useWeb3();
 
   /**
    * Calculate borrow positions for all assets
    * Returns a map of asset symbols to position data
    */
   const calculateBorrowPositions = () => {
-    // Mock borrow amounts with real-time price calculation
-    const borrowAmounts = {
-      USDC: "1,234.56",
-      LBTC: "0.000161",
-      WKAIA: "523.45",
-      KAIA: "523.45",
-      "USD₮": "0",
-      USDT: "0",
-      USDT0: "0",
-    };
+    // If wallet not connected, return empty debt positions
+    if (!isConnected) {
+      const emptyPositions: Record<
+        string,
+        { amount: string; usdValue: string }
+      > = {};
+      
+      // Return dash for all known tokens when disconnected
+      const knownTokens = ["USDC", "LBTC", "WKAIA", "KAIA", "USD₮", "USDT", "USDT0"];
+      knownTokens.forEach(token => {
+        emptyPositions[token] = { amount: "-", usdValue: "-" };
+      });
+      
+      return emptyPositions;
+    }
 
     // Calculate USD values using real prices
     const calculateUsdValue = (symbol: string, amount: string): string => {
+      if (amount === "0" || amount === "-") return "$0.00";
       const price = getPriceBySymbol(symbol);
       const numAmount = parseFloat(amount.replace(/,/g, ""));
       const usdValue = price * numAmount;
       return `$${usdValue.toFixed(2)}`;
     };
 
-    // Convert to position format
+    // Get real debt balances from wallet
     const borrowPositions: Record<
       string,
       { amount: string; usdValue: string }
     > = {};
-    Object.entries(borrowAmounts).forEach(([symbol, amount]) => {
-      borrowPositions[symbol] = {
-        amount,
-        usdValue: calculateUsdValue(symbol, amount),
-      };
+
+    // Process each token's debt balance from aaveUserBalances
+    Object.entries(aaveUserBalances).forEach(([tokenAddress, balanceData]) => {
+      // Find the token symbol from the address by checking all known tokens
+      const tokenSymbol = ["WKAIA", "USDT", "USDC", "USDT0", "USD₮"].find(symbol => 
+        getTokenAddress(symbol)?.toLowerCase() === tokenAddress.toLowerCase()
+      );
+      
+      if (tokenSymbol && balanceData.variableDebtBalance) {
+        const debtAmount = parseFloat(balanceData.variableDebtBalance);
+        const formattedAmount = debtAmount > 0 ? debtAmount.toLocaleString() : "0";
+        
+        borrowPositions[tokenSymbol] = {
+          amount: formattedAmount,
+          usdValue: calculateUsdValue(tokenSymbol, formattedAmount),
+        };
+      }
+    });
+
+    // Ensure all known tokens have entries
+    const knownTokens = ["USDC", "LBTC", "WKAIA", "KAIA", "USD₮", "USDT", "USDT0"];
+    knownTokens.forEach(token => {
+      if (!borrowPositions[token]) {
+        borrowPositions[token] = { amount: "0", usdValue: "$0.00" };
+      }
     });
 
     return borrowPositions;
@@ -54,7 +83,7 @@ export function useMarketCalculations() {
     borrowPositions: Record<string, { amount: string; usdValue: string }>
   ): boolean => {
     const position = borrowPositions[debtAsset];
-    return position?.amount !== "0" && position?.amount !== undefined;
+    return position?.amount !== "0" && position?.amount !== "-" && position?.amount !== undefined;
   };
 
   /**
@@ -64,6 +93,9 @@ export function useMarketCalculations() {
     debtAsset: string,
     borrowPositions: Record<string, { amount: string; usdValue: string }>
   ) => {
+    if (!isConnected) {
+      return { amount: "-", usdValue: "-" };
+    }
     return borrowPositions[debtAsset] || { amount: "0", usdValue: "$0.00" };
   };
 

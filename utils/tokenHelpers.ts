@@ -10,6 +10,7 @@ export const getTokenAddress = (symbol: string): string | undefined => {
     USDT: TOKEN_ADDRESSES.USDT,
     USDC: TOKEN_ADDRESSES.USDC,
     USDT0: TOKEN_ADDRESSES.USDT0,
+    "USD₮": TOKEN_ADDRESSES["USD₮"],
   } as const;
 
   return addressMap[symbol as keyof typeof addressMap]?.toLowerCase();
