@@ -4,17 +4,17 @@ import Image from "next/image";
 import { useState } from "react";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
-import { useTokenPrices } from "@/hooks/useTokenPrices";
-import { toPercentFromRay, toPercentFromBps, formatLiquidity, formatUsdValue } from "@/utils/aaveFormatters";
-import { getTokenAddress } from "@/utils/tokenHelpers";
-import { useWeb3 } from "@/lib/web3Provider";
+import { useAaveData } from "@/hooks/useAaveData";
+import { useMarketCalculations } from "@/hooks/useMarketCalculations";
+import { MarketStatsOverview } from "@/components/markets/MarketStatsOverview";
+import { MarketGroupHeader } from "@/components/markets/MarketGroupHeader";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
-  const { getPriceBySymbol } = useTokenPrices();
-  const { aaveParamsV3Index, aaveStatesV3 } = useWeb3();
+  const { getSupplyAPY, getBorrowAPY, getLLTV, getLiquidity } = useAaveData();
+  const { calculateBorrowPositions, getPositionData } = useMarketCalculations();
 
 
   // Calculate total pairs and assets
@@ -31,34 +31,9 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
     )
   ).size;
 
-  // Mock borrow amounts with real-time price calculation
-  const borrowAmounts = {
-    USDC: "1,234.56",
-    LBTC: "0.000161",
-    WKAIA: "523.45",
-    KAIA: "523.45",
-    "USD₮": "0",
-    USDT: "0",
-  };
 
-  // Calculate USD values using real prices
-  const calculateUsdValue = (symbol: string, amount: string): string => {
-    const price = getPriceBySymbol(symbol);
-    const numAmount = parseFloat(amount.replace(/,/g, ""));
-    const usdValue = price * numAmount;
-    return `$${usdValue.toFixed(2)}`;
-  };
-
-  // Dynamic borrow positions with real price calculation
-  const borrowPositions = Object.fromEntries(
-    Object.entries(borrowAmounts).map(([symbol, amount]) => [
-      symbol,
-      {
-        amount,
-        usdValue: calculateUsdValue(symbol, amount),
-      },
-    ])
-  );
+  // Get borrow positions for all assets
+  const borrowPositions = calculateBorrowPositions();
 
   const toggleExpand = (groupName: string) => {
     setExpandedGroup(expandedGroup === groupName ? null : groupName);
@@ -98,23 +73,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
         </div>
 
         {/* Market Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-4">
-            <div className="text-[#728395] text-sm mb-1">Total Liquidity</div>
-            <div className="text-2xl font-bold">$2.8M</div>
-            <div className="text-[#23c09b] text-sm">+15.2% (24h)</div>
-          </div>
-          <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-4">
-            <div className="text-[#728395] text-sm mb-1">Active Pairs</div>
-            <div className="text-2xl font-bold">{totalPairs}</div>
-            <div className="text-[#2ae5b9] text-sm">{totalAssets} Assets</div>
-          </div>
-          <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-4">
-            <div className="text-[#728395] text-sm mb-1">Best ROE</div>
-            <div className="text-2xl font-bold">39.65%</div>
-            <div className="text-orange-400 text-sm">KAIA/USDT</div>
-          </div>
-        </div>
+        <MarketStatsOverview totalPairs={totalPairs} totalAssets={totalAssets} />
 
         {/* Markets Table */}
         <div className="bg-[#0c1d2f] border border-[#14304e] rounded-2xl overflow-hidden">
@@ -274,30 +233,16 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* Supply APY */}
                             <div className="text-right">
-                              {(() => {
-                                const addr = getTokenAddress(pair.collateralAsset.symbol);
-                                const st = addr ? (aaveStatesV3 as Record<string, { liquidityRate?: bigint }>)[addr] : null;
-                                const dynamicAPY = st ? toPercentFromRay(st.liquidityRate) : null;
-                                return (
-                                  <div className="text-[#23c09b] font-semibold">
-                                    {dynamicAPY ?? pair.supplyAPY}
-                                  </div>
-                                );
-                              })()}
+                              <div className="text-[#23c09b] font-semibold">
+                                {getSupplyAPY(pair.collateralAsset.symbol) ?? pair.supplyAPY}
+                              </div>
                             </div>
 
                             {/* Borrow APY */}
                             <div className="text-right">
-                              {(() => {
-                                const addr = getTokenAddress(pair.debtAsset.symbol);
-                                const st = addr ? (aaveStatesV3 as Record<string, { variableBorrowRate?: bigint }>)[addr] : null;
-                                const dynamicAPY = st ? toPercentFromRay(st.variableBorrowRate) : null;
-                                return (
-                                  <div className="text-orange-400 font-semibold">
-                                    {dynamicAPY ?? pair.borrowAPY}
-                                  </div>
-                                );
-                              })()}
+                              <div className="text-orange-400 font-semibold">
+                                {getBorrowAPY(pair.debtAsset.symbol) ?? pair.borrowAPY}
+                              </div>
                             </div>
 
                             {/* Max ROE */}
@@ -316,34 +261,22 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* LLTV */}
                             <div className="text-right">
-                              {(() => {
-                                const addr = getTokenAddress(pair.collateralAsset.symbol);
-                                const params = addr ? (aaveParamsV3Index as Record<string, { reserveLiquidationThreshold?: number | bigint }>)[addr] : null;
-                                const dynamicLLTV = params ? toPercentFromBps(params.reserveLiquidationThreshold) : null;
-                                return (
-                                  <div className="font-semibold">
-                                    {dynamicLLTV ?? pair.lltv}
-                                  </div>
-                                );
-                              })()}
+                              <div className="font-semibold">
+                                {getLLTV(pair.collateralAsset.symbol) ?? pair.lltv}
+                              </div>
                             </div>
 
                             {/* Liquidity */}
                             <div className="text-right">
                               {(() => {
-                                const addr = getTokenAddress(pair.debtAsset.symbol);
-                                const st = addr ? (aaveStatesV3 as Record<string, { availableLiquidity?: bigint }>)[addr] : null;
-                                const dynamicLiquidity = st ? formatLiquidity(st.availableLiquidity, pair.debtAsset.symbol) : null;
-                                const usdValue = dynamicLiquidity && addr ? formatUsdValue(dynamicLiquidity, addr) : null;
-                                
-                                
+                                const { amount, usdValue } = getLiquidity(pair.debtAsset.symbol);
                                 return (
                                   <>
                                     <div className="font-semibold">
                                       {usdValue || pair.liquidity}
                                     </div>
                                     <div className="text-[#728395] text-xs">
-                                      {dynamicLiquidity ? `${dynamicLiquidity} ${pair.debtAsset.symbol}` : `${pair.liquidityAmount} ${pair.liquidityToken}`}
+                                      {amount ? `${amount} ${pair.debtAsset.symbol}` : `${pair.liquidityAmount} ${pair.liquidityToken}`}
                                     </div>
                                   </>
                                 );
@@ -353,10 +286,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Your Debt */}
                             <div className="text-right">
                               {(() => {
-                                const debtAsset = pair.debtAsset.symbol;
-                                const position = borrowPositions[
-                                  debtAsset as keyof typeof borrowPositions
-                                ] || { amount: "0", usdValue: "$0.00" };
+                                const position = getPositionData(pair.debtAsset.symbol, borrowPositions);
                                 const hasDebt = position.amount !== "0";
 
                                 return (
@@ -377,10 +307,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                             {/* Action */}
                             <div className="text-center">
                               {(() => {
-                                const debtAsset = pair.debtAsset.symbol;
-                                const position = borrowPositions[
-                                  debtAsset as keyof typeof borrowPositions
-                                ] || { amount: "0", usdValue: "$0.00" };
+                                const position = getPositionData(pair.debtAsset.symbol, borrowPositions);
                                 const hasDebt = position.amount !== "0";
 
                                 return (
@@ -397,7 +324,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                       if (hasDebt && onPageChange) {
                                         // Store the asset info for repay page
                                         const repayAssetInfo = {
-                                          symbol: debtAsset,
+                                          symbol: pair.debtAsset.symbol,
                                           amount: position.amount,
                                           usdValue: position.usdValue,
                                           asset: pair.debtAsset,
@@ -420,7 +347,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                         e.stopPropagation();
                                         if (onPageChange) {
                                           const repayAssetInfo = {
-                                            symbol: debtAsset,
+                                            symbol: pair.debtAsset.symbol,
                                             amount: position.amount,
                                             usdValue: position.usdValue,
                                             asset: pair.debtAsset,
