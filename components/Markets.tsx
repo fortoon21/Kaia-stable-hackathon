@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
-import { TOKEN_ADDRESSES } from "@/constants/tokens";
+import { TOKEN_ADDRESSES, TOKEN_DECIMALS } from "@/constants/tokens";
 import { getCachedPrices, getPriceByAddress } from "@/lib/priceApi";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
 import { useWeb3 } from "@/lib/web3Provider";
@@ -24,6 +24,8 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
       const bn = typeof value === "string" ? BigInt(value) : (value as bigint);
       const pct = parseFloat(ethers.formatUnits(bn, 27)) * 100;
       if (!Number.isFinite(pct)) return null;
+      
+      
       return `${pct.toFixed(2)}%`;
     } catch {
       return null;
@@ -44,7 +46,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const formatLiquidity = (value: unknown, symbol: string) => {
     try {
       if (value === undefined || value === null) return null;
-      const decimals = symbol === "USDC" ? 6 : 18;
+      const decimals = TOKEN_DECIMALS[symbol] || 18;
       const amt = parseFloat(ethers.formatUnits(value as bigint, decimals));
       if (!Number.isFinite(amt)) return null;
       return amt.toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -396,6 +398,8 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 const st = addr ? (aaveStatesV3 as Record<string, { availableLiquidity?: bigint }>)[addr] : null;
                                 const dynamicLiquidity = st ? formatLiquidity(st.availableLiquidity, pair.debtAsset.symbol) : null;
                                 const usdValue = dynamicLiquidity && addr ? formatUsdValue(dynamicLiquidity, addr) : null;
+                                
+                                
                                 return (
                                   <>
                                     <div className="font-semibold">
