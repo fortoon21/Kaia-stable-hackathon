@@ -22,7 +22,7 @@ export const AAVE_CONFIG = {
 } as const;
 
 export const LOOP_CONFIG = {
-  LEVERAGE_LOOP_ADDRESS: "0x265af8AC750f9c67418d8f684432dFD35a89f39d",
+  LEVERAGE_LOOP_ADDRESS: "0x33d349BB3D4FB201c672498902dBfBDaB1887c79",
 } as const;
 
 export const EISEN_CONFIG = {
