@@ -1,13 +1,12 @@
 "use client";
 
-import { ethers } from "ethers";
 import Image from "next/image";
 import { useState } from "react";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
-import { TOKEN_ADDRESSES, TOKEN_DECIMALS } from "@/constants/tokens";
-import { getCachedPrices, getPriceByAddress } from "@/lib/priceApi";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
+import { toPercentFromRay, toPercentFromBps, formatLiquidity, formatUsdValue } from "@/utils/aaveFormatters";
+import { getTokenAddress } from "@/utils/tokenHelpers";
 import { useWeb3 } from "@/lib/web3Provider";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
@@ -17,68 +16,6 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const { getPriceBySymbol } = useTokenPrices();
   const { aaveParamsV3Index, aaveStatesV3 } = useWeb3();
 
-  // Utility functions for converting blockchain data
-  const toPercentFromRay = (value: unknown) => {
-    try {
-      if (value === undefined || value === null) return null;
-      const bn = typeof value === "string" ? BigInt(value) : (value as bigint);
-      const pct = parseFloat(ethers.formatUnits(bn, 27)) * 100;
-      if (!Number.isFinite(pct)) return null;
-      
-      
-      return `${pct.toFixed(2)}%`;
-    } catch {
-      return null;
-    }
-  };
-
-  const toPercentFromBps = (value: unknown) => {
-    try {
-      if (value === undefined || value === null) return null;
-      const num = typeof value === "bigint" ? Number(value) : Number(value as number);
-      if (!Number.isFinite(num)) return null;
-      return `${(num / 100).toFixed(2)}%`;
-    } catch {
-      return null;
-    }
-  };
-
-  const formatLiquidity = (value: unknown, symbol: string) => {
-    try {
-      if (value === undefined || value === null) return null;
-      const decimals = TOKEN_DECIMALS[symbol] || 18;
-      const amt = parseFloat(ethers.formatUnits(value as bigint, decimals));
-      if (!Number.isFinite(amt)) return null;
-      return amt.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    } catch {
-      return null;
-    }
-  };
-
-  const formatUsdValue = (amount: string | number, tokenAddress: string) => {
-    const priceData = getCachedPrices();
-    const price = getPriceByAddress(priceData, tokenAddress);
-    const numAmount = typeof amount === 'string' ? parseFloat(amount.replace(/,/g, '')) : amount;
-    if (!price || !Number.isFinite(numAmount)) return null;
-    const usdValue = numAmount * price;
-    if (usdValue >= 1000000) {
-      return `$${(usdValue / 1000000).toFixed(2)}M`;
-    } else if (usdValue >= 1000) {
-      return `$${(usdValue / 1000).toFixed(1)}K`;
-    } else {
-      return `$${usdValue.toFixed(2)}`;
-    }
-  };
-
-  const getTokenAddress = (symbol: string) => {
-    const addressMap = {
-      WKAIA: TOKEN_ADDRESSES.WKAIA,
-      USDT: TOKEN_ADDRESSES.USDT,
-      USDC: TOKEN_ADDRESSES.USDC,
-      USDT0: TOKEN_ADDRESSES.USDT0,
-    } as const;
-    return addressMap[symbol as keyof typeof addressMap]?.toLowerCase();
-  };
 
   // Calculate total pairs and assets
   const totalPairs = MARKET_GROUPS.reduce(
