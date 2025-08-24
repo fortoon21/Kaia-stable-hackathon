@@ -52,7 +52,7 @@ export function useAaveData() {
     const addr = getTokenAddress(collateralSymbol);
     if (!addr) return null;
 
-    const params = aaveParamsV3Index as Record<string, any>;
+    const params = aaveParamsV3Index as Record<string, unknown[]>;
     const param = params[addr];
     if (!param?.[8]) return null;
 
@@ -112,7 +112,7 @@ export function useAaveData() {
     let hasValidData = false;
 
     for (const symbol of assets) {
-      const { amount, usdValue } = getLiquidity(symbol);
+      const { usdValue } = getLiquidity(symbol);
       if (usdValue) {
         // Extract numeric value from usdValue (e.g., "$37.4K" -> 37400)
         const numericValue = parseUsdValue(usdValue);
