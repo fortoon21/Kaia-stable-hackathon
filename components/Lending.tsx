@@ -1154,15 +1154,24 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Available liquidity
                         </div>
                         <div className="text-white text-lg font-medium">
-                          {selectedPair?.debtAsset?.symbol
-                            ? getLiquidity(selectedPair.debtAsset.symbol)?.usdValue || "$506.7K"
-                            : "$506.7K"}
+                          {bottomTab === "collateral"
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? getLiquidity(selectedPair.collateralAsset.symbol)?.usdValue || "$506.7K"
+                                : "$506.7K")
+                            : (selectedPair?.debtAsset?.symbol
+                                ? getLiquidity(selectedPair.debtAsset.symbol)?.usdValue || "$506.7K"
+                                : "$506.7K")
+                          }
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
-                          {selectedPair?.debtAsset?.symbol
-                            ? getLiquidity(selectedPair.debtAsset.symbol)?.amount
-                            : selectedPair?.liquidityAmount}{" "}
-                          {selectedPair?.debtAsset?.symbol || selectedPair?.liquidityToken}
+                          {bottomTab === "collateral"
+                            ? (selectedPair?.collateralAsset?.symbol
+                                ? `${getLiquidity(selectedPair.collateralAsset.symbol)?.amount || "506.7K"} ${selectedPair.collateralAsset.symbol}`
+                                : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "WKAIA"}`)
+                            : (selectedPair?.debtAsset?.symbol
+                                ? `${getLiquidity(selectedPair.debtAsset.symbol)?.amount || "506.7K"} ${selectedPair.debtAsset.symbol}`
+                                : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "USDT"}`)
+                          }
                         </div>
                       </div>
                     </div>
