@@ -1,17 +1,82 @@
 "use client";
 
+import { ethers } from "ethers";
 import Image from "next/image";
 import { useState } from "react";
 import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
+import { TOKEN_ADDRESSES } from "@/constants/tokens";
+import { getCachedPrices, getPriceByAddress } from "@/lib/priceApi";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
+import { useWeb3 } from "@/lib/web3Provider";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const { getPriceBySymbol } = useTokenPrices();
+  const { aaveParamsV3Index, aaveStatesV3 } = useWeb3();
 
+  // Utility functions for converting blockchain data
+  const toPercentFromRay = (value: unknown) => {
+    try {
+      if (value === undefined || value === null) return null;
+      const bn = typeof value === "string" ? BigInt(value) : (value as bigint);
+      const pct = parseFloat(ethers.formatUnits(bn, 27)) * 100;
+      if (!Number.isFinite(pct)) return null;
+      return `${pct.toFixed(2)}%`;
+    } catch {
+      return null;
+    }
+  };
+
+  const toPercentFromBps = (value: unknown) => {
+    try {
+      if (value === undefined || value === null) return null;
+      const num = typeof value === "bigint" ? Number(value) : Number(value as number);
+      if (!Number.isFinite(num)) return null;
+      return `${(num / 100).toFixed(2)}%`;
+    } catch {
+      return null;
+    }
+  };
+
+  const formatLiquidity = (value: unknown, symbol: string) => {
+    try {
+      if (value === undefined || value === null) return null;
+      const decimals = symbol === "USDC" ? 6 : 18;
+      const amt = parseFloat(ethers.formatUnits(value as bigint, decimals));
+      if (!Number.isFinite(amt)) return null;
+      return amt.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    } catch {
+      return null;
+    }
+  };
+
+  const formatUsdValue = (amount: string | number, tokenAddress: string) => {
+    const priceData = getCachedPrices();
+    const price = getPriceByAddress(priceData, tokenAddress);
+    const numAmount = typeof amount === 'string' ? parseFloat(amount.replace(/,/g, '')) : amount;
+    if (!price || !Number.isFinite(numAmount)) return null;
+    const usdValue = numAmount * price;
+    if (usdValue >= 1000000) {
+      return `$${(usdValue / 1000000).toFixed(2)}M`;
+    } else if (usdValue >= 1000) {
+      return `$${(usdValue / 1000).toFixed(1)}K`;
+    } else {
+      return `$${usdValue.toFixed(2)}`;
+    }
+  };
+
+  const getTokenAddress = (symbol: string) => {
+    const addressMap = {
+      WKAIA: TOKEN_ADDRESSES.WKAIA,
+      USDT: TOKEN_ADDRESSES.USDT,
+      USDC: TOKEN_ADDRESSES.USDC,
+      USDT0: TOKEN_ADDRESSES.USDT0,
+    } as const;
+    return addressMap[symbol as keyof typeof addressMap]?.toLowerCase();
+  };
 
   // Calculate total pairs and assets
   const totalPairs = MARKET_GROUPS.reduce(
@@ -270,16 +335,30 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* Supply APY */}
                             <div className="text-right">
-                              <div className="text-[#23c09b] font-semibold">
-                                {pair.supplyAPY}
-                              </div>
+                              {(() => {
+                                const addr = getTokenAddress(pair.collateralAsset.symbol);
+                                const st = addr ? (aaveStatesV3 as Record<string, { liquidityRate?: bigint }>)[addr] : null;
+                                const dynamicAPY = st ? toPercentFromRay(st.liquidityRate) : null;
+                                return (
+                                  <div className="text-[#23c09b] font-semibold">
+                                    {dynamicAPY ?? pair.supplyAPY}
+                                  </div>
+                                );
+                              })()}
                             </div>
 
                             {/* Borrow APY */}
                             <div className="text-right">
-                              <div className="text-orange-400 font-semibold">
-                                {pair.borrowAPY}
-                              </div>
+                              {(() => {
+                                const addr = getTokenAddress(pair.debtAsset.symbol);
+                                const st = addr ? (aaveStatesV3 as Record<string, { variableBorrowRate?: bigint }>)[addr] : null;
+                                const dynamicAPY = st ? toPercentFromRay(st.variableBorrowRate) : null;
+                                return (
+                                  <div className="text-orange-400 font-semibold">
+                                    {dynamicAPY ?? pair.borrowAPY}
+                                  </div>
+                                );
+                              })()}
                             </div>
 
                             {/* Max ROE */}
@@ -298,17 +377,36 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* LLTV */}
                             <div className="text-right">
-                              <div className="font-semibold">{pair.lltv}</div>
+                              {(() => {
+                                const addr = getTokenAddress(pair.collateralAsset.symbol);
+                                const params = addr ? (aaveParamsV3Index as Record<string, { reserveLiquidationThreshold?: number | bigint }>)[addr] : null;
+                                const dynamicLLTV = params ? toPercentFromBps(params.reserveLiquidationThreshold) : null;
+                                return (
+                                  <div className="font-semibold">
+                                    {dynamicLLTV ?? pair.lltv}
+                                  </div>
+                                );
+                              })()}
                             </div>
 
                             {/* Liquidity */}
                             <div className="text-right">
-                              <div className="font-semibold">
-                                {pair.liquidity}
-                              </div>
-                              <div className="text-[#728395] text-xs">
-                                {pair.liquidityAmount} {pair.liquidityToken}
-                              </div>
+                              {(() => {
+                                const addr = getTokenAddress(pair.debtAsset.symbol);
+                                const st = addr ? (aaveStatesV3 as Record<string, { availableLiquidity?: bigint }>)[addr] : null;
+                                const dynamicLiquidity = st ? formatLiquidity(st.availableLiquidity, pair.debtAsset.symbol) : null;
+                                const usdValue = dynamicLiquidity && addr ? formatUsdValue(dynamicLiquidity, addr) : null;
+                                return (
+                                  <>
+                                    <div className="font-semibold">
+                                      {usdValue || pair.liquidity}
+                                    </div>
+                                    <div className="text-[#728395] text-xs">
+                                      {dynamicLiquidity ? `${dynamicLiquidity} ${pair.debtAsset.symbol}` : `${pair.liquidityAmount} ${pair.liquidityToken}`}
+                                    </div>
+                                  </>
+                                );
+                              })()}
                             </div>
 
                             {/* Your Debt */}

@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import AaveFacet from "@/lib/abi/AaveFacet.json";
+import { AAVE_CONFIG, AAVE_ASSETS } from "@/constants/tokens";
 
 interface WindowWithWallets extends Window {
   kaia?: {
@@ -164,9 +165,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   );
 
   // ---------------- Aave helpers (ABI + caching) ----------------
-  const AAVE_FACET_ADDRESS = "0xE661BE01F9e42Dc3Ed93909aA3c559A36187300d";
-  const AAVE_LENDING_POOL_V3 = "0xcf1af042f2a071df60a64ed4bdc9c7dee40780be";
-  const AAVE_ASSETS_CSV = "0x19aac5f612f524b754ca7e7c41cbfa2e981a4432,0x5c13e303a62fc5dedf5b52d66873f2e59fedadc2,0x608792deb376cce1c9fa4d0e6b7b44f507cffa6a,0xd077a400968890eacc75cdc901f0356c943e4fdb";
   const AAVE_DEBUG = false;
 
   // Normalize Aave V3 state tuple (ethers Result) into a plain object
@@ -209,12 +207,12 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   }, []);
 
   const getAaveContract = useCallback(() => {
-    if (!AAVE_FACET_ADDRESS) return null;
+    if (!AAVE_CONFIG.FACET_ADDRESS) return null;
     try {
       const readonly = new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
       const read = signer ?? provider ?? readonly;
       return new ethers.Contract(
-        AAVE_FACET_ADDRESS,
+        AAVE_CONFIG.FACET_ADDRESS,
         (AaveFacet as { abi: ethers.InterfaceAbi }).abi,
         read
       );
@@ -273,12 +271,12 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchAaveParamsAndStates = useCallback(async () => {
-    if (!AAVE_FACET_ADDRESS || !AAVE_LENDING_POOL_V3) return;
+    if (!AAVE_CONFIG.FACET_ADDRESS || !AAVE_CONFIG.LENDING_POOL_V3) return;
 
     const contract = getAaveContract();
     if (!contract) return;
 
-    const resolvedPool = await resolveAavePoolAddress(AAVE_LENDING_POOL_V3);
+    const resolvedPool = await resolveAavePoolAddress(AAVE_CONFIG.LENDING_POOL_V3);
     const effectiveChainId = chainId ?? 8217;
     const cachePrefix = `aave:v3:${effectiveChainId}:${resolvedPool}`;
 
@@ -352,11 +350,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     }
 
     // States V3 for provided assets
-    const assets = AAVE_ASSETS_CSV
-      ? AAVE_ASSETS_CSV.split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
+    const assets = AAVE_ASSETS;
 
     const nextStates: Record<string, unknown> = {};
     await Promise.all(
@@ -377,7 +371,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
               signer?.provider ??
               provider ??
               new ethers.JsonRpcProvider(KAIA_NETWORKS.mainnet.rpcUrl);
-            const rawHex = await rp.call({ to: AAVE_FACET_ADDRESS, data });
+            const rawHex = await rp.call({ to: AAVE_CONFIG.FACET_ADDRESS, data });
             const decoded = iface.decodeFunctionResult(
               "aavePoolStateV3",
               rawHex
@@ -606,12 +600,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const run = async () => {
       if (!address) return;
-      const assets = AAVE_ASSETS_CSV
-        ? AAVE_ASSETS_CSV.split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [];
-      if (assets.length === 0) return;
+      const assets = AAVE_ASSETS;
 
       const erc20Abi = [
         "function balanceOf(address owner) view returns (uint256)",

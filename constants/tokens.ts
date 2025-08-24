@@ -14,3 +14,17 @@ export const TOKEN_DECIMALS: { [key: string]: number } = {
   USDT0: 6,
   USDT: 6,
 };
+
+// Aave V3 configuration
+export const AAVE_CONFIG = {
+  FACET_ADDRESS: "0xE661BE01F9e42Dc3Ed93909aA3c559A36187300d",
+  LENDING_POOL_V3: "0xcf1af042f2a071df60a64ed4bdc9c7dee40780be",
+} as const;
+
+// Generate Aave assets list from TOKEN_ADDRESSES
+export const AAVE_ASSETS = [
+  TOKEN_ADDRESSES.WKAIA,
+  TOKEN_ADDRESSES.USDT0, 
+  TOKEN_ADDRESSES.USDC,
+  TOKEN_ADDRESSES.USDT,
+] as const;
