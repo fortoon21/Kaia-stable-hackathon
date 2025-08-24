@@ -729,10 +729,25 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     run();
   }, [aaveParamsV3Index, address, provider, signer]);
 
-  // Fetch Aave V3 params/state once per page load (and cached to localStorage)
+  // Fetch Aave V3 params/state once per page load and set up 15-second interval
   useEffect(() => {
     if (!mounted) return;
+
+    // Initial fetch
     fetchAaveParamsAndStates();
+
+    // Set up 15-second interval for automatic refresh
+    const interval = setInterval(async () => {
+      if (!AAVE_CONFIG.FACET_ADDRESS || !AAVE_CONFIG.LENDING_POOL_V3) return;
+      try {
+        sessionStorage.removeItem("lastAaveFetch");
+        await fetchAaveParamsAndStates();
+      } catch (_error) {
+        console.warn("Failed to refresh Aave data:", _error);
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(interval);
   }, [mounted, fetchAaveParamsAndStates]);
 
   // Auto-reconnect on mount if previously connected
