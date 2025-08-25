@@ -155,10 +155,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
       const decimals = TOKEN_DECIMALS[symbol] ?? 18;
       if (!tokenAddress) throw new Error("Unsupported token");
 
-      // Determine amount to repay (input overrides preset)
+      // Determine amount to repay (use collateral amount from input)
       const rawAmount =
-        debtAmount && debtAmount.trim().length > 0
-          ? debtAmount
+        collateralAmount && collateralAmount.trim().length > 0
+          ? collateralAmount
           : repayAsset.amount || "0";
       const cleanedAmount = rawAmount.replace(/,/g, "");
       const amountWei = ethers.parseUnits(cleanedAmount || "0", decimals);
@@ -226,7 +226,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
     } finally {
       setIsRepaying(false);
     }
-  }, [signer, address, repayAsset, debtAmount, refreshAaveData]);
+  }, [signer, address, repayAsset, collateralAmount, refreshAaveData]);
 
   // Calculate USD values using live prices - don't show loading for price updates
   const calculateUSDValue = useCallback(
