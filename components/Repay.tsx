@@ -12,6 +12,7 @@ import {
   TOKEN_DECIMALS,
 } from "@/constants/tokens";
 import { useWeb3 } from "@/lib/web3Provider";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
 
 interface RepayProps {
   onGoBack?: () => void;
@@ -34,14 +35,17 @@ type RepayAsset = {
 } | null;
 
 export default function Repay({ onGoBack }: RepayProps = {}) {
-  const { signer, address, refreshAaveData } = useWeb3();
-  const [activeTab, setActiveTab] = useState<"wallet" | "swap">("swap");
+  const { signer, address, refreshAaveData, getTokenBalance, isConnected } = useWeb3();
+  const { loading: pricesLoading, getPriceBySymbol } = useTokenPrices();
+  const [activeTab, setActiveTab] = useState<"wallet" | "swap">("wallet");
   const [repayPercent, setRepayPercent] = useState(0);
   const [collateralAmount, setCollateralAmount] = useState("");
   const [debtAmount, setDebtAmount] = useState("");
   const [repayAsset, setRepayAsset] = useState<RepayAsset>(null);
   const [isRepaying, setIsRepaying] = useState(false);
-
+  const [tokenBalance, setTokenBalance] = useState<string>("0");
+  const [balanceLoading, setBalanceLoading] = useState(false);
+  
   // Load repay asset info from localStorage
   useEffect(() => {
     const storedAsset = localStorage.getItem("repayAsset");
@@ -95,6 +99,49 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
       });
     }
   }, []);
+
+  // Fetch actual token balance - stable version
+  useEffect(() => {
+    let isCancelled = false;
+    
+    const fetchBalance = async () => {
+      if (!isConnected || !repayAsset?.symbol) {
+        setTokenBalance("0");
+        return;
+      }
+      
+      setBalanceLoading(true);
+      try {
+        const symbol = repayAsset.symbol as keyof typeof TOKEN_ADDRESSES;
+        const tokenAddress = TOKEN_ADDRESSES[symbol];
+        const decimals = TOKEN_DECIMALS[symbol] ?? 18;
+        
+        if (tokenAddress && getTokenBalance) {
+          const balance = await getTokenBalance(tokenAddress, decimals);
+          if (!isCancelled) {
+            setTokenBalance(balance);
+          }
+        } else if (!isCancelled) {
+          setTokenBalance("0");
+        }
+      } catch (error) {
+        console.error("Failed to fetch token balance:", error);
+        if (!isCancelled) {
+          setTokenBalance("0");
+        }
+      } finally {
+        if (!isCancelled) {
+          setBalanceLoading(false);
+        }
+      }
+    };
+
+    fetchBalance();
+    
+    return () => {
+      isCancelled = true;
+    };
+  }, [isConnected, repayAsset?.symbol, getTokenBalance]);
 
   const handleRepay = useCallback(async () => {
     try {
@@ -162,6 +209,70 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
     }
   }, [signer, address, repayAsset, debtAmount, refreshAaveData]);
 
+  // Calculate USD values using live prices - don't show loading for price updates
+  const calculateUSDValue = useCallback((amount: string, symbol: string): string => {
+    if (!amount || amount === "0") return "$0.00";
+    
+    const numAmount = parseFloat(amount.replace(/,/g, ""));
+    if (Number.isNaN(numAmount)) return "$0.00";
+    
+    const price = getPriceBySymbol(symbol);
+    if (price === 0 && pricesLoading) {
+      // Only show loading if we don't have any price data yet
+      return "Loading...";
+    }
+    
+    const usdValue = numAmount * price;
+    return `$${usdValue.toFixed(2)}`;
+  }, [getPriceBySymbol, pricesLoading]);
+
+  // Handle percentage slider changes
+  const handleSliderChange = useCallback((newPercent: number) => {
+    setRepayPercent(newPercent);
+    
+    if (newPercent === 0 || !tokenBalance || tokenBalance === "0") {
+      setCollateralAmount("");
+      return;
+    }
+
+    const balance = parseFloat(tokenBalance.replace(/,/g, ""));
+    if (!Number.isNaN(balance)) {
+      const calculatedAmount = (balance * newPercent) / 100;
+      setCollateralAmount(calculatedAmount.toFixed(6));
+    }
+  }, [tokenBalance]);
+
+  // Handle input amount changes
+  const handleAmountChange = useCallback((newAmount: string) => {
+    setCollateralAmount(newAmount);
+    
+    if (!newAmount || !tokenBalance || tokenBalance === "0") {
+      setRepayPercent(0);
+      return;
+    }
+
+    const amount = parseFloat(newAmount.replace(/,/g, ""));
+    const balance = parseFloat(tokenBalance.replace(/,/g, ""));
+    
+    if (!Number.isNaN(amount) && !Number.isNaN(balance) && balance > 0) {
+      const percentage = Math.min(100, Math.max(0, (amount / balance) * 100));
+      setRepayPercent(Math.round(percentage));
+    }
+  }, [tokenBalance]);
+
+  // Check if repay amount is valid
+  const isValidRepayAmount = useCallback(() => {
+    if (!collateralAmount || !repayAsset) return false;
+    
+    const amount = parseFloat(collateralAmount.replace(/,/g, ""));
+    if (Number.isNaN(amount) || amount <= 0) return false;
+    
+    const debtAmount = parseFloat(repayAsset.amount.replace(/,/g, ""));
+    if (Number.isNaN(debtAmount)) return false;
+    
+    return amount <= debtAmount;
+  }, [collateralAmount, repayAsset]);
+
   return (
     <div className="text-white">
       <div
@@ -193,9 +304,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
         {/* Page title */}
         <h1 className="text-3xl font-bold mb-8">Repay</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left side - Main repay interface */}
-          <div className="lg:col-span-2">
+        <div className="max-w-4xl mx-auto">
+          {/* Main repay interface */}
+          <div>
             {/* Tab selector - matching Lending page style */}
             <div className="flex bg-[#0a1420] rounded-lg p-1 mb-6">
               <button
@@ -212,20 +323,25 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
               <button
                 type="button"
                 onClick={() => setActiveTab("swap")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors ${
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative ${
                   activeTab === "swap"
                     ? "bg-[#14304e] text-white"
                     : "text-[#728395] hover:text-white"
                 }`}
               >
                 Swap collateral
+                <div className="absolute top-1 right-1">
+                  <span className="text-xs text-[#2ae5b9] font-medium bg-[#0c1d2f] px-1.5 py-0.5 rounded">
+                    Coming Soon
+                  </span>
+                </div>
               </button>
             </div>
 
             {/* From wallet / Collateral to swap section - Updated design */}
             {repayAsset && (
-              <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
-                <div className="flex justify-between items-center mb-4">
+              <div className={`bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
+                <div className="flex justify-between items-center mb-2">
                   <span className="text-white font-medium">
                     {activeTab === "wallet"
                       ? "From Wallet"
@@ -234,12 +350,25 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   <div className="flex items-center text-sm text-[#728395]">
                     <span className="mr-2">Balance:</span>
                     <span className="text-white font-medium">
-                      {activeTab === "wallet"
-                        ? `0 ${repayAsset.symbol}`
-                        : `28.29 ${repayAsset.collateralAsset?.symbol}`}
+                      {balanceLoading && tokenBalance === "0"
+                        ? "Loading balance..." 
+                        : activeTab === "wallet"
+                          ? `${tokenBalance} ${repayAsset.symbol}`
+                          : `28.29 ${repayAsset.collateralAsset?.symbol}`
+                      }
                     </span>
                   </div>
                 </div>
+                
+                {/* Owed debt info - smaller display */}
+                {activeTab === "wallet" && repayAsset && (
+                  <div className="mb-4 text-xs text-right">
+                    <span className="text-[#728395]">Owed Debt: </span>
+                    <span className="text-[#f59e0b] font-medium">
+                      {repayAsset.amount} {repayAsset.symbol} ({calculateUSDValue(repayAsset.amount, repayAsset.symbol)})
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -305,11 +434,13 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   <div className="text-right">
                     <NumberInput
                       value={collateralAmount}
-                      onChange={setCollateralAmount}
+                      onChange={handleAmountChange}
                       placeholder="0.00"
                       className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
                     />
-                    <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
+                    <div className="text-[#728395] text-sm mt-1">
+                      {calculateUSDValue(collateralAmount, activeTab === "wallet" ? repayAsset.symbol : repayAsset.collateralAsset?.symbol || "")}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -317,7 +448,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
 
             {/* Debt to repay section - Only show for swap tab */}
             {activeTab === "swap" && repayAsset && (
-              <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6">
+              <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6 blur-sm opacity-50 pointer-events-none">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-white font-medium">Debt to Repay</span>
                   <div className="flex items-center text-sm text-[#728395]">
@@ -369,7 +500,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                       className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
                     />
                     <div className="text-[#728395] text-sm mt-1">
-                      {repayAsset.usdValue}
+                      {calculateUSDValue(debtAmount || repayAsset.amount, repayAsset.symbol)}
                     </div>
                   </div>
                 </div>
@@ -377,7 +508,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             )}
 
             {/* Repay percentage slider - Enhanced design */}
-            <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6">
+            <div className={`bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <div className="text-white font-semibold text-lg">
@@ -403,197 +534,35 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   max={100}
                   step={1}
                   value={repayPercent}
-                  onChange={setRepayPercent}
+                  onChange={handleSliderChange}
                   fillColor="rgba(42,229,185,0.8)"
                   trackColor="rgba(42,229,185,0.15)"
                   className="h-1.5"
                 />
                 <div className="flex justify-between text-xs text-[#728395] mt-3">
-                  <span className="bg-[#0a1420] px-2 py-1 rounded">0%</span>
-                  <span className="bg-[#0a1420] px-2 py-1 rounded">25%</span>
-                  <span className="bg-[#0a1420] px-2 py-1 rounded">50%</span>
-                  <span className="bg-[#0a1420] px-2 py-1 rounded">75%</span>
-                  <span className="bg-[#0a1420] px-2 py-1 rounded">100%</span>
+                  <span>0%</span>
+                  <span>25%</span>
+                  <span>50%</span>
+                  <span>75%</span>
+                  <span>100%</span>
                 </div>
               </div>
             </div>
 
             {/* Action buttons - Enhanced design */}
-            <div className="flex space-x-4">
+            <div className={`${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
               <button
                 type="button"
-                className="flex-1 py-4 px-6 bg-gradient-to-r from-[#14304e] to-[#1a3a5c] border border-[#14304e] text-white font-semibold rounded-lg hover:from-[#1a3a5c] hover:to-[#1e4062] transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                Add to Batch
-              </button>
-              <button
-                type="button"
-                className="flex-1 py-4 px-6 bg-gradient-to-r from-[#2ae5b9] to-[#22c09b] text-black font-semibold rounded-lg hover:from-[#22c09b] hover:to-[#1ea87a] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                disabled={isRepaying || !repayAsset}
+                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 ${
+                  isRepaying || !repayAsset || !isValidRepayAmount()
+                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#2ae5b9] to-[#22c09b] text-black hover:from-[#22c09b] hover:to-[#1ea87a] shadow-lg hover:shadow-xl transform hover:scale-105"
+                }`}
+                disabled={isRepaying || !repayAsset || !isValidRepayAmount()}
                 onClick={handleRepay}
               >
                 {isRepaying ? "Repaying..." : "Repay Debt"}
               </button>
-            </div>
-          </div>
-
-          {/* Right side - Position summary */}
-          <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 h-fit">
-            {/* Current Position */}
-            <div className="mb-6">
-              {/* Collateral */}
-              {repayAsset && (
-                <div className="bg-[#08131f] rounded-lg p-4 mb-3">
-                  <div className="text-[#728395] text-sm mb-2">Collateral</div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
-                        {repayAsset.collateralAsset?.imageUrl ? (
-                          <Image
-                            src={repayAsset.collateralAsset.imageUrl}
-                            alt={repayAsset.collateralAsset.symbol}
-                            width={24}
-                            height={24}
-                            className="object-cover rounded-full"
-                          />
-                        ) : (
-                          <div
-                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
-                              repayAsset.collateralAsset?.iconBg ||
-                              "from-[#2775CA] to-[#1e5f9a]"
-                            }`}
-                          >
-                            <span className="text-white font-bold text-xs">
-                              {repayAsset.collateralAsset?.icon ||
-                                repayAsset.collateralAsset?.symbol?.[0]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <span className="font-semibold">
-                        {repayAsset.collateralAsset?.symbol}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold">28.29</div>
-                      <div className="text-[#728395] text-xs">$28.29</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Debt */}
-              {repayAsset && (
-                <div className="bg-[#08131f] rounded-lg p-4">
-                  <div className="text-[#728395] text-sm mb-2">Debt</div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden">
-                        {repayAsset.asset?.imageUrl ? (
-                          <Image
-                            src={repayAsset.asset.imageUrl}
-                            alt={repayAsset.symbol}
-                            width={24}
-                            height={24}
-                            className="object-cover rounded-full"
-                          />
-                        ) : (
-                          <div
-                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
-                              repayAsset.asset?.iconBg ||
-                              "from-orange-500 to-orange-600"
-                            }`}
-                          >
-                            <span className="text-white font-bold text-xs">
-                              {repayAsset.asset?.icon || repayAsset.symbol[0]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <span className="font-semibold">{repayAsset.symbol}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-[#f59e0b]">
-                        {repayAsset.amount}
-                      </div>
-                      <div className="text-[#728395] text-xs">
-                        {repayAsset.usdValue}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Position metrics */}
-            <div className="space-y-3 border-t border-[#14304e] pt-6">
-              <div className="flex justify-between items-center">
-                <span className="text-[#728395] text-sm">Health Factor</span>
-                <div className="text-right">
-                  <span className="text-[#2ae5b9] font-bold text-lg">1.24</span>
-                  <div className="text-[#728395] text-xs">Safe</div>
-                </div>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395] text-sm">Current LTV</span>
-                <div className="text-right">
-                  <div className="font-semibold">64.21%</div>
-                  <div className="text-[#728395] text-xs">Max: 80.00%</div>
-                </div>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395] text-sm">
-                  Liquidation Price
-                </span>
-                <div className="text-right">
-                  <div className="font-semibold">$97,340</div>
-                  <div className="text-[#728395] text-xs">per LBTC</div>
-                </div>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#728395] text-sm">APY</span>
-                <span className="text-[#f59e0b] font-semibold">-4.2%</span>
-              </div>
-            </div>
-
-            {/* Transaction details */}
-            <div className="space-y-3 border-t border-[#14304e] pt-6 mt-6">
-              <div className="flex justify-between">
-                <span className="text-[#728395] text-sm">Repay Method</span>
-                <span className="font-semibold text-white">
-                  {activeTab === "wallet" ? "From Wallet" : "Swap & Repay"}
-                </span>
-              </div>
-              {activeTab === "swap" && (
-                <>
-                  <div className="flex justify-between">
-                    <span className="text-[#728395] text-sm">Price Impact</span>
-                    <span className="text-[#2ae5b9] font-semibold">
-                      &lt; 0.01%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#728395] text-sm">
-                      Slippage Tolerance
-                    </span>
-                    <span className="font-semibold text-white">0.5%</span>
-                  </div>
-                </>
-              )}
-              <div className="flex justify-between">
-                <span className="text-[#728395] text-sm">Network Fee</span>
-                <div className="text-right">
-                  <div className="font-semibold text-white">~0.002 ETH</div>
-                  <div className="text-[#728395] text-xs">$6.84</div>
-                </div>
-              </div>
-              <div className="bg-[#08131f] rounded-lg p-3 mt-4">
-                <div className="text-[#728395] text-xs mb-1">After Repay</div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white">New Health Factor:</span>
-                  <span className="text-[#2ae5b9] font-semibold">2.1</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
