@@ -63,20 +63,20 @@ const TokenSelector = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 bg-[#14304e] hover:bg-[#1a3a5c] px-4 py-3 rounded-lg border border-[#14304e] transition-all duration-200"
+        className="flex items-center space-x-3 bg-surface-2 hover:bg-surface-ghost px-4 py-3 rounded-sm border border-line-soft transition-all duration-200"
       >
-        <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+        <div className="w-8 h-8 rounded-pill flex items-center justify-center overflow-hidden">
           {token.imageUrl ? (
             <Image
               src={token.imageUrl}
               alt={token.symbol}
               width={32}
               height={32}
-              className="object-cover rounded-full"
+              className="object-cover rounded-pill"
             />
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center rounded-full text-white font-bold text-sm"
+              className="w-full h-full flex items-center justify-center rounded-pill text-heading font-heading font-bold text-sm"
               style={{ backgroundColor: token.iconBg }}
             >
               {token.icon}
@@ -84,11 +84,11 @@ const TokenSelector = ({
           )}
         </div>
         <div className="text-left">
-          <div className="font-semibold text-white">{token.symbol}</div>
-          <div className="text-[#728395] text-sm">{token.name}</div>
+          <div className="font-heading font-semibold text-heading">{token.symbol}</div>
+          <div className="text-body text-sm">{token.name}</div>
         </div>
         <svg
-          className="w-4 h-4 text-[#728395]"
+          className="w-4 h-4 text-body"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -102,7 +102,7 @@ const TokenSelector = ({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1d2f] border border-[#14304e] rounded-lg shadow-xl z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-surface-1 border border-line-soft rounded-md shadow-2 z-50">
           {AVAILABLE_TOKENS.filter(
             (t) => t.symbol !== excludeToken?.symbol
           ).map((availableToken) => (
@@ -113,20 +113,20 @@ const TokenSelector = ({
                 onSelect(availableToken);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-[#14304e] transition-colors first:rounded-t-lg last:rounded-b-lg"
+              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-surface-ghost transition-colors first:rounded-t-md last:rounded-b-md"
             >
-              <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-8 h-8 rounded-pill flex items-center justify-center overflow-hidden">
                 {availableToken.imageUrl ? (
                   <Image
                     src={availableToken.imageUrl}
                     alt={availableToken.symbol}
                     width={32}
                     height={32}
-                    className="object-cover rounded-full"
+                    className="object-cover rounded-pill"
                   />
                 ) : (
                   <div
-                    className="w-full h-full flex items-center justify-center rounded-full text-white font-bold text-sm"
+                    className="w-full h-full flex items-center justify-center rounded-pill text-heading font-heading font-bold text-sm"
                     style={{ backgroundColor: availableToken.iconBg }}
                   >
                     {availableToken.icon}
@@ -134,18 +134,18 @@ const TokenSelector = ({
                 )}
               </div>
               <div className="text-left flex-1">
-                <div className="font-semibold text-white">
+                <div className="font-heading font-semibold text-heading">
                   {availableToken.symbol}
                 </div>
-                <div className="text-[#728395] text-sm">
+                <div className="text-body text-sm">
                   {availableToken.name}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-white font-semibold">
+                <div className="text-heading font-heading font-semibold">
                   {availableToken.balance}
                 </div>
-                <div className="text-[#728395] text-xs">Balance</div>
+                <div className="text-body text-xs">Balance</div>
               </div>
             </button>
           ))}
@@ -172,28 +172,28 @@ export default function SwapCollateral() {
   };
 
   return (
-    <div className="text-white p-6">
+    <div className="text-heading p-6">
       <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto`}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Swap Collateral</h1>
-          <p className="text-[#728395]">
+          <h1 className="text-3xl font-bold mb-2 font-heading text-heading">Swap Collateral</h1>
+          <p className="text-body">
             Swap between your available collateral tokens
           </p>
         </div>
 
         <div className="max-w-2xl mx-auto">
           {/* Swap Interface */}
-          <div className="bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-2xl p-6">
+          <div className="bg-surface-1 border border-line-soft rounded-lg p-6 shadow-2">
             {/* From Token */}
             <div className="mb-4">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-[#728395] text-sm font-medium">From</span>
-                <span className="text-[#728395] text-sm">
+                <span className="text-body text-sm font-medium font-heading">From</span>
+                <span className="text-body text-sm">
                   Balance: {fromToken.balance} {fromToken.symbol}
                 </span>
               </div>
-              <div className="bg-[#08131f] rounded-lg p-4">
+              <div className="bg-surface-2 rounded-md p-4 border border-line-soft">
                 <div className="flex items-center justify-between">
                   <TokenSelector
                     token={fromToken}
@@ -207,9 +207,9 @@ export default function SwapCollateral() {
                       value={fromAmount}
                       onChange={setFromAmount}
                       placeholder="0.00"
-                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
+                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-heading font-heading"
                     />
-                    <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
+                    <div className="text-muted text-sm mt-1">~ $0.00</div>
                   </div>
                 </div>
               </div>
@@ -220,10 +220,10 @@ export default function SwapCollateral() {
               <button
                 type="button"
                 onClick={handleSwapTokens}
-                className="bg-[#14304e] hover:bg-[#1a3a5c] rounded-full p-3 transition-all duration-200 transform hover:scale-110"
+                className="bg-surface-3 hover:bg-surface-ghost border border-line-soft rounded-full p-3 transition-all duration-200 transform hover:scale-110"
               >
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-5 h-5 text-heading"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -240,12 +240,12 @@ export default function SwapCollateral() {
             {/* To Token */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-[#728395] text-sm font-medium">To</span>
-                <span className="text-[#728395] text-sm">
+                <span className="text-body text-sm font-medium font-heading">To</span>
+                <span className="text-body text-sm">
                   Balance: {toToken.balance} {toToken.symbol}
                 </span>
               </div>
-              <div className="bg-[#08131f] rounded-lg p-4">
+              <div className="bg-surface-2 rounded-md p-4 border border-line-soft">
                 <div className="flex items-center justify-between">
                   <TokenSelector
                     token={toToken}
@@ -259,9 +259,9 @@ export default function SwapCollateral() {
                       value={toAmount}
                       onChange={setToAmount}
                       placeholder="0.00"
-                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
+                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-heading font-heading"
                     />
-                    <div className="text-[#728395] text-sm mt-1">~ $0.00</div>
+                    <div className="text-muted text-sm mt-1">~ $0.00</div>
                   </div>
                 </div>
               </div>
@@ -271,29 +271,29 @@ export default function SwapCollateral() {
             <div className="bg-[#08131f] rounded-lg p-4 mb-6">
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-[#728395] text-sm">Exchange Rate</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-body text-sm">Exchange Rate</span>
+                  <span className="font-heading font-semibold text-heading">
                     1 {fromToken.symbol} = 0.99 {toToken.symbol}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#728395] text-sm">Price Impact</span>
-                  <span className="text-[#2ae5b9] font-semibold">
+                  <span className="text-body text-sm">Price Impact</span>
+                  <span className="text-[#23c09b] font-semibold font-heading">
                     &lt; 0.01%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#728395] text-sm">Network Fee</span>
+                  <span className="text-body text-sm">Network Fee</span>
                   <div className="text-right">
-                    <div className="font-semibold text-white">~0.002 ETH</div>
-                    <div className="text-[#728395] text-xs">$6.84</div>
+                    <div className="font-heading font-semibold text-heading">~0.002 ETH</div>
+                    <div className="text-body text-xs">$6.84</div>
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#728395] text-sm">
+                  <span className="text-body text-sm">
                     Slippage Tolerance
                   </span>
-                  <span className="font-semibold text-white">0.5%</span>
+                  <span className="font-heading font-semibold text-heading">0.5%</span>
                 </div>
               </div>
             </div>
@@ -301,7 +301,7 @@ export default function SwapCollateral() {
             {/* Action Button */}
             <button
               type="button"
-              className="w-full py-4 px-6 bg-gradient-to-r from-[#2ae5b9] to-[#22c09b] text-black font-semibold rounded-lg hover:from-[#22c09b] hover:to-[#1ea87a] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="w-full py-4 px-6 bg-primary-100 text-black font-heading font-semibold rounded-md hover:bg-primary-200 transition-all duration-200 shadow-1 hover:shadow-2 transform hover:scale-105"
             >
               Swap Collateral
             </button>

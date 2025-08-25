@@ -65,14 +65,14 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             symbol: "LBTC",
             asset: "LBTC",
             icon: "₿",
-            iconBg: "from-orange-500 to-orange-600",
+            iconBg: "bg-primary-200",
             imageUrl: null,
           },
           collateralAsset: {
             symbol: "USDC",
             asset: "USDC",
             icon: "$",
-            iconBg: "from-[#2775CA] to-[#1e5f9a]",
+            iconBg: "bg-secondary",
             imageUrl: null,
           },
         });
@@ -94,7 +94,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
           symbol: "USDC",
           asset: "USDC",
           icon: "$",
-          iconBg: "from-[#2775CA] to-[#1e5f9a]",
+          iconBg: "from-blue-600 to-blue-700",
           imageUrl: null,
         },
       });
@@ -284,7 +284,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
   }, [collateralAmount, repayAsset]);
 
   return (
-    <div className="text-white">
+    <div className="text-heading">
       <div
         className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6 ${LAYOUT.CONTENT_PADDING_TOP_CLASS} pt-24`}
       >
@@ -292,7 +292,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
         <button
           type="button"
           onClick={() => onGoBack?.()}
-          className="flex items-center text-[#728395] hover:text-white transition-colors mb-6"
+          className="flex items-center text-body hover:text-heading transition-colors mb-6"
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -312,20 +312,20 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
         </button>
 
         {/* Page title */}
-        <h1 className="text-3xl font-bold mb-8">Repay</h1>
+        <h1 className="text-3xl font-bold mb-8 text-heading font-heading">Repay</h1>
 
         <div className="max-w-4xl mx-auto">
           {/* Main repay interface */}
           <div>
             {/* Tab selector - matching Lending page style */}
-            <div className="flex bg-[#0a1420] rounded-lg p-1 mb-6">
+            <div className="flex bg-surface-2 rounded-lg p-1 mb-6">
               <button
                 type="button"
                 onClick={() => setActiveTab("wallet")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors ${
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors font-heading ${
                   activeTab === "wallet"
-                    ? "bg-[#14304e] text-white"
-                    : "text-[#728395] hover:text-white"
+                    ? "bg-surface-3 text-heading border border-line-soft"
+                    : "text-body hover:text-heading hover:bg-surface-ghost"
                 }`}
               >
                 From wallet
@@ -333,15 +333,15 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
               <button
                 type="button"
                 onClick={() => setActiveTab("swap")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative ${
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative font-heading ${
                   activeTab === "swap"
-                    ? "bg-[#14304e] text-white"
-                    : "text-[#728395] hover:text-white"
+                    ? "bg-surface-3 text-heading border border-line-soft"
+                    : "text-body hover:text-heading hover:bg-surface-ghost"
                 }`}
               >
                 Swap collateral
                 <div className="absolute top-1 right-1">
-                  <span className="text-xs text-[#2ae5b9] font-medium bg-[#0c1d2f] px-1.5 py-0.5 rounded">
+                  <span className="text-xs text-black font-medium bg-primary-100 px-1.5 py-0.5 rounded-xs font-heading">
                     Coming Soon
                   </span>
                 </div>
@@ -351,17 +351,17 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             {/* From wallet / Collateral to swap section - Updated design */}
             {repayAsset && (
               <div
-                className={`bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
+                className={`bg-surface-1 border border-line-soft rounded-lg p-6 mb-6 shadow-1 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-white font-medium">
+                  <span className="text-heading font-medium font-heading">
                     {activeTab === "wallet"
                       ? "From Wallet"
                       : "Collateral to Swap"}
                   </span>
-                  <div className="flex items-center text-sm text-[#728395]">
+                  <div className="flex items-center text-sm text-body">
                     <span className="mr-2">Balance:</span>
-                    <span className="text-white font-medium">
+                    <span className="text-heading font-medium font-heading">
                       {balanceLoading && tokenBalance === "0"
                         ? "Loading balance..."
                         : activeTab === "wallet"
@@ -374,8 +374,8 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                 {/* Owed debt info - smaller display */}
                 {activeTab === "wallet" && repayAsset && (
                   <div className="mb-4 text-xs text-right">
-                    <span className="text-[#728395]">Owed Debt: </span>
-                    <span className="text-[#f59e0b] font-medium">
+                    <span className="text-body">Owed Debt: </span>
+                    <span className="text-warning font-medium font-heading">
                       {repayAsset.amount} {repayAsset.symbol} (
                       {calculateUSDValue(repayAsset.amount, repayAsset.symbol)})
                     </span>
@@ -397,12 +397,12 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           />
                         ) : (
                           <div
-                            className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                            className={`w-full h-full flex items-center justify-center rounded-full ${
                               repayAsset.asset?.iconBg ||
-                              "from-orange-500 to-orange-600"
+                              "bg-primary-200"
                             }`}
                           >
-                            <span className="text-white font-bold text-lg">
+                            <span className="text-heading font-bold text-lg">
                               {repayAsset.asset?.icon || repayAsset.symbol[0]}
                             </span>
                           </div>
@@ -418,12 +418,12 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                         />
                       ) : (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
                             repayAsset.collateralAsset?.iconBg ||
-                            "from-[#2775CA] to-[#1e5f9a]"
+                            "bg-secondary"
                           }`}
                         >
-                          <span className="text-white font-bold text-lg">
+                          <span className="text-heading font-bold text-lg">
                             {repayAsset.collateralAsset?.icon ||
                               repayAsset.collateralAsset?.symbol?.[0]}
                           </span>
@@ -431,12 +431,12 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                       )}
                     </div>
                     <div>
-                      <div className="font-semibold text-lg">
+                      <div className="font-semibold text-lg text-heading font-heading">
                         {activeTab === "wallet"
                           ? repayAsset.symbol
                           : repayAsset.collateralAsset?.symbol}
                       </div>
-                      <div className="text-[#728395] text-sm">
+                      <div className="text-body text-sm">
                         {activeTab === "wallet"
                           ? repayAsset.asset?.asset || repayAsset.symbol
                           : repayAsset.collateralAsset?.asset}
@@ -448,9 +448,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                       value={collateralAmount}
                       onChange={handleAmountChange}
                       placeholder="0.00"
-                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
+                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-heading font-heading"
                     />
-                    <div className="text-[#728395] text-sm mt-1">
+                    <div className="text-muted text-sm mt-1">
                       {calculateUSDValue(
                         collateralAmount,
                         activeTab === "wallet"
@@ -465,12 +465,12 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
 
             {/* Debt to repay section - Only show for swap tab */}
             {activeTab === "swap" && repayAsset && (
-              <div className="bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6 blur-sm opacity-50 pointer-events-none">
+              <div className="bg-surface-1 border border-line-soft rounded-lg p-6 mb-6 blur-sm opacity-50 pointer-events-none shadow-1">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-white font-medium">Debt to Repay</span>
-                  <div className="flex items-center text-sm text-[#728395]">
+                  <span className="text-heading font-medium font-heading">Debt to Repay</span>
+                  <div className="flex items-center text-sm text-body">
                     <span className="mr-2">Owed:</span>
-                    <span className="text-[#f59e0b] font-medium">
+                    <span className="text-warning font-medium font-heading">
                       {repayAsset.amount} {repayAsset.symbol}
                     </span>
                   </div>
@@ -489,22 +489,22 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                         />
                       ) : (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br ${
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
                             repayAsset.asset?.iconBg ||
-                            "from-orange-500 to-orange-600"
+                            "bg-primary-200"
                           }`}
                         >
-                          <span className="text-white font-bold text-sm">
+                          <span className="text-heading font-bold text-sm">
                             {repayAsset.asset?.icon || repayAsset.symbol[0]}
                           </span>
                         </div>
                       )}
                     </div>
                     <div>
-                      <div className="font-semibold text-lg">
+                      <div className="font-semibold text-lg text-heading font-heading">
                         {repayAsset.symbol}
                       </div>
-                      <div className="text-[#728395] text-sm">
+                      <div className="text-body text-sm">
                         {repayAsset.asset?.asset || repayAsset.symbol}
                       </div>
                     </div>
@@ -514,9 +514,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                       value={debtAmount}
                       onChange={setDebtAmount}
                       placeholder="0.00"
-                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
+                      className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-heading font-heading"
                     />
-                    <div className="text-[#728395] text-sm mt-1">
+                    <div className="text-muted text-sm mt-1">
                       {calculateUSDValue(
                         debtAmount || repayAsset.amount,
                         repayAsset.symbol
@@ -529,22 +529,22 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
 
             {/* Repay percentage slider - Enhanced design */}
             <div
-              className={`bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
+              className={`bg-surface-1 border border-line-soft rounded-lg p-6 mb-6 shadow-1 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
             >
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <div className="text-white font-semibold text-lg">
+                  <div className="text-heading font-semibold text-lg font-heading">
                     Repay Amount
                   </div>
-                  <div className="text-[#728395] text-sm mt-1">
+                  <div className="text-body text-sm mt-1">
                     Select percentage of debt to repay
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[#2ae5b9] font-bold text-2xl">
+                  <span className="text-primary-100 font-bold text-2xl font-heading">
                     {repayPercent}%
                   </span>
-                  <div className="text-[#728395] text-sm mt-1">
+                  <div className="text-body text-sm mt-1">
                     of total debt
                   </div>
                 </div>
@@ -561,7 +561,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   trackColor="rgba(42,229,185,0.15)"
                   className="h-1.5"
                 />
-                <div className="flex justify-between text-xs text-[#728395] mt-3">
+                <div className="flex justify-between text-xs text-body mt-3">
                   <span>0%</span>
                   <span>25%</span>
                   <span>50%</span>
@@ -577,10 +577,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             >
               <button
                 type="button"
-                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 ${
+                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 font-heading ${
                   isRepaying || !repayAsset || !isValidRepayAmount()
-                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-[#2ae5b9] to-[#22c09b] text-black hover:from-[#22c09b] hover:to-[#1ea87a] shadow-lg hover:shadow-xl transform hover:scale-105"
+                    ? "bg-surface-3 text-muted cursor-not-allowed border border-line-soft"
+                    : "bg-primary-100 text-black hover:bg-primary-200 shadow-lg hover:shadow-xl transform hover:scale-105"
                 }`}
                 disabled={isRepaying || !repayAsset || !isValidRepayAmount()}
                 onClick={handleRepay}

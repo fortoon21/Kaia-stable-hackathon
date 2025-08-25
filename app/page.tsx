@@ -123,7 +123,7 @@ export default function Home() {
         <div
           className={`${LAYOUT.CONTENT_PADDING_TOP_CLASS} flex-grow flex items-center justify-center`}
         >
-          <div className="animate-pulse text-[#728395]">Loading...</div>
+          <div className="animate-pulse text-[#8B9A6B]">Loading...</div>
         </div>
       </div>
     );

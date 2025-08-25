@@ -39,7 +39,7 @@ export default function Lending({ selectedPair }: LendingProps) {
           data-node-id="1:5"
         >
           {/* Combined Header and Stats Wrapper */}
-          <div className="absolute left-[80px] top-12 w-[780px] h-[280px] bg-[#0a1a14]/5 rounded-lg p-4">
+          <div className="absolute left-[80px] top-12 w-[780px] h-[280px] rounded-md p-4">
             {/* Header Section - Component */}
             <div className="absolute left-0 top-0 w-[740px] h-[120px]">
               <LendingHeader selectedPair={selectedPair} />
@@ -58,7 +58,7 @@ export default function Lending({ selectedPair }: LendingProps) {
           {/* Bottom Tabs and Overview */}
           <div className="absolute left-[80px] w-[780px] top-[332px]">
             {/* Tabs */}
-            <div className="h-auto bg-[#0c1d2f] border border-[#14304e] rounded-t-2xl">
+            <div className="h-auto bg-surface-1 border border-line-soft rounded-t-lg shadow-1">
               <LendingBottomTabs
                 activeTab={bottomTab}
                 onTabChange={setBottomTab}
@@ -67,7 +67,7 @@ export default function Lending({ selectedPair }: LendingProps) {
             </div>
 
             {/* Content based on selected tab */}
-            <div className="bg-[#0c1d2f] border border-[#14304e] border-t-0 rounded-b-2xl p-8">
+            <div className="bg-surface-1 border border-line-soft border-t-0 rounded-b-lg p-8 shadow-1">
               {bottomTab === "pair" ? (
                 <LendingOverviewTab
                   selectedPair={selectedPair}

@@ -91,8 +91,8 @@ export function LendingInputForm({
       {/* Collateral Amount Input */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="text-sm text-[#728395]">Collateral Amount</label>
-          <div className="text-xs text-[#728395]">
+          <label className="text-sm text-body font-heading">Collateral Amount</label>
+          <div className="text-xs text-body">
             Balance:{" "}
             {isLoadingBalance ? "Loading..." : collateralBalance || "0"}{" "}
             {selectedPair?.collateralAsset.symbol}
@@ -104,17 +104,17 @@ export function LendingInputForm({
             value={collateralAmount}
             onChange={handleCollateralAmountChange}
             placeholder="0.00"
-            className="w-full bg-[#14304e] text-white rounded-lg px-4 py-3 pr-20 focus:outline-none focus:ring-2 focus:ring-[#2ae5b9]"
+            className="w-full bg-surface-2 text-heading rounded-sm px-4 py-3 pr-20 focus:outline-none focus:ring-2 focus:ring-[#2ae5b9]"
           />
           <button
             type="button"
             onClick={handleMaxClick}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#2ae5b9]/20 text-[#2ae5b9] px-3 py-1 rounded text-sm hover:bg-[#2ae5b9]/30 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-100/20 text-primary-100 px-3 py-1 rounded-xs text-sm hover:bg-primary-100/30 transition-colors font-heading"
           >
             MAX
           </button>
         </div>
-        <div className="text-xs text-[#728395] mt-1">
+        <div className="text-xs text-body mt-1">
           ≈{" "}
           {formatDollarAmount(
             parseFloat(collateralAmount || "0") * collateralPrice
@@ -126,15 +126,15 @@ export function LendingInputForm({
       {activeTab === "multiply" ? (
         <div>
           <div className="flex justify-between items-center mb-3">
-            <label className="text-sm text-[#728395]">Multiplier</label>
+            <label className="text-sm text-body font-heading">Multiplier</label>
             <div className="flex items-center space-x-2">
               <input
                 type="text"
                 value={multiplierInput}
                 onChange={handleMultiplierInputChange}
-                className="w-16 bg-[#14304e] text-white rounded px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#2ae5b9]"
+                className="w-16 bg-surface-2 text-heading rounded-xs px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#2ae5b9]"
               />
-              <span className="text-[#728395] text-sm">x</span>
+              <span className="text-body text-sm">x</span>
             </div>
           </div>
           <Slider
@@ -145,7 +145,7 @@ export function LendingInputForm({
             onChange={handleMultiplierSliderChange}
             className="mb-2"
           />
-          <div className="flex justify-between text-xs text-[#728395]">
+          <div className="flex justify-between text-xs text-body">
             <span>1.00x</span>
             <span>{maxMultiplier.toFixed(2)}x</span>
           </div>
@@ -153,15 +153,15 @@ export function LendingInputForm({
       ) : (
         <div>
           <div className="flex justify-between items-center mb-3">
-            <label className="text-sm text-[#728395]">LTV</label>
+            <label className="text-sm text-body font-heading">LTV</label>
             <div className="flex items-center space-x-2">
               <input
                 type="text"
                 value={ltvInput}
                 onChange={handleLtvInputChange}
-                className="w-16 bg-[#14304e] text-white rounded px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#2ae5b9]"
+                className="w-16 bg-surface-2 text-heading rounded-xs px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#2ae5b9]"
               />
-              <span className="text-[#728395] text-sm">%</span>
+              <span className="text-body text-sm">%</span>
             </div>
           </div>
           <Slider
@@ -172,7 +172,7 @@ export function LendingInputForm({
             onChange={handleLtvSliderChange}
             className="mb-2"
           />
-          <div className="flex justify-between text-xs text-[#728395]">
+          <div className="flex justify-between text-xs text-body">
             <span>0%</span>
             <span>80%</span>
           </div>

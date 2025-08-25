@@ -16,30 +16,30 @@ export function LendingStatsSection({
 
   return (
     <div
-      className="absolute h-[98.66px] left-0 right-4 top-[140px] bg-[#0a1a14]/10 rounded-lg p-2"
+      className="absolute h-[98.66px] left-0 right-4 top-[140px] bg-surface-ghost rounded-md p-2"
       data-name="List"
       data-node-id="1:18"
     >
       {/* Liquidity */}
       <div
-        className="absolute leading-[0] left-0 not-italic right-[582px] top-0 bottom-0 bg-[#08131f]/30 rounded-lg"
+        className="absolute leading-[0] left-0 not-italic right-[582px] top-0 bottom-0 bg-surface-2 rounded-md"
         data-name="Item"
         data-node-id="1:19"
       >
         <div
-          className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-[#728395] text-[16px] top-2.5 translate-y-[-50%] w-[66.993px]"
+          className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[66.993px] font-heading"
           data-node-id="1:20"
         >
           <p className="block leading-[20px]">Liquidity</p>
         </div>
         <div
-          className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[20.912px]"
+          className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-muted text-[32px] top-[48.5px] translate-y-[-50%] w-[20.912px] font-heading"
           data-node-id="1:21"
         >
           <p className="block leading-[42.67px]">$</p>
         </div>
         <div
-          className="absolute flex flex-col font-medium h-[39px] justify-center left-[26.59px] text-[#f7f7f8] text-[32px] top-[48.5px] translate-y-[-50%] w-[117.772px]"
+          className="absolute flex flex-col font-medium h-[39px] justify-center left-[26.59px] text-heading text-[32px] top-[48.5px] translate-y-[-50%] w-[117.772px] font-heading"
           data-node-id="1:22"
         >
           <p className="block leading-[42.67px]">
@@ -52,10 +52,10 @@ export function LendingStatsSection({
           </p>
         </div>
         <div
-          className="absolute flex flex-col font-semibold h-[17px] justify-center left-0 text-[#728395] text-[14px] top-[88.16px] translate-y-[-50%] w-[95.427px]"
+          className="absolute flex flex-col font-semibold h-[17px] justify-center left-0 text-body text-[14px] top-[88.16px] translate-y-[-50%] w-[95.427px] font-heading"
           data-node-id="1:23"
         >
-          <p className="block leading-[20px]">
+          <p className="block leading-[20px] whitespace-nowrap">
             {selectedPair?.debtAsset?.symbol
               ? getLiquidity(selectedPair.debtAsset.symbol)?.amount || "22.85M"
               : "22.85M"}{" "}
@@ -66,18 +66,18 @@ export function LendingStatsSection({
 
       {/* Max multiplier */}
       <div
-        className="absolute leading-[0] left-[275px] not-italic right-[307px] top-0 bottom-0 bg-[#08131f]/30 rounded-lg"
+        className="absolute leading-[0] left-[275px] not-italic right-[307px] top-0 bottom-0 bg-surface-2 rounded-md"
         data-name="Item"
         data-node-id="1:24"
       >
         <div
-          className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-[#728395] text-[16px] top-2.5 translate-y-[-50%] w-[109.729px]"
+          className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[109.729px] font-heading"
           data-node-id="1:25"
         >
-          <p className="block leading-[20px]">Max multiplier</p>
+          <p className="block leading-[20px] whitespace-nowrap">Max multiplier</p>
         </div>
         <div
-          className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#f7f7f8] text-[32px] top-[48.5px] translate-y-[-50%] w-[63.875px]"
+          className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-heading text-[32px] top-[48.5px] translate-y-[-50%] w-[63.875px] font-heading"
           data-node-id="1:26"
         >
           <p className="block leading-[42.67px]">
@@ -85,7 +85,7 @@ export function LendingStatsSection({
           </p>
         </div>
         <div
-          className="absolute flex flex-col font-medium h-[39px] justify-center left-[69.48px] text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[17.944px]"
+          className="absolute flex flex-col font-medium h-[39px] justify-center left-[69.48px] text-muted text-[32px] top-[48.5px] translate-y-[-50%] w-[17.944px] font-heading"
           data-node-id="1:27"
         >
           <p className="block leading-[42.67px]">x</p>
@@ -94,18 +94,18 @@ export function LendingStatsSection({
 
       {/* Max ROE */}
       <div
-        className="absolute leading-[0] left-[550px] not-italic right-8 top-0 bottom-0 bg-[#08131f]/30 rounded-lg"
+        className="absolute leading-[0] left-[550px] not-italic right-8 top-0 bottom-0 bg-surface-2 rounded-md"
         data-name="Item"
         data-node-id="1:28"
       >
         <div
-          className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-[#728395] text-[16px] top-2.5 translate-y-[-50%] w-[90px]"
+          className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[90px] font-heading"
           data-node-id="1:29"
         >
           <p className="block leading-[20px] whitespace-nowrap">Max ROE</p>
         </div>
         <div
-          className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#23c09b] text-[32px] top-[48.5px] translate-y-[-50%] w-[85.221px]"
+          className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#23c09b] text-[32px] top-[48.5px] translate-y-[-50%] w-[85.221px] font-heading"
           data-node-id="1:30"
         >
           <p className="block leading-[42.67px]">
@@ -119,7 +119,7 @@ export function LendingStatsSection({
           </p>
         </div>
         <div
-          className="absolute flex flex-col font-medium h-[39px] justify-center left-[91px] text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[20px]"
+          className="absolute flex flex-col font-medium h-[39px] justify-center left-[91px] text-muted text-[32px] top-[48.5px] translate-y-[-50%] w-[20px] font-heading"
           data-node-id="1:31"
         >
           <p className="block leading-[42.67px]">%</p>

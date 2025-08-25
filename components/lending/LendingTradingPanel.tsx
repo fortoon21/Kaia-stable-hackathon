@@ -323,16 +323,16 @@ export function LendingTradingPanel({
 
   return (
     <div
-      className="bg-[#0c1d2f] h-full pointer-events-auto rounded-2xl flex flex-col"
+      className="bg-surface-1 h-full pointer-events-auto rounded-lg shadow-1 flex flex-col font-heading"
       data-name="Background+Border"
       data-node-id="1:32"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-2xl"
+        className="absolute border border-line-soft border-solid inset-0 pointer-events-none rounded-lg"
       />
       <div
-        className="bg-[#08131f] h-[53px] rounded-tl-[16px] rounded-tr-[16px] flex-shrink-0"
+        className="bg-surface-2 h-[53px] rounded-tl-md rounded-tr-md flex-shrink-0"
         data-name="Background"
         data-node-id="1:33"
       >
@@ -344,17 +344,17 @@ export function LendingTradingPanel({
           <button
             type="button"
             onClick={() => setActiveTab("borrow")}
-            className="absolute h-[53px] left-0 w-1/2 rounded-tl-[16px] top-0 cursor-pointer hover:bg-[#14304e] transition-colors relative"
+            className="absolute h-[53px] left-0 w-1/2 rounded-tl-md top-0 cursor-pointer hover:bg-surface-ghost transition-colors relative"
             data-name="Tab"
             data-node-id="1:35"
           >
             <div
               aria-hidden="true"
-              className="absolute border-[#14304e] border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
+              className="absolute border-line-soft border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
             />
             <div
               className={`absolute flex flex-col font-normal h-5 justify-center leading-[0] not-italic text-[16px] text-center translate-x-[-50%] translate-y-[-50%] w-[54.205px] ${
-                activeTab === "borrow" ? "text-[#ddfbf4]" : "text-[#728395]"
+                activeTab === "borrow" ? "text-heading" : "text-body"
               }`}
               data-node-id="1:36"
               style={{
@@ -365,28 +365,28 @@ export function LendingTradingPanel({
               <p className="block leading-[20px]">Borrow</p>
             </div>
             <div className="absolute top-1 right-1">
-              <span className="text-xs text-[#2ae5b9] font-medium bg-[#0c1d2f] px-1.5 py-0.5 rounded">
+              <span className="text-xs text-heading font-medium bg-primary-500 px-1.5 py-0.5 rounded">
                 Coming Soon
               </span>
             </div>
             {activeTab === "borrow" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-100"></div>
             )}
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("multiply")}
-            className="absolute h-[53px] right-0 w-1/2 rounded-tr-[16px] top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
+            className="absolute h-[53px] right-0 w-1/2 rounded-tr-md top-0 cursor-pointer hover:bg-surface-ghost transition-colors"
             data-name="Tab"
             data-node-id="1:37"
           >
             <div
               aria-hidden="true"
-              className="absolute border-[#14304e] border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
+              className="absolute border-line-soft border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
             />
             <div
               className={`absolute flex flex-col font-normal h-5 justify-center leading-[0] not-italic text-[16px] text-center translate-x-[-50%] translate-y-[-50%] w-[59.773px] ${
-                activeTab === "multiply" ? "text-[#ddfbf4]" : "text-[#728395]"
+                activeTab === "multiply" ? "text-heading" : "text-body"
               }`}
               data-node-id="1:38"
               style={{
@@ -397,7 +397,7 @@ export function LendingTradingPanel({
               <p className="block leading-[20px]">Multiply</p>
             </div>
             {activeTab === "multiply" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-100"></div>
             )}
           </button>
         </div>
@@ -410,14 +410,14 @@ export function LendingTradingPanel({
           <div className="space-y-4">
             {/* Margin Collateral - Only for Multiply Tab */}
             {activeTab === "multiply" && (
-              <div className="bg-[#040a10] rounded-lg p-6">
+              <div className="bg-surface-2 rounded-md shadow-1 p-6">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-[#a1acb8] text-sm">
+                  <div className="text-body text-sm">
                     Margin collateral
                   </div>
                   {isConnected && (
                     <div className="flex items-center space-x-2">
-                      <div className="text-[#728395] text-xs">
+                      <div className="text-body text-xs">
                         <span>Balance: </span>
                         <span className="tabular-nums font-mono">
                           {isLoadingBalance ? "..." : collateralBalance}
@@ -432,7 +432,7 @@ export function LendingTradingPanel({
                         onClick={() =>
                           setCollateralAmount(collateralBalance || "0")
                         }
-                        className="bg-[#14304e] hover:bg-[#1a3d5c] text-[#2ae5b9] text-xs px-2 py-1 rounded transition-colors"
+                        className="bg-primary-400 hover:bg-primary-200 text-heading text-xs px-2 py-1 rounded transition-colors"
                         disabled={
                           isLoadingBalance ||
                           !collateralBalance ||
@@ -450,9 +450,9 @@ export function LendingTradingPanel({
                     placeholder="0"
                     value={collateralAmount}
                     onChange={(e) => setCollateralAmount(e.target.value)}
-                    className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                    className="bg-transparent text-heading text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                   />
-                  <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                  <div className="bg-surface-2 rounded-pill shadow-1 px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
                     {selectedPair?.collateralAsset.imageUrl ? (
                       <Image
                         src={selectedPair.collateralAsset.imageUrl}
@@ -462,14 +462,14 @@ export function LendingTradingPanel({
                         className="w-5 h-5 rounded-full"
                       />
                     ) : (
-                      <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                      <div className="w-5 h-5 bg-primary-100 rounded-full"></div>
                     )}
-                    <span className="text-white text-sm font-semibold">
+                    <span className="text-heading text-sm font-semibold">
                       {selectedPair?.collateralAsset.symbol || "PT-USDe"}
                     </span>
                   </div>
                 </div>
-                <div className="text-[#a1acb8] text-sm mt-3">
+                <div className="text-body text-sm mt-3">
                   ~{" "}
                   {calculateUSDValue(collateralAmount || "0", collateralPrice)}
                 </div>
@@ -478,12 +478,12 @@ export function LendingTradingPanel({
 
             {/* Multiplier Section - Only for Multiply Tab */}
             {activeTab === "multiply" && (
-              <div className="bg-[#040a10] rounded-lg p-6">
+              <div className="bg-surface-2 rounded-md shadow-1 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="text-white text-sm font-semibold">
+                  <div className="text-heading text-sm font-semibold">
                     Multiplier
                   </div>
-                  <div className="bg-[#0c1d2f] rounded px-3 py-1 flex items-center">
+                  <div className="bg-primary-500 rounded px-3 py-1 flex items-center">
                     <input
                       type="text"
                       value={multiplierInput}
@@ -522,9 +522,9 @@ export function LendingTradingPanel({
                           }
                         }
                       }}
-                      className="text-white text-sm font-semibold bg-transparent w-12 text-right outline-none"
+                      className="text-heading text-sm font-semibold bg-transparent w-12 text-right outline-none"
                     />
-                    <span className="text-white text-sm font-semibold ml-0.5">
+                    <span className="text-heading text-sm font-semibold ml-0.5">
                       x
                     </span>
                   </div>
@@ -543,9 +543,9 @@ export function LendingTradingPanel({
                     trackColor="rgba(42,229,185,0.2)"
                   />
                 </div>
-                <div className="flex justify-between text-xs text-[#728395]">
+                <div className="flex justify-between text-xs text-body">
                   <span>1.00X</span>
-                  <span className="text-[#435971]">
+                  <span className="text-body">
                     {realMaxMultiplier > 1
                       ? ((realMaxMultiplier - 1) * 0.25 + 1).toFixed(2)
                       : "-.-"}
@@ -557,7 +557,7 @@ export function LendingTradingPanel({
                       : "-.-"}
                     X
                   </span>
-                  <span className="text-[#435971]">
+                  <span className="text-body">
                     {realMaxMultiplier > 1
                       ? ((realMaxMultiplier - 1) * 0.75 + 1).toFixed(2)
                       : "-.-"}
@@ -577,18 +577,18 @@ export function LendingTradingPanel({
             {activeTab === "multiply" && (
               <div className="space-y-4">
                 {/* Long Position */}
-                <div className="bg-[#08131f] rounded-lg p-4">
-                  <div className="text-[#728395] text-sm mb-2">Long</div>
+                <div className="bg-surface-1 border border-[#23c09b]/20 rounded-lg p-4">
+                  <div className="text-body text-sm mb-2">Long</div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-white">
+                      <div className="text-heading">
                         {/* Long = collateralAmount * multiplier */}
                         {(
                           parseFloat(collateralAmount || "0") * multiplier
                         ).toFixed(2)}{" "}
                         {selectedPair?.collateralAsset.symbol || "PT-USDe"}
                       </div>
-                      <div className="text-[#a1acb8] text-sm">
+                      <div className="text-body text-sm">
                         {calculateUSDValue(
                           (
                             parseFloat(collateralAmount || "0") * multiplier
@@ -597,7 +597,7 @@ export function LendingTradingPanel({
                         )}
                       </div>
                     </div>
-                    <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                    <div className="bg-surface-2 rounded-pill shadow-1 px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
                       {selectedPair?.collateralAsset.imageUrl ? (
                         <Image
                           src={selectedPair.collateralAsset.imageUrl}
@@ -607,9 +607,9 @@ export function LendingTradingPanel({
                           className="w-5 h-5 rounded-full"
                         />
                       ) : (
-                        <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                        <div className="w-5 h-5 bg-primary-100 rounded-full"></div>
                       )}
-                      <span className="text-white text-sm">
+                      <span className="text-heading text-sm">
                         {selectedPair?.collateralAsset.symbol || "PT-USDe"}
                       </span>
                     </div>
@@ -617,25 +617,25 @@ export function LendingTradingPanel({
                 </div>
 
                 {/* Short Position */}
-                <div className="bg-[#08131f] rounded-lg p-4">
-                  <div className="text-[#728395] text-sm mb-2">Short</div>
+                <div className="bg-surface-1 border border-warning/20 rounded-lg p-4">
+                  <div className="text-body text-sm mb-2">Short</div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-white">
+                      <div className="text-heading">
                         {/* Short = flashloan amount (borrowed debt) */}
                         {parseFloat(
                           leveragePosition.flashloanAmount || "0"
                         ).toFixed(2)}{" "}
                         {selectedPair?.debtAsset.symbol || "USDC"}
                       </div>
-                      <div className="text-[#a1acb8] text-sm">
+                      <div className="text-body text-sm">
                         {calculateUSDValue(
                           leveragePosition.flashloanAmount || "0",
                           debtPrice
                         )}
                       </div>
                     </div>
-                    <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                    <div className="bg-surface-2 rounded-pill shadow-1 px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
                       {selectedPair?.debtAsset.imageUrl ? (
                         <Image
                           src={selectedPair.debtAsset.imageUrl}
@@ -645,11 +645,11 @@ export function LendingTradingPanel({
                           className="w-5 h-5 rounded-full"
                         />
                       ) : (
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-heading text-xs">
                           {selectedPair?.debtAsset.symbol?.[0] || "U"}
                         </div>
                       )}
-                      <span className="text-white text-sm">
+                      <span className="text-heading text-sm">
                         {selectedPair?.debtAsset.symbol || "USDC"}
                       </span>
                     </div>
@@ -661,12 +661,12 @@ export function LendingTradingPanel({
             {activeTab === "borrow" && (
               <div className="space-y-4 blur-sm opacity-50 pointer-events-none">
                 {/* Supply Section */}
-                <div className="bg-[#040a10] rounded-lg p-6">
+                <div className="bg-surface-2 rounded-md shadow-1 p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-[#a1acb8] text-sm">
+                    <div className="text-body text-sm">
                       Supply {selectedPair?.collateralAsset.symbol || "USDC"}
                     </div>
-                    <div className="text-xs text-[#728395]">
+                    <div className="text-xs text-body">
                       <span className="mr-2">Market</span>
                       <span>Euler Base</span>
                     </div>
@@ -675,9 +675,9 @@ export function LendingTradingPanel({
                     <input
                       type="number"
                       placeholder="0"
-                      className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                      className="bg-transparent text-heading text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                     />
-                    <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                    <div className="bg-surface-2 rounded-pill shadow-1 px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
                       {selectedPair?.collateralAsset.imageUrl ? (
                         <Image
                           src={selectedPair.collateralAsset.imageUrl}
@@ -687,19 +687,19 @@ export function LendingTradingPanel({
                           className="w-5 h-5 rounded-full"
                         />
                       ) : (
-                        <div className="w-5 h-5 bg-[#17e3c2] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        <div className="w-5 h-5 bg-primary-100 rounded-full flex items-center justify-center text-heading text-xs font-bold">
                           {selectedPair?.collateralAsset.symbol?.[0] || "K"}
                         </div>
                       )}
-                      <span className="text-white text-sm font-semibold">
+                      <span className="text-heading text-sm font-semibold">
                         {selectedPair?.collateralAsset.symbol || "USDC"}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-3">
-                    <div className="text-[#a1acb8]">~ $0.00</div>
+                    <div className="text-body">~ $0.00</div>
                     <div className="flex items-center space-x-2">
-                      <div className="text-[#728395]">
+                      <div className="text-body">
                         <span>Balance: </span>
                         <span className="tabular-nums font-mono">
                           {isLoadingBalance ? "..." : collateralBalance}
@@ -714,7 +714,7 @@ export function LendingTradingPanel({
                         onClick={() =>
                           setCollateralAmount(collateralBalance || "0")
                         }
-                        className="px-2 py-1 bg-[#14304e] text-[#2ae5b9] text-xs font-semibold rounded hover:bg-[#1a3a5c] transition-colors"
+                        className="px-2 py-1 bg-primary-400 text-heading text-xs font-semibold rounded hover:bg-primary-300 transition-colors"
                       >
                         MAX
                       </button>
@@ -723,12 +723,12 @@ export function LendingTradingPanel({
                 </div>
 
                 {/* Borrow Section */}
-                <div className="bg-[#040a10] rounded-lg p-6">
+                <div className="bg-surface-2 rounded-md shadow-1 p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <div className="text-[#a1acb8] text-sm">
+                    <div className="text-body text-sm">
                       Borrow {selectedPair?.debtAsset.symbol || "USDS"}
                     </div>
-                    <div className="text-xs text-[#728395]">
+                    <div className="text-xs text-body">
                       <span className="mr-2">Market</span>
                       <span>Euler Base</span>
                     </div>
@@ -737,9 +737,9 @@ export function LendingTradingPanel({
                     <input
                       type="number"
                       placeholder="0"
-                      className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                      className="bg-transparent text-heading text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                     />
-                    <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                    <div className="bg-surface-2 rounded-pill shadow-1 px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
                       {selectedPair?.debtAsset.imageUrl ? (
                         <Image
                           src={selectedPair.debtAsset.imageUrl}
@@ -749,26 +749,26 @@ export function LendingTradingPanel({
                           className="w-5 h-5 rounded-full"
                         />
                       ) : (
-                        <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-heading text-xs font-bold">
                           {selectedPair?.debtAsset.symbol?.[0] || "U"}
                         </div>
                       )}
-                      <span className="text-white text-sm font-semibold">
+                      <span className="text-heading text-sm font-semibold">
                         {selectedPair?.debtAsset.symbol || "USDS"}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-sm mt-3">
-                    <div className="text-[#a1acb8]">~ $0.00</div>
-                    <div className="text-[#728395]">Max borrow 0</div>
+                    <div className="text-body">~ $0.00</div>
+                    <div className="text-body">Max borrow 0</div>
                   </div>
                 </div>
 
                 {/* LTV Section */}
-                <div className="bg-[#040a10] rounded-lg p-6">
+                <div className="bg-surface-2 rounded-md shadow-1 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="text-white text-sm font-semibold">LTV</div>
-                    <div className="bg-[#0c1d2f] rounded px-3 py-1 flex items-center">
+                    <div className="text-heading text-sm font-semibold">LTV</div>
+                    <div className="bg-primary-500 rounded px-3 py-1 flex items-center">
                       <input
                         type="text"
                         value={ltvInput}
@@ -807,9 +807,9 @@ export function LendingTradingPanel({
                             }
                           }
                         }}
-                        className="text-white text-sm font-semibold bg-transparent w-10 text-right outline-none"
+                        className="text-heading text-sm font-semibold bg-transparent w-10 text-right outline-none"
                       />
-                      <span className="text-white text-sm font-semibold ml-0.5">
+                      <span className="text-heading text-sm font-semibold ml-0.5">
                         %
                       </span>
                     </div>
@@ -829,7 +829,7 @@ export function LendingTradingPanel({
                       className="h-1.5"
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-[#728395]">
+                  <div className="flex justify-between text-xs text-body">
                     <span>0.00%</span>
                     <span>23.00%</span>
                     <span>47.00%</span>
@@ -839,36 +839,36 @@ export function LendingTradingPanel({
                 </div>
 
                 {/* Details Section */}
-                <div className="bg-[#040a10] rounded-lg p-6 space-y-3 text-sm">
+                <div className="bg-surface-2 rounded-md shadow-1 p-6 space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Net APY ⚙️</span>
-                    <span className="text-white">0.00%</span>
+                    <span className="text-body">Net APY ⚙️</span>
+                    <span className="text-heading">0.00%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Current oracle price</span>
-                    <span className="text-white">
-                      $1.00 <span className="text-[#a1acb8]">USDC ⇄</span>
+                    <span className="text-body">Current oracle price</span>
+                    <span className="text-heading">
+                      $1.00 <span className="text-body">USDC ⇄</span>
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">
+                    <span className="text-body">
                       Liquidation oracle price
                     </span>
-                    <span className="text-white">-</span>
+                    <span className="text-heading">-</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Your LTV</span>
-                    <span className="text-white">∞</span>
+                    <span className="text-body">Your LTV</span>
+                    <span className="text-heading">∞</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Your health</span>
-                    <span className="text-white">-</span>
+                    <span className="text-body">Your health</span>
+                    <span className="text-heading">-</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Estimated gas fee</span>
+                    <span className="text-body">Estimated gas fee</span>
                     <div className="text-right">
-                      <div className="text-white">{"<0.000001 ETH"}</div>
-                      <div className="text-[#a1acb8] text-xs">{"<$0.01"}</div>
+                      <div className="text-heading">{"<0.000001 ETH"}</div>
+                      <div className="text-body text-xs">{"<$0.01"}</div>
                     </div>
                   </div>
                 </div>
@@ -877,11 +877,11 @@ export function LendingTradingPanel({
 
             {/* Trading Details/Stats Section - Only for Multiply Tab */}
             {activeTab === "multiply" && (
-              <div className="bg-[#10263e] rounded-lg p-6 space-y-4 mt-4">
+              <div className="bg-surface-2 rounded-md p-6 space-y-4 mt-4 border border-line-soft shadow-1">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">ROE</span>
-                    <span className="text-white">
+                    <span className="text-body">ROE</span>
+                    <span className="text-heading">
                       {(() => {
                         if (
                           !selectedPair?.collateralAsset?.symbol ||
@@ -921,8 +921,8 @@ export function LendingTradingPanel({
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Your LTV</span>
-                    <span className="text-white">
+                    <span className="text-body">Your LTV</span>
+                    <span className="text-heading">
                       {(() => {
                         const longValue =
                           parseFloat(collateralAmount || "0") *
@@ -941,20 +941,20 @@ export function LendingTradingPanel({
                   </div>
                 </div>
 
-                <hr className="border-[#14304e]" />
+                <hr className="border-line-soft" />
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Swap</span>
-                    <span className="text-white">Yes</span>
+                    <span className="text-body">Swap</span>
+                    <span className="text-heading">Yes</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Slippage tolerance</span>
-                    <span className="text-white">0.05%</span>
+                    <span className="text-body">Slippage tolerance</span>
+                    <span className="text-heading">0.05%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Routed via</span>
-                    <span className="text-white flex items-center">
+                    <span className="text-body">Routed via</span>
+                    <span className="text-heading flex items-center">
                       <Image
                         src="https://raw.githubusercontent.com/EisenFinance/assets/main/assets/eisen/symbol/eisen-favicon.svg"
                         alt="Eisen"
@@ -973,14 +973,14 @@ export function LendingTradingPanel({
 
       {/* Fixed Bottom Action Button */}
       <div
-        className={`flex-shrink-0 bg-[#08131f] rounded-b-2xl border-t border-[#14304e] p-4 ${activeTab === "borrow" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
+        className={`flex-shrink-0 bg-bg-main rounded-b-2xl border-t border-line-soft p-4 ${activeTab === "borrow" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
       >
         {!isConnected ? (
           <WalletConnectorV2 />
         ) : (
           <button
             type="button"
-            className="w-full bg-[#2ae5b9] text-black py-4 rounded-full font-semibold hover:bg-[#17e3c2] transition-colors"
+            className="w-full bg-primary-100 text-black py-4 rounded-full font-semibold hover:bg-primary-100 transition-colors"
             onClick={activeTab === "multiply" ? handleOpenMultiply : undefined}
           >
             {activeTab === "multiply"

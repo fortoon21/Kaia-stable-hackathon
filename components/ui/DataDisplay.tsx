@@ -12,8 +12,8 @@ export function DataRow({
   label,
   value,
   subValue,
-  valueClassName = "text-white",
-  labelClassName = "text-[#728395]",
+  valueClassName = "text-heading",
+  labelClassName = "text-body",
 }: DataRowProps) {
   return (
     <div className="flex justify-between items-start py-2">
@@ -21,7 +21,7 @@ export function DataRow({
       <div className="text-right">
         <div className={`font-medium ${valueClassName}`}>{value}</div>
         {subValue && (
-          <div className="text-xs text-[#a1acb8] mt-0.5">{subValue}</div>
+          <div className="text-xs text-muted mt-0.5">{subValue}</div>
         )}
       </div>
     </div>
@@ -41,8 +41,8 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={`mb-6 ${className}`}>
-      <h2 className="text-xl font-semibold text-white">{title}</h2>
-      {subtitle && <p className="text-sm text-[#728395] mt-1">{subtitle}</p>}
+      <h2 className="text-xl font-semibold text-heading">{title}</h2>
+      {subtitle && <p className="text-sm text-body mt-1">{subtitle}</p>}
     </div>
   );
 }
@@ -70,7 +70,7 @@ export function ValueWithLabel({
 
   return (
     <div>
-      <div className="text-[#728395] text-xs mb-1">{label}</div>
+      <div className="text-body text-xs mb-1">{label}</div>
       <div
         className={`font-semibold ${sizeClasses[size]}`}
         style={{ color: valueColor }}
@@ -78,7 +78,7 @@ export function ValueWithLabel({
         {value}
       </div>
       {subValue && (
-        <div className="text-[#a1acb8] text-xs mt-0.5">{subValue}</div>
+        <div className="text-muted text-xs mt-0.5">{subValue}</div>
       )}
     </div>
   );

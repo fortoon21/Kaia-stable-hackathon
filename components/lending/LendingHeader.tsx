@@ -19,10 +19,10 @@ export function LendingHeader({ selectedPair }: LendingHeaderProps) {
         >
           <div
             aria-hidden="true"
-            className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-[30px]"
+            className="absolute border border-primary-400 border-solid inset-0 pointer-events-none rounded-[30px]"
           />
           <div
-            className="absolute bg-[#14304e] left-px overflow-clip rounded-[29px] size-[58px] top-px"
+            className="absolute bg-primary-400 left-px overflow-clip rounded-[29px] size-[58px] top-px"
             data-name="Background"
             data-node-id="1:7"
           >
@@ -40,7 +40,7 @@ export function LendingHeader({ selectedPair }: LendingHeaderProps) {
                   className="w-14 h-14 rounded-full object-cover z-10"
                 />
               ) : (
-                <div className="w-14 h-14 bg-[#17e3c2] rounded-full flex items-center justify-center text-white font-bold z-10">
+                <div className="w-14 h-14 bg-primary-200 rounded-full flex items-center justify-center text-heading font-bold z-10 font-heading">
                   {selectedPair?.collateralAsset.symbol?.[0] || "K"}
                 </div>
               )}
@@ -54,10 +54,10 @@ export function LendingHeader({ selectedPair }: LendingHeaderProps) {
         >
           <div
             aria-hidden="true"
-            className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-[30px]"
+            className="absolute border border-primary-400 border-solid inset-0 pointer-events-none rounded-[30px]"
           />
           <div
-            className="absolute bg-[#14304e] left-px overflow-clip rounded-[29px] size-[58px] top-px"
+            className="absolute bg-primary-400 left-px overflow-clip rounded-[29px] size-[58px] top-px"
             data-name="Background"
             data-node-id="1:11"
           >
@@ -71,7 +71,7 @@ export function LendingHeader({ selectedPair }: LendingHeaderProps) {
                   className="w-14 h-14 rounded-full object-cover"
                 />
               ) : (
-                <div className="bg-blue-500 rounded-full w-14 h-14 flex items-center justify-center text-white font-bold">
+                <div className="bg-secondary rounded-full w-14 h-14 flex items-center justify-center text-heading font-bold font-heading">
                   {selectedPair?.debtAsset.symbol?.[0] || "U"}
                 </div>
               )}
@@ -82,12 +82,12 @@ export function LendingHeader({ selectedPair }: LendingHeaderProps) {
 
       {/* Title Section */}
       <div className="absolute left-[120px] top-0">
-        <div className="text-[#728395] text-[16px] font-semibold leading-[20px] mb-2">
+        <div className="text-body text-[16px] font-semibold leading-[20px] mb-2 font-heading">
           {selectedPair?.collateralAsset.protocol || "TGIF Yield"}
         </div>
-        <div className="flex items-center text-[#f7f7f8] text-[36px] font-medium leading-[48px]">
+        <div className="flex items-center text-heading text-[36px] font-medium leading-[48px] font-heading">
           <span>{selectedPair?.collateralAsset.asset || "Error"}</span>
-          <span className="text-[#728395] mx-2">/</span>
+          <span className="text-body mx-2">/</span>
           <span>{selectedPair?.debtAsset.symbol || "USDC"}</span>
         </div>
       </div>

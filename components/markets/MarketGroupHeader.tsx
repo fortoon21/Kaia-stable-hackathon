@@ -44,11 +44,11 @@ export function MarketGroupHeader({
           />
         )}
         <span className="font-semibold text-lg">{groupName}</span>
-        <span className="text-[#728395] text-sm">
+        <span className="text-body text-sm">
           ({pairCount} {pairCount === 1 ? "pair" : "pairs"})
         </span>
       </div>
-      <div className="text-[#728395]">
+      <div className="text-body">
         {isExpanded ? (
           <svg
             className="w-5 h-5"

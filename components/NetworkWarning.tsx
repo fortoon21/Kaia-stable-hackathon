@@ -37,15 +37,15 @@ export default function NetworkWarning() {
   return (
     <div className="fixed top-20 left-0 right-0 z-50 mx-4">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-yellow-500 border border-yellow-600 rounded-lg p-4 shadow-lg">
+        <div className="bg-warning border border-yellow-600 rounded-md p-4 shadow-2">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-lg">⚠️</span>
+              <div className="w-8 h-8 bg-yellow-600 rounded-pill flex items-center justify-center">
+                <span className="text-heading text-lg">⚠️</span>
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-black font-semibold text-sm">
+              <h3 className="text-black font-heading font-semibold text-sm">
                 Wrong Network Detected
               </h3>
               <p className="text-black text-sm mt-1">
@@ -57,7 +57,7 @@ export default function NetworkWarning() {
               <button
                 type="button"
                 onClick={handleSwitchToKaia}
-                className="bg-black text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-sm"
+                className="bg-black text-heading px-4 py-2 rounded-sm font-heading font-semibold hover:bg-gray-800 transition-colors text-sm"
               >
                 Switch to Kaia
               </button>
@@ -65,7 +65,7 @@ export default function NetworkWarning() {
           </div>
 
           {error && (
-            <div className="mt-3 p-2 bg-red-100 border border-red-300 rounded text-red-700 text-xs">
+            <div className="mt-3 p-2 bg-red-100 border border-red-300 rounded-sm text-red-700 text-xs">
               {error}
             </div>
           )}

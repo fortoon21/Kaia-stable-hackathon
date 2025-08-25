@@ -22,14 +22,14 @@ export function LendingStatisticsTab({
 
   return (
     <>
-      <h2 className="text-white text-xl font-semibold mb-8">Statistics</h2>
+      <h2 className="text-heading text-xl font-semibold mb-8">Statistics</h2>
 
       <div className="space-y-8">
         {/* First row - Total supply, Total borrowed, Available liquidity */}
         <div className="grid grid-cols-3 gap-8">
           <div>
-            <div className="text-[#728395] text-sm mb-2">Total supply</div>
-            <div className="text-white text-lg font-medium">
+            <div className="text-body text-sm mb-2">Total supply</div>
+            <div className="text-heading text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? getTotalSupply(selectedPair.collateralAsset.symbol)
@@ -40,7 +40,7 @@ export function LendingStatisticsTab({
                     "$1.24M"
                   : "$1.24M"}
             </div>
-            <div className="text-[#a1acb8] text-xs mt-1">
+            <div className="text-muted text-xs mt-1">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? `${
@@ -60,8 +60,8 @@ export function LendingStatisticsTab({
           </div>
 
           <div>
-            <div className="text-[#728395] text-sm mb-2">Total borrowed</div>
-            <div className="text-white text-lg font-medium">
+            <div className="text-body text-sm mb-2">Total borrowed</div>
+            <div className="text-heading text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? getTotalBorrowed(selectedPair.collateralAsset.symbol)
@@ -72,7 +72,7 @@ export function LendingStatisticsTab({
                     "$896K"
                   : "$896K"}
             </div>
-            <div className="text-[#a1acb8] text-xs mt-1">
+            <div className="text-muted text-xs mt-1">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? `${
@@ -92,10 +92,10 @@ export function LendingStatisticsTab({
           </div>
 
           <div>
-            <div className="text-[#728395] text-sm mb-2">
+            <div className="text-body text-sm mb-2">
               Available liquidity
             </div>
-            <div className="text-white text-lg font-medium">
+            <div className="text-heading text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? getLiquidity(selectedPair.collateralAsset.symbol)
@@ -106,7 +106,7 @@ export function LendingStatisticsTab({
                     "$506.7K"
                   : "$506.7K"}
             </div>
-            <div className="text-[#a1acb8] text-xs mt-1">
+            <div className="text-muted text-xs mt-1">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? `${
@@ -131,8 +131,8 @@ export function LendingStatisticsTab({
         {/* Second row - Supply APY, Borrow APY, Empty */}
         <div className="grid grid-cols-3 gap-8">
           <div>
-            <div className="text-[#728395] text-sm mb-2">Supply APY</div>
-            <div className="text-[#2ae5b9] text-lg font-medium">
+            <div className="text-body text-sm mb-2">Supply APY</div>
+            <div className="text-primary-100 text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
                   ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "8.83%"
@@ -144,7 +144,7 @@ export function LendingStatisticsTab({
           </div>
 
           <div>
-            <div className="text-[#728395] text-sm mb-2">Borrow APY</div>
+            <div className="text-body text-sm mb-2">Borrow APY</div>
             <div className="text-orange-400 text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol

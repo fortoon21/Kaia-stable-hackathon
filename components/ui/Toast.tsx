@@ -44,15 +44,15 @@ function Toast({ message, onClose }: ToastProps) {
     >
       <span className="text-2xl">{icons[message.type]}</span>
       <div className="flex-1">
-        <h4 className="font-semibold text-white">{message.title}</h4>
+        <h4 className="font-semibold text-heading">{message.title}</h4>
         {message.description && (
-          <p className="text-sm text-[#728395] mt-1">{message.description}</p>
+          <p className="text-sm text-body mt-1">{message.description}</p>
         )}
       </div>
       <button
         type="button"
         onClick={() => onClose(message.id)}
-        className="text-[#728395] hover:text-white transition-colors"
+        className="text-body hover:text-heading transition-colors"
       >
         ✕
       </button>

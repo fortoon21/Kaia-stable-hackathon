@@ -96,19 +96,19 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
     // Fallback to first letter if no image
     return (
-      <div className="w-full h-full flex items-center justify-center bg-[#2ae5b9] rounded-full text-black font-bold">
+      <div className="w-full h-full flex items-center justify-center bg-primary-100 rounded-pill text-black font-heading font-bold">
         {marketName[0]}
       </div>
     );
   };
 
   return (
-    <div className="text-white">
+    <div className="text-heading">
       <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6 pt-20`}>
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">TGIF Lending Markets</h1>
-          <p className="text-[#728395]">
+          <h1 className="text-3xl font-heading font-bold mb-2 text-heading">TGIF Lending Markets</h1>
+          <p className="text-body">
             Leverage your positions with collateral and debt assets
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
         />
 
         {/* Markets Table */}
-        <div className="bg-[#0c1d2f] border border-[#14304e] rounded-2xl overflow-hidden">
+        <div className="bg-surface-1 border border-line-soft rounded-lg overflow-hidden shadow-1">
           {/* Market Groups */}
           <div>
             {MARKET_GROUPS.map((group) => (
@@ -130,26 +130,26 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                 {/* Group Header */}
                 <button
                   type="button"
-                  className="w-full bg-[#0a1420] px-6 py-6 border-b border-[#14304e] cursor-pointer hover:bg-[#0a1420]/80 transition-colors text-left"
+                  className="w-full bg-surface-2 px-6 py-6 border-b border-line-soft cursor-pointer hover:bg-surface-ghost transition-colors text-left"
                   onClick={() => toggleExpand(group.name)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-pill overflow-hidden flex items-center justify-center">
                         {getMarketImageComponent(group.name)}
                       </div>
                       <div>
-                        <div className="font-semibold text-[#2ae5b9] text-lg">
+                        <div className="font-heading font-semibold text-primary-100 text-lg">
                           {group.name}
                         </div>
-                        <div className="text-xs text-[#728395]">
+                        <div className="text-xs text-body">
                           {group.tradingPairs.length} trading pairs available
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <svg
-                        className={`w-5 h-5 text-[#728395] transition-transform duration-200 ${
+                        className={`w-5 h-5 text-body transition-transform duration-200 ${
                           expandedGroup === group.name
                             ? "rotate-90"
                             : "rotate-0"
@@ -172,12 +172,12 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                 {/* Trading Pairs */}
                 {expandedGroup === group.name && (
-                  <div className="bg-[#0a1420]">
+                  <div className="bg-surface-2">
                     {/* Accordion Header */}
-                    <div className="bg-[#0a1420] px-6 py-4 border-b border-[#14304e]">
+                    <div className="bg-surface-2 px-6 py-4 border-b border-line-soft">
                       <div className="flex items-center">
                         <div
-                          className="grid gap-1 text-[#728395] text-xs font-semibold flex-1"
+                          className="grid gap-1 text-body text-xs font-heading font-semibold flex-1"
                           style={{
                             gridTemplateColumns:
                               "1fr 1fr 0.8fr 0.8fr 0.6fr 0.8fr 0.5fr 0.8fr 0.8fr 0.6fr",
@@ -201,7 +201,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                       <button
                         type="button"
                         key={`${pair.collateralAsset.symbol}-${pair.debtAsset.symbol}`}
-                        className="w-full px-6 py-4 border-b border-[#14304e]/20 last:border-b-0 hover:bg-[#14304e]/10 transition-colors cursor-pointer text-left"
+                        className="w-full px-6 py-4 border-b border-line-soft last:border-b-0 hover:bg-surface-ghost transition-colors cursor-pointer text-left"
                         onClick={() => onSelectPair?.(pair)}
                       >
                         <div className="flex items-center">
@@ -214,18 +214,18 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                           >
                             {/* Collateral Asset */}
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                              <div className="w-8 h-8 rounded-pill flex items-center justify-center text-heading font-heading font-bold text-sm overflow-hidden">
                                 {pair.collateralAsset.imageUrl ? (
                                   <Image
                                     src={pair.collateralAsset.imageUrl}
                                     alt={pair.collateralAsset.symbol}
                                     width={32}
                                     height={32}
-                                    className="object-cover rounded-full"
+                                    className="object-cover rounded-pill"
                                   />
                                 ) : (
                                   <div
-                                    className="w-full h-full flex items-center justify-center rounded-full"
+                                    className="w-full h-full flex items-center justify-center rounded-pill"
                                     style={{
                                       backgroundColor:
                                         pair.collateralAsset.iconBg,
@@ -236,10 +236,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 )}
                               </div>
                               <div>
-                                <div className="font-medium text-sm">
+                                <div className="font-heading font-medium text-sm text-heading">
                                   {pair.collateralAsset.asset}
                                 </div>
-                                <div className="text-[#728395] text-xs">
+                                <div className="text-body text-xs">
                                   {pair.collateralAsset.protocol}
                                 </div>
                               </div>
@@ -247,18 +247,18 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* Debt Asset */}
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                              <div className="w-8 h-8 rounded-pill flex items-center justify-center text-heading font-heading font-bold text-sm overflow-hidden">
                                 {pair.debtAsset.imageUrl ? (
                                   <Image
                                     src={pair.debtAsset.imageUrl}
                                     alt={pair.debtAsset.symbol}
                                     width={32}
                                     height={32}
-                                    className="object-cover rounded-full"
+                                    className="object-cover rounded-pill"
                                   />
                                 ) : (
                                   <div
-                                    className="w-full h-full flex items-center justify-center rounded-full"
+                                    className="w-full h-full flex items-center justify-center rounded-pill"
                                     style={{
                                       backgroundColor: pair.debtAsset.iconBg,
                                     }}
@@ -268,10 +268,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 )}
                               </div>
                               <div>
-                                <div className="font-medium text-sm">
+                                <div className="font-heading font-medium text-sm text-heading">
                                   {pair.debtAsset.asset}
                                 </div>
-                                <div className="text-[#728395] text-xs">
+                                <div className="text-body text-xs">
                                   {pair.debtAsset.protocol}
                                 </div>
                               </div>
@@ -287,14 +287,14 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* Borrow APY */}
                             <div className="text-right">
-                              <div className="text-orange-400 font-semibold">
+                              <div className="text-warning font-semibold">
                                 {getBorrowAPY(pair.debtAsset.symbol) ?? "-"}
                               </div>
                             </div>
 
                             {/* Max ROE */}
                             <div className="text-right">
-                              <div className="text-[#2ae5b9] font-semibold">
+                              <div className="text-primary-100 font-heading font-semibold">
                                 {getMaxROE(
                                   pair.collateralAsset.symbol,
                                   pair.debtAsset.symbol
@@ -304,7 +304,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* Max Multiplier */}
                             <div className="text-right">
-                              <div className="font-semibold">
+                              <div className="font-heading font-semibold">
                                 {(() => {
                                   const pairKey = `${pair.collateralAsset.symbol}-${pair.debtAsset.symbol}`;
                                   const maxLev = maxMultipliers[pairKey];
@@ -323,7 +323,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                             {/* LLTV */}
                             <div className="text-right">
-                              <div className="font-semibold">
+                              <div className="font-heading font-semibold">
                                 {getLLTV(pair.collateralAsset.symbol) ?? "-"}
                               </div>
                             </div>
@@ -336,10 +336,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 );
                                 return (
                                   <>
-                                    <div className="font-semibold">
+                                    <div className="font-heading font-semibold">
                                       {usdValue || "-"}
                                     </div>
-                                    <div className="text-[#728395] text-xs">
+                                    <div className="text-body text-xs">
                                       {amount
                                         ? `${amount} ${pair.debtAsset.symbol}`
                                         : "-"}
@@ -361,11 +361,11 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 return (
                                   <div>
                                     <div
-                                      className={`font-semibold text-sm ${hasDebt ? "text-[#f59e0b]" : "text-[#728395]"}`}
+                                      className={`font-heading font-semibold text-sm ${hasDebt ? "text-warning" : "text-body"}`}
                                     >
                                       {position.amount}
                                     </div>
-                                    <div className="text-[#728395] text-xs">
+                                    <div className="text-body text-xs">
                                       {position.usdValue}
                                     </div>
                                   </div>
@@ -385,10 +385,10 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
 
                                 return (
                                   <div
-                                    className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200 cursor-pointer ${
+                                    className={`px-3 py-1.5 rounded-sm font-heading font-semibold text-xs transition-all duration-200 cursor-pointer ${
                                       canRepay
-                                        ? "bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white hover:from-[#d97706] hover:to-[#b45309] shadow-lg hover:shadow-xl"
-                                        : "bg-[#14304e] text-[#728395] cursor-not-allowed"
+                                        ? "bg-warning hover:bg-warning/80 text-heading shadow-lg hover:shadow-xl"
+                                        : "bg-surface-2 text-muted cursor-not-allowed"
                                     }`}
                                     role="button"
                                     tabIndex={canRepay ? 0 : -1}

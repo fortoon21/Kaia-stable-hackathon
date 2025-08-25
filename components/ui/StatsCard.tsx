@@ -26,17 +26,17 @@ export function StatsCard({
       case "up":
         return "text-[#23c09b]";
       case "down":
-        return "text-[#ff6b6b]";
+        return "text-warning";
       default:
-        return "text-[#728395]";
+        return "text-body";
     }
   };
 
   return (
     <div className={`${className}`}>
-      <div className="text-[#728395] text-sm mb-2">{label}</div>
+      <div className="text-body text-sm mb-2 font-heading">{label}</div>
       <div className="flex items-baseline gap-2">
-        <div className="text-lg font-medium" style={{ color: valueColor }}>
+        <div className="text-lg font-heading font-medium" style={{ color: valueColor }}>
           {value}
         </div>
         {trend && trendValue && (
@@ -47,7 +47,7 @@ export function StatsCard({
         )}
       </div>
       {subValue && (
-        <div className="text-[#a1acb8] text-xs mt-1">{subValue}</div>
+        <div className="text-muted text-xs mt-1">{subValue}</div>
       )}
     </div>
   );

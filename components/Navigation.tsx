@@ -26,7 +26,7 @@ export default function Navigation({
       ></div>
 
       <div
-        className={`fixed ${LAYOUT.NAVIGATION_HEIGHT_CLASS} left-4 right-4 top-4 mx-auto max-w-7xl min-w-[1024px] ${LAYOUT.BACKGROUND_CLASS} border border-[#10263e] rounded-2xl backdrop-blur-md bg-opacity-98 z-[9999] shadow-2xl`}
+        className={`fixed ${LAYOUT.NAVIGATION_HEIGHT_CLASS} left-4 right-4 top-4 mx-auto max-w-7xl min-w-[1024px] bg-surface-1 border border-line-soft rounded-2xl backdrop-blur-md z-[9999] shadow-2 font-heading`}
       >
         <div className="h-full overflow-visible">
           <div className="min-w-max px-6 h-full flex items-center justify-between">
@@ -49,10 +49,10 @@ export default function Navigation({
                 <button
                   type="button"
                   onClick={() => onPageChange("markets")}
-                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-md font-semibold text-sm transition-colors whitespace-nowrap ${
                     currentPage === "markets"
-                      ? "text-[#ddfbf4] bg-[#14304e]"
-                      : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
+                      ? "text-primary-100 bg-surface-2 border border-line-soft"
+                      : "text-body hover:text-heading hover:bg-surface-ghost"
                   }`}
                 >
                   Markets
@@ -60,10 +60,10 @@ export default function Navigation({
                 <button
                   type="button"
                   onClick={() => onPageChange("lending")}
-                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-colors whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-md font-semibold text-sm transition-colors whitespace-nowrap ${
                     currentPage === "lending"
-                      ? "text-[#ddfbf4] bg-[#14304e]"
-                      : "text-[#728395] hover:text-[#ddfbf4] hover:bg-[#10263e]"
+                      ? "text-primary-100 bg-surface-2 border border-line-soft"
+                      : "text-body hover:text-heading hover:bg-surface-ghost"
                   }`}
                 >
                   Lending
@@ -75,7 +75,7 @@ export default function Navigation({
             <div className="flex items-center space-x-3 flex-shrink-0 ml-8">
               {/* Combined Network & Wallet Info */}
               {isConnected ? (
-                <div className="flex items-center space-x-3 bg-[#14304e] border border-[#10263e] rounded-full px-4 py-2">
+                <div className="flex items-center space-x-3 bg-surface-2 border border-line-soft rounded-pill px-4 py-2 shadow-1">
                   {/* Network Info */}
                   <div className="flex items-center space-x-2">
                     <div
@@ -106,13 +106,13 @@ export default function Navigation({
                         {networkInfo.symbol}
                       </span>
                     </div>
-                    <span className="text-[#ddfbf4] text-sm font-medium whitespace-nowrap">
+                    <span className="text-heading text-sm font-medium whitespace-nowrap">
                       {networkInfo.name}
                     </span>
                   </div>
 
                   {/* Separator */}
-                  <div className="w-px h-4 bg-[#10263e]"></div>
+                  <div className="w-px h-4 bg-line-soft"></div>
 
                   {/* Wallet Info */}
                   <WalletConnectorV2 />
