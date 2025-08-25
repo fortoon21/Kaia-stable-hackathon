@@ -1,12 +1,14 @@
 "use client";
 
 import { ethers } from "ethers";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { LendingBottomTabs } from "@/components/lending/LendingBottomTabs";
 import { LendingHeader } from "@/components/lending/LendingHeader";
 import { LendingInputForm } from "@/components/lending/LendingInputForm";
 import { LendingPositionInfo } from "@/components/lending/LendingPositionInfo";
 import { LendingTabs } from "@/components/lending/LendingTabs";
+import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import {
   AAVE_CONFIG,
