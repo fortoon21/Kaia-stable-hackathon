@@ -36,10 +36,7 @@ export function StatsCard({
     <div className={`${className}`}>
       <div className="text-[#728395] text-sm mb-2">{label}</div>
       <div className="flex items-baseline gap-2">
-        <div
-          className="text-lg font-medium"
-          style={{ color: valueColor }}
-        >
+        <div className="text-lg font-medium" style={{ color: valueColor }}>
           {value}
         </div>
         {trend && trendValue && (
@@ -62,10 +59,10 @@ interface StatsGridProps {
   className?: string;
 }
 
-export function StatsGrid({ 
-  children, 
+export function StatsGrid({
+  children,
   columns = 3,
-  className = "" 
+  className = "",
 }: StatsGridProps) {
   const gridCols = {
     2: "grid-cols-2",

@@ -21,13 +21,21 @@ export function useMarketCalculations() {
         string,
         { amount: string; usdValue: string }
       > = {};
-      
+
       // Return dash for all known tokens when disconnected
-      const knownTokens = ["USDC", "LBTC", "WKAIA", "KAIA", "USD₮", "USDT", "USDT0"];
-      knownTokens.forEach(token => {
+      const knownTokens = [
+        "USDC",
+        "LBTC",
+        "WKAIA",
+        "KAIA",
+        "USD₮",
+        "USDT",
+        "USDT0",
+      ];
+      knownTokens.forEach((token) => {
         emptyPositions[token] = { amount: "-", usdValue: "-" };
       });
-      
+
       return emptyPositions;
     }
 
@@ -49,14 +57,16 @@ export function useMarketCalculations() {
     // Process each token's debt balance from aaveUserBalances
     Object.entries(aaveUserBalances).forEach(([tokenAddress, balanceData]) => {
       // Find the token symbol from the address by checking all known tokens
-      const tokenSymbol = ["WKAIA", "USDT", "USDC", "USDT0", "USD₮"].find(symbol => 
-        getTokenAddress(symbol)?.toLowerCase() === tokenAddress.toLowerCase()
+      const tokenSymbol = ["WKAIA", "USDT", "USDC", "USDT0", "USD₮"].find(
+        (symbol) =>
+          getTokenAddress(symbol)?.toLowerCase() === tokenAddress.toLowerCase()
       );
-      
+
       if (tokenSymbol && balanceData.variableDebtBalance) {
         const debtAmount = parseFloat(balanceData.variableDebtBalance);
-        const formattedAmount = debtAmount > 0 ? debtAmount.toLocaleString() : "0";
-        
+        const formattedAmount =
+          debtAmount > 0 ? debtAmount.toLocaleString() : "0";
+
         borrowPositions[tokenSymbol] = {
           amount: formattedAmount,
           usdValue: calculateUsdValue(tokenSymbol, formattedAmount),
@@ -65,8 +75,16 @@ export function useMarketCalculations() {
     });
 
     // Ensure all known tokens have entries
-    const knownTokens = ["USDC", "LBTC", "WKAIA", "KAIA", "USD₮", "USDT", "USDT0"];
-    knownTokens.forEach(token => {
+    const knownTokens = [
+      "USDC",
+      "LBTC",
+      "WKAIA",
+      "KAIA",
+      "USD₮",
+      "USDT",
+      "USDT0",
+    ];
+    knownTokens.forEach((token) => {
       if (!borrowPositions[token]) {
         borrowPositions[token] = { amount: "0", usdValue: "$0.00" };
       }
@@ -83,7 +101,11 @@ export function useMarketCalculations() {
     borrowPositions: Record<string, { amount: string; usdValue: string }>
   ): boolean => {
     const position = borrowPositions[debtAsset];
-    return position?.amount !== "0" && position?.amount !== "-" && position?.amount !== undefined;
+    return (
+      position?.amount !== "0" &&
+      position?.amount !== "-" &&
+      position?.amount !== undefined
+    );
   };
 
   /**

@@ -21,18 +21,18 @@ export async function ensureCollateralApproval({
     "function allowance(address owner, address spender) view returns (uint256)",
     "function approve(address spender, uint256 amount) returns (bool)",
   ];
-  
+
   const collateralErc20 = new ethers.Contract(
     collateralUnderlying,
     erc20Abi,
     signer
   );
-  
+
   const currentAllowance: bigint = await collateralErc20.allowance(
     address,
     loopAddress
   );
-  
+
   if (currentAllowance < collAmtWei) {
     console.log("Prompting wallet: ERC20.approve for collateral allowance", {
       asset: collateralUnderlying,
@@ -40,7 +40,7 @@ export async function ensureCollateralApproval({
       currentAllowance: currentAllowance.toString(),
       requiredAllowance: collAmtWei.toString(),
     });
-    
+
     const txApprove = await collateralErc20.approve(
       loopAddress,
       ethers.MaxUint256
@@ -70,33 +70,37 @@ export async function ensureBorrowDelegation({
     "function borrowAllowance(address fromUser, address toUser) view returns (uint256)",
     "function approveDelegation(address delegatee, uint256 amount)",
   ];
-  
+
   const variableDebtToken = new ethers.Contract(
     variableDebtAsset,
     debtTokenAbi,
     signer
   );
-  
-  const currentBorrowAllowance: bigint = await variableDebtToken.borrowAllowance(
-    address,
-    loopAddress
-  );
-  
+
+  const currentBorrowAllowance: bigint =
+    await variableDebtToken.borrowAllowance(address, loopAddress);
+
   // Calculate required allowance with premium
-  const bpsNumber = Number.isFinite(flBps) ? Math.max(0, Math.floor(Number(flBps))) : 0;
+  const bpsNumber = Number.isFinite(flBps)
+    ? Math.max(0, Math.floor(Number(flBps)))
+    : 0;
   const ONE_WAD = BigInt("1000000000000000000");
   const premiumWad = (BigInt(bpsNumber) * ONE_WAD) / BigInt("10000");
-  const premiumWei = (flashloanAmtWei * premiumWad + (ONE_WAD - BigInt("1"))) / ONE_WAD;
+  const premiumWei =
+    (flashloanAmtWei * premiumWad + (ONE_WAD - BigInt("1"))) / ONE_WAD;
   const requiredBorrowAllowance = flashloanAmtWei + premiumWei;
-  
+
   if (currentBorrowAllowance < requiredBorrowAllowance) {
-    console.log("Prompting wallet: approveDelegation for variable debt delegation", {
-      debtToken: variableDebtAsset,
-      delegatee: loopAddress,
-      currentBorrowAllowance: currentBorrowAllowance.toString(),
-      requiredBorrowAllowance: requiredBorrowAllowance.toString(),
-    });
-    
+    console.log(
+      "Prompting wallet: approveDelegation for variable debt delegation",
+      {
+        debtToken: variableDebtAsset,
+        delegatee: loopAddress,
+        currentBorrowAllowance: currentBorrowAllowance.toString(),
+        requiredBorrowAllowance: requiredBorrowAllowance.toString(),
+      }
+    );
+
     const txApproveDelegation = await variableDebtToken.approveDelegation(
       loopAddress,
       ethers.MaxUint256
@@ -124,26 +128,34 @@ export async function ensureCollateralEnabled({
     const userConfAbi: ethers.InterfaceAbi = [
       "function getUserConfiguration(address user) view returns (uint256)",
     ];
-    
+
     const poolView = new ethers.Contract(poolAddress, userConfAbi, signer);
     const confData: bigint = await poolView.getUserConfiguration(address);
-    
+
     const collateralBitPos = BigInt(reserveId * 2 + 1);
-    const isUsingCollateral = ((confData >> collateralBitPos) & BigInt(1)) === BigInt(1);
-    
+    const isUsingCollateral =
+      ((confData >> collateralBitPos) & BigInt(1)) === BigInt(1);
+
     if (!isUsingCollateral) {
       const aavePoolAbi: ethers.InterfaceAbi = [
         "function setUserUseReserveAsCollateral(address asset, bool useAsCollateral)",
       ];
-      
-      const poolContract = new ethers.Contract(poolAddress, aavePoolAbi, signer);
-      
-      console.log("Prompting wallet: setUserUseReserveAsCollateral to enable collateral", {
-        pool: poolAddress,
-        asset: collateralUnderlying,
-        useAsCollateral: true,
-      });
-      
+
+      const poolContract = new ethers.Contract(
+        poolAddress,
+        aavePoolAbi,
+        signer
+      );
+
+      console.log(
+        "Prompting wallet: setUserUseReserveAsCollateral to enable collateral",
+        {
+          pool: poolAddress,
+          asset: collateralUnderlying,
+          useAsCollateral: true,
+        }
+      );
+
       const txEnable = await poolContract.setUserUseReserveAsCollateral(
         collateralUnderlying,
         true
@@ -181,13 +193,13 @@ export function calculateLeverageAmounts(params: LeverageCalculationParams) {
     initialCollateralHuman,
     initialDebtHuman,
   } = params;
-  
+
   // Convert basis points to decimals
-  const flashloanPremiumDec = Number.isFinite(flashloanPremiumBps) 
+  const flashloanPremiumDec = Number.isFinite(flashloanPremiumBps)
     ? (flashloanPremiumBps / 10000).toString()
     : "0.0009";
   const maxLtvDec = (maxLtvBps / 10000).toString();
-  
+
   // Calculate max leverage
   const targetLev = Math.max(1, Math.min(multiplier, 25));
   const maxLev = calculateMaxLeverage({
@@ -201,9 +213,9 @@ export function calculateLeverageAmounts(params: LeverageCalculationParams) {
     flashloanPremium: flashloanPremiumDec,
     maxLTV: maxLtvDec,
   });
-  
+
   const clampedTarget = Math.min(targetLev, maxLev);
-  
+
   // Calculate leverage parameters
   const leverageCalc = calculateLeverageParams({
     collateralDecimals,
@@ -216,7 +228,7 @@ export function calculateLeverageAmounts(params: LeverageCalculationParams) {
     priceOfDebt: debtPrice.toString(),
     flashloanPremium: flashloanPremiumDec,
   });
-  
+
   return {
     flashloanAmount: leverageCalc.flashloanAmount,
     ltv: leverageCalc.ltv,
@@ -233,5 +245,7 @@ export function resolvePoolAddress(addressesProvider: string): string {
 }
 
 export function getDragonSwapPool(debtAssetSymbol: string): string {
-  return DRAGON_SWAP_POOLS[debtAssetSymbol as keyof typeof DRAGON_SWAP_POOLS] || "";
+  return (
+    DRAGON_SWAP_POOLS[debtAssetSymbol as keyof typeof DRAGON_SWAP_POOLS] || ""
+  );
 }

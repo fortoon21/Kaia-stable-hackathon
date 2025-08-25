@@ -34,17 +34,15 @@ interface SectionHeaderProps {
   className?: string;
 }
 
-export function SectionHeader({ 
-  title, 
-  subtitle, 
-  className = "" 
+export function SectionHeader({
+  title,
+  subtitle,
+  className = "",
 }: SectionHeaderProps) {
   return (
     <div className={`mb-6 ${className}`}>
       <h2 className="text-xl font-semibold text-white">{title}</h2>
-      {subtitle && (
-        <p className="text-sm text-[#728395] mt-1">{subtitle}</p>
-      )}
+      {subtitle && <p className="text-sm text-[#728395] mt-1">{subtitle}</p>}
     </div>
   );
 }
@@ -73,7 +71,7 @@ export function ValueWithLabel({
   return (
     <div>
       <div className="text-[#728395] text-xs mb-1">{label}</div>
-      <div 
+      <div
         className={`font-semibold ${sizeClasses[size]}`}
         style={{ color: valueColor }}
       >

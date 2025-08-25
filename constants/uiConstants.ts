@@ -4,7 +4,7 @@ export const COLORS = {
   primary: "#2ae5b9",
   primaryHover: "#17e3c2",
   primaryDark: "#23c09b",
-  
+
   // Background colors
   bgPrimary: "#08131f",
   bgSecondary: "#0c1d2f",
@@ -12,7 +12,7 @@ export const COLORS = {
   bgCard: "#14304e",
   bgCardHover: "#14304e/20",
   bgDanger: "#ff6b6b",
-  
+
   // Text colors
   textPrimary: "#ffffff",
   textSecondary: "#728395",
@@ -21,11 +21,11 @@ export const COLORS = {
   textWarning: "#f59e0b",
   textDanger: "#ff6b6b",
   textOrange: "#fb923c",
-  
+
   // Border colors
   borderPrimary: "#14304e",
   borderSecondary: "#1e3a5f",
-  
+
   // Status colors
   positive: "#23c09b",
   negative: "#ff6b6b",
@@ -36,19 +36,19 @@ export const COLORS = {
 // Common spacing values
 export const SPACING = {
   xs: "0.25rem", // 4px
-  sm: "0.5rem",  // 8px
-  md: "1rem",    // 16px
-  lg: "1.5rem",  // 24px
-  xl: "2rem",    // 32px
-  xxl: "3rem",   // 48px
+  sm: "0.5rem", // 8px
+  md: "1rem", // 16px
+  lg: "1.5rem", // 24px
+  xl: "2rem", // 32px
+  xxl: "3rem", // 48px
 } as const;
 
 // Border radius values
 export const RADIUS = {
-  sm: "0.375rem",  // 6px
-  md: "0.5rem",    // 8px
-  lg: "1rem",      // 16px
-  xl: "1.5rem",    // 24px
+  sm: "0.375rem", // 6px
+  md: "0.5rem", // 8px
+  lg: "1rem", // 16px
+  xl: "1.5rem", // 24px
   full: "9999px",
 } as const;
 
@@ -64,11 +64,11 @@ export const TRANSITIONS = {
 export const TYPOGRAPHY = {
   // Font sizes
   fontSize: {
-    xs: "text-xs",    // 12px
-    sm: "text-sm",    // 14px
+    xs: "text-xs", // 12px
+    sm: "text-sm", // 14px
     base: "text-base", // 16px
-    lg: "text-lg",    // 18px
-    xl: "text-xl",    // 20px
+    lg: "text-lg", // 18px
+    xl: "text-xl", // 20px
     "2xl": "text-2xl", // 24px
     "3xl": "text-3xl", // 30px
   },
