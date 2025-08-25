@@ -532,83 +532,47 @@ export default function Lending({ selectedPair }: LendingProps) {
                 <div className="p-3">
                   {/* Trading Form Container */}
                   <div className="space-y-4">
-                    {/* Margin Collateral - Only for Multiply Tab */}
-                    {activeTab === "multiply" && (
-                      <div className="bg-[#040a10] rounded-lg p-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="text-[#a1acb8] text-sm">
-                            Margin collateral
-                          </div>
-                          {isConnected && (
-                            <div className="flex items-center space-x-2">
-                              <div className="text-[#728395] text-xs">
-                                <span>Balance: </span>
-                                <span className="tabular-nums font-mono">
-                                  {isLoadingBalance ? "..." : collateralBalance}
-                                </span>
-                                <span>
-                                  {" "}
-                                  {selectedPair?.collateralAsset.symbol ||
-                                    "WKAIA"}
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setCollateralAmount(collateralBalance || "0")
-                                }
-                                className="bg-[#14304e] hover:bg-[#1a3d5c] text-[#2ae5b9] text-xs px-2 py-1 rounded transition-colors"
-                                disabled={
-                                  isLoadingBalance ||
-                                  !collateralBalance ||
-                                  collateralBalance === "-"
-                                }
-                              >
-                                MAX
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <input
-                            type="number"
-                            placeholder="0"
-                            value={collateralAmount}
-                            onChange={(e) =>
-                              setCollateralAmount(e.target.value)
-                            }
-                            className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
-                          />
-                          <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
-                            {selectedPair?.collateralAsset.imageUrl ? (
-                              <Image
-                                src={selectedPair.collateralAsset.imageUrl}
-                                alt={selectedPair.collateralAsset.symbol}
-                                width={20}
-                                height={20}
-                                className="w-5 h-5 rounded-full"
-                              />
-                            ) : (
-                              <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
-                            )}
-                            <span className="text-white text-sm font-semibold">
-                              {selectedPair?.collateralAsset.symbol ||
-                                "PT-USDe"}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-[#a1acb8] text-sm mt-3">
-                          ~{" "}
-                          {calculateUSDValue(
-                            collateralAmount || "0",
-                            collateralPrice
-                          )}
-                        </div>
-                      </div>
-                    )}
+                    {/* Input Form Component */}
+                    <LendingInputForm
+                      activeTab={activeTab}
+                      selectedPair={selectedPair}
+                      collateralAmount={collateralAmount}
+                      onCollateralAmountChange={setCollateralAmount}
+                      collateralBalance={collateralBalance || "0"}
+                      isLoadingBalance={isLoadingBalance}
+                      collateralPrice={collateralPrice}
+                      multiplier={multiplier}
+                      onMultiplierChange={setMultiplier}
+                      multiplierInput={multiplierInput}
+                      onMultiplierInputChange={setMultiplierInput}
+                      maxMultiplier={realMaxMultiplier}
+                      ltvValue={ltvValue}
+                      onLtvChange={setLtvValue}
+                      ltvInput={ltvInput}
+                      onLtvInputChange={setLtvInput}
+                    />
 
-                    {/* Multiplier Section - Only for Multiply Tab */}
-                    {activeTab === "multiply" && (
+                    {/* Position Info Component */}
+                    <LendingPositionInfo
+                      activeTab={activeTab}
+                      selectedPair={selectedPair}
+                      multiplier={multiplier}
+                      collateralAmount={collateralAmount}
+                      leveragePosition={{
+                        totalCollateral: parseFloat(leveragePosition.collateralAmount || "0"),
+                        totalDebt: parseFloat(leveragePosition.debtAmount || "0"),
+                        netAPY: 8.5 * multiplier - 5.4 * (multiplier - 1),
+                        currentLTV: parseFloat(leveragePosition.ltv || "0"),
+                        liquidationPrice: collateralPrice * 0.8,
+                        healthFactor: 2.5
+                      }}
+                      collateralPrice={collateralPrice}
+                      debtPrice={debtPrice}
+                      isReady={false}
+                    />
+
+                    {/* Remove old Multiplier Section - keeping for reference */}
+                    {false && activeTab === "multiply" && (
                       <div className="bg-[#040a10] rounded-lg p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="text-white text-sm font-semibold">
