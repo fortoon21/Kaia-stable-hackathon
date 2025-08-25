@@ -34,17 +34,17 @@ export interface TradingPair {
   collateralAsset: {
     asset: string;
     symbol: string;
-    icon: string;
-    iconBg: string;
-    protocol: string;
+    icon?: string;
+    iconBg?: string;
+    protocol?: string;
     imageUrl?: string;
   };
   debtAsset: {
     asset: string;
     symbol: string;
-    icon: string;
-    iconBg: string;
-    protocol: string;
+    icon?: string;
+    iconBg?: string;
+    protocol?: string;
     imageUrl?: string;
   };
   supplyAPY: string;

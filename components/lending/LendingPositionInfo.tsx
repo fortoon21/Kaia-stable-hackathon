@@ -1,12 +1,12 @@
 "use client";
 
 import { DataRow } from "@/components/ui/DataDisplay";
-import type { TabType, TradingPair } from "@/types/lending";
+import type { LendingProps, TabType } from "@/types/lending";
 import { formatDollarAmount, formatPercentage } from "@/utils/formatters";
 
 interface LendingPositionInfoProps {
   activeTab: TabType;
-  selectedPair?: TradingPair;
+  selectedPair?: LendingProps["selectedPair"];
   multiplier: number;
   collateralAmount: string;
   leveragePosition: {

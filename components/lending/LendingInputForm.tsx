@@ -1,12 +1,12 @@
 "use client";
 
 import Slider from "@/components/ui/Slider";
-import type { TabType, TradingPair } from "@/types/lending";
+import type { LendingProps, TabType } from "@/types/lending";
 import { formatDollarAmount } from "@/utils/formatters";
 
 interface LendingInputFormProps {
   activeTab: TabType;
-  selectedPair?: TradingPair;
+  selectedPair?: LendingProps["selectedPair"];
   collateralAmount: string;
   onCollateralAmountChange: (value: string) => void;
   collateralBalance: string;

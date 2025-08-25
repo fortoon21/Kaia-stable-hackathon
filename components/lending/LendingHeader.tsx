@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import type { TradingPair } from "@/types/lending";
+import type { LendingProps } from "@/types/lending";
 
 interface LendingHeaderProps {
-  selectedPair?: TradingPair;
+  selectedPair?: LendingProps["selectedPair"];
 }
 
 export function LendingHeader({ selectedPair }: LendingHeaderProps) {
