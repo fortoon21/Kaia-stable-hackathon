@@ -120,17 +120,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
       setIsRepaying(true);
 
       // Resolve pool address (handles AddressesProvider)
-      let pool: string = AAVE_CONFIG.LENDING_POOL_V3 as unknown as string;
-      try {
-        const providerProbeAbi: ethers.InterfaceAbi = [
-          "function getPool() view returns (address)",
-        ];
-        const probe = new ethers.Contract(pool, providerProbeAbi, signer);
-        const maybePool: string = await probe.getPool();
-        if (ethers.isAddress(maybePool) && maybePool !== ethers.ZeroAddress) {
-          pool = maybePool;
-        }
-      } catch {}
+      const pool: string = AAVE_CONFIG.LENDING_POOL_V3 as unknown as string;
 
       // 1) Check allowance to Aave V3 pool, approve max if insufficient
       const erc20Abi: ethers.InterfaceAbi = [

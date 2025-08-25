@@ -226,29 +226,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     }
   }, [provider, signer]);
 
-  const resolveAavePoolAddress = useCallback(
-    async (maybeProviderOrPool: string) => {
-      try {
-        if (!maybeProviderOrPool) return maybeProviderOrPool;
-        const readonly = new ethers.JsonRpcProvider(
-          KAIA_NETWORKS.mainnet.rpcUrl
-        );
-        const providerContract = new ethers.Contract(
-          maybeProviderOrPool,
-          ["function getPool() view returns (address)"],
-          readonly
-        );
-        const poolAddr: string = await providerContract.getPool();
-        if (ethers.isAddress(poolAddr) && poolAddr !== ethers.ZeroAddress) {
-          return poolAddr;
-        }
-      } catch {
-        // not a provider; treat input as pool
-      }
-      return maybeProviderOrPool;
-    },
-    []
-  );
 
   const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -283,7 +260,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
     // Execute all three operations in parallel
     const [resolvedPool, paramsResult, statesResult] = await Promise.all([
-      resolveAavePoolAddress(AAVE_CONFIG.LENDING_POOL_V3),
+      AAVE_CONFIG.LENDING_POOL_V3,
       (async () => {
         const effectiveChainId = chainId ?? 8217;
         const tempCachePrefix = `aave:v3:${effectiveChainId}:${AAVE_CONFIG.LENDING_POOL_V3}`;
@@ -519,7 +496,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     chainId,
     getAaveContract,
     provider,
-    resolveAavePoolAddress,
+    // resolveAavePoolAddress,
     coerceAaveStateV3,
     signer?.provider,
   ]);

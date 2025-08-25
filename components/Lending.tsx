@@ -252,19 +252,8 @@ export default function Lending({ selectedPair }: LendingProps) {
 
       // 1c) Ensure the supplied collateral is flagged as usable as collateral in Aave for the user
       // Resolve pool address (handle AddressesProvider case)
-      let pool: string = AAVE_CONFIG.LENDING_POOL_V3 as unknown as string;
-      try {
-        const providerProbeAbi: ethers.InterfaceAbi = [
-          "function getPool() view returns (address)",
-        ];
-        const probe = new ethers.Contract(pool, providerProbeAbi, signer);
-        const maybePool: string = await probe.getPool();
-        if (ethers.isAddress(maybePool) && maybePool !== ethers.ZeroAddress) {
-          pool = maybePool;
-        }
-      } catch {
-        // Not an addresses provider; pool remains as configured
-      }
+      const pool = AAVE_CONFIG.LENDING_POOL_V3 as unknown as string;
+
       // Check if already using reserve as collateral; skip tx if true
       try {
         const userConfAbi: ethers.InterfaceAbi = [
