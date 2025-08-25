@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { getNetworkColor, getNetworkName } from "@/constants/networks";
 import { validations } from "@/lib/validations";
 import { useWeb3 } from "@/lib/web3Provider";
@@ -200,8 +201,8 @@ export default function WalletConnectorV2() {
         </button>
 
         {/* Account Modal */}
-        {showAccountModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+        {showAccountModal && typeof document !== 'undefined' && createPortal(
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] animate-fade-in">
             <div className="bg-[#0c1d2f] border border-[#14304e] rounded-2xl p-6 w-96 max-w-[90vw] animate-scale-in">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-white">
@@ -295,7 +296,8 @@ export default function WalletConnectorV2() {
                 </div>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );
@@ -320,8 +322,8 @@ export default function WalletConnectorV2() {
       </button>
 
       {/* Wallet Selection Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">
+      {showModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[10000] animate-fade-in p-4">
           <div className="bg-[#0c1d2f] border border-[#14304e] rounded-2xl p-6 w-96 max-w-full max-h-[80vh] overflow-y-auto animate-scale-in">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">
@@ -413,7 +415,8 @@ export default function WalletConnectorV2() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -7,11 +7,13 @@ import { LAYOUT } from "@/constants/layout";
 import { MARKET_ASSET_IMAGES, MARKET_GROUPS } from "@/constants/marketData";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useMarketCalculations } from "@/hooks/useMarketCalculations";
+import { useWeb3 } from "@/lib/web3Provider";
 import type { MarketsProps } from "@/types/lending";
 import { getMarketImage } from "@/utils/formatters";
 
 export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const { isConnected } = useWeb3();
   const {
     getSupplyAPY,
     getBorrowAPY,
@@ -379,19 +381,20 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                   borrowPositions
                                 );
                                 const hasDebt = position.amount !== "0";
+                                const canRepay = hasDebt && isConnected;
 
                                 return (
                                   <div
                                     className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200 cursor-pointer ${
-                                      hasDebt
+                                      canRepay
                                         ? "bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white hover:from-[#d97706] hover:to-[#b45309] shadow-lg hover:shadow-xl"
                                         : "bg-[#14304e] text-[#728395] cursor-not-allowed"
                                     }`}
                                     role="button"
-                                    tabIndex={hasDebt ? 0 : -1}
+                                    tabIndex={canRepay ? 0 : -1}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      if (hasDebt && onPageChange) {
+                                      if (canRepay && onPageChange) {
                                         // Store the asset info for repay page
                                         const repayAssetInfo = {
                                           symbol: pair.debtAsset.symbol,
@@ -411,7 +414,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                     onKeyDown={(e) => {
                                       if (
                                         (e.key === "Enter" || e.key === " ") &&
-                                        hasDebt
+                                        canRepay
                                       ) {
                                         e.preventDefault();
                                         e.stopPropagation();
@@ -433,7 +436,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                       }
                                     }}
                                   >
-                                    {hasDebt ? "Repay" : "No Debt"}
+                                    Repay
                                   </div>
                                 );
                               })()}
