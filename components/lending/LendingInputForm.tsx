@@ -41,7 +41,9 @@ export function LendingInputForm({
   ltvInput,
   onLtvInputChange,
 }: LendingInputFormProps) {
-  const handleCollateralAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCollateralAmountChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
       onCollateralAmountChange(value);
@@ -59,7 +61,9 @@ export function LendingInputForm({
     onMultiplierInputChange(value.toFixed(2));
   };
 
-  const handleMultiplierInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMultiplierInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
     onMultiplierInputChange(value);
     const numValue = parseFloat(value);
@@ -89,7 +93,8 @@ export function LendingInputForm({
         <div className="flex justify-between items-center mb-2">
           <label className="text-sm text-[#728395]">Collateral Amount</label>
           <div className="text-xs text-[#728395]">
-            Balance: {isLoadingBalance ? "Loading..." : collateralBalance || "0"}{" "}
+            Balance:{" "}
+            {isLoadingBalance ? "Loading..." : collateralBalance || "0"}{" "}
             {selectedPair?.collateralAsset.symbol}
           </div>
         </div>
@@ -110,7 +115,10 @@ export function LendingInputForm({
           </button>
         </div>
         <div className="text-xs text-[#728395] mt-1">
-          ≈ {formatDollarAmount(parseFloat(collateralAmount || "0") * collateralPrice)}
+          ≈{" "}
+          {formatDollarAmount(
+            parseFloat(collateralAmount || "0") * collateralPrice
+          )}
         </div>
       </div>
 

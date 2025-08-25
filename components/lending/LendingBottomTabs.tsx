@@ -9,10 +9,10 @@ interface LendingBottomTabsProps {
   selectedPair?: LendingProps["selectedPair"];
 }
 
-export function LendingBottomTabs({ 
-  activeTab, 
+export function LendingBottomTabs({
+  activeTab,
   onTabChange,
-  selectedPair 
+  selectedPair,
 }: LendingBottomTabsProps) {
   return (
     <div className="flex w-full">

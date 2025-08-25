@@ -35,7 +35,8 @@ type RepayAsset = {
 } | null;
 
 export default function Repay({ onGoBack }: RepayProps = {}) {
-  const { signer, address, refreshAaveData, getTokenBalance, isConnected } = useWeb3();
+  const { signer, address, refreshAaveData, getTokenBalance, isConnected } =
+    useWeb3();
   const { loading: pricesLoading, getPriceBySymbol } = useTokenPrices();
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("wallet");
   const [repayPercent, setRepayPercent] = useState(0);
@@ -45,7 +46,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
   const [isRepaying, setIsRepaying] = useState(false);
   const [tokenBalance, setTokenBalance] = useState<string>("0");
   const [balanceLoading, setBalanceLoading] = useState(false);
-  
+
   // Load repay asset info from localStorage
   useEffect(() => {
     const storedAsset = localStorage.getItem("repayAsset");
@@ -103,19 +104,19 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
   // Fetch actual token balance - stable version
   useEffect(() => {
     let isCancelled = false;
-    
+
     const fetchBalance = async () => {
       if (!isConnected || !repayAsset?.symbol) {
         setTokenBalance("0");
         return;
       }
-      
+
       setBalanceLoading(true);
       try {
         const symbol = repayAsset.symbol as keyof typeof TOKEN_ADDRESSES;
         const tokenAddress = TOKEN_ADDRESSES[symbol];
         const decimals = TOKEN_DECIMALS[symbol] ?? 18;
-        
+
         if (tokenAddress && getTokenBalance) {
           const balance = await getTokenBalance(tokenAddress, decimals);
           if (!isCancelled) {
@@ -137,7 +138,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
     };
 
     fetchBalance();
-    
+
     return () => {
       isCancelled = true;
     };
@@ -210,66 +211,75 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
   }, [signer, address, repayAsset, debtAmount, refreshAaveData]);
 
   // Calculate USD values using live prices - don't show loading for price updates
-  const calculateUSDValue = useCallback((amount: string, symbol: string): string => {
-    if (!amount || amount === "0") return "$0.00";
-    
-    const numAmount = parseFloat(amount.replace(/,/g, ""));
-    if (Number.isNaN(numAmount)) return "$0.00";
-    
-    const price = getPriceBySymbol(symbol);
-    if (price === 0 && pricesLoading) {
-      // Only show loading if we don't have any price data yet
-      return "Loading...";
-    }
-    
-    const usdValue = numAmount * price;
-    return `$${usdValue.toFixed(2)}`;
-  }, [getPriceBySymbol, pricesLoading]);
+  const calculateUSDValue = useCallback(
+    (amount: string, symbol: string): string => {
+      if (!amount || amount === "0") return "$0.00";
+
+      const numAmount = parseFloat(amount.replace(/,/g, ""));
+      if (Number.isNaN(numAmount)) return "$0.00";
+
+      const price = getPriceBySymbol(symbol);
+      if (price === 0 && pricesLoading) {
+        // Only show loading if we don't have any price data yet
+        return "Loading...";
+      }
+
+      const usdValue = numAmount * price;
+      return `$${usdValue.toFixed(2)}`;
+    },
+    [getPriceBySymbol, pricesLoading]
+  );
 
   // Handle percentage slider changes
-  const handleSliderChange = useCallback((newPercent: number) => {
-    setRepayPercent(newPercent);
-    
-    if (newPercent === 0 || !tokenBalance || tokenBalance === "0") {
-      setCollateralAmount("");
-      return;
-    }
+  const handleSliderChange = useCallback(
+    (newPercent: number) => {
+      setRepayPercent(newPercent);
 
-    const balance = parseFloat(tokenBalance.replace(/,/g, ""));
-    if (!Number.isNaN(balance)) {
-      const calculatedAmount = (balance * newPercent) / 100;
-      setCollateralAmount(calculatedAmount.toFixed(6));
-    }
-  }, [tokenBalance]);
+      if (newPercent === 0 || !tokenBalance || tokenBalance === "0") {
+        setCollateralAmount("");
+        return;
+      }
+
+      const balance = parseFloat(tokenBalance.replace(/,/g, ""));
+      if (!Number.isNaN(balance)) {
+        const calculatedAmount = (balance * newPercent) / 100;
+        setCollateralAmount(calculatedAmount.toFixed(6));
+      }
+    },
+    [tokenBalance]
+  );
 
   // Handle input amount changes
-  const handleAmountChange = useCallback((newAmount: string) => {
-    setCollateralAmount(newAmount);
-    
-    if (!newAmount || !tokenBalance || tokenBalance === "0") {
-      setRepayPercent(0);
-      return;
-    }
+  const handleAmountChange = useCallback(
+    (newAmount: string) => {
+      setCollateralAmount(newAmount);
 
-    const amount = parseFloat(newAmount.replace(/,/g, ""));
-    const balance = parseFloat(tokenBalance.replace(/,/g, ""));
-    
-    if (!Number.isNaN(amount) && !Number.isNaN(balance) && balance > 0) {
-      const percentage = Math.min(100, Math.max(0, (amount / balance) * 100));
-      setRepayPercent(Math.round(percentage));
-    }
-  }, [tokenBalance]);
+      if (!newAmount || !tokenBalance || tokenBalance === "0") {
+        setRepayPercent(0);
+        return;
+      }
+
+      const amount = parseFloat(newAmount.replace(/,/g, ""));
+      const balance = parseFloat(tokenBalance.replace(/,/g, ""));
+
+      if (!Number.isNaN(amount) && !Number.isNaN(balance) && balance > 0) {
+        const percentage = Math.min(100, Math.max(0, (amount / balance) * 100));
+        setRepayPercent(Math.round(percentage));
+      }
+    },
+    [tokenBalance]
+  );
 
   // Check if repay amount is valid
   const isValidRepayAmount = useCallback(() => {
     if (!collateralAmount || !repayAsset) return false;
-    
+
     const amount = parseFloat(collateralAmount.replace(/,/g, ""));
     if (Number.isNaN(amount) || amount <= 0) return false;
-    
+
     const debtAmount = parseFloat(repayAsset.amount.replace(/,/g, ""));
     if (Number.isNaN(debtAmount)) return false;
-    
+
     return amount <= debtAmount;
   }, [collateralAmount, repayAsset]);
 
@@ -340,7 +350,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
 
             {/* From wallet / Collateral to swap section - Updated design */}
             {repayAsset && (
-              <div className={`bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
+              <div
+                className={`bg-[#0c1d2f] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
+              >
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-white font-medium">
                     {activeTab === "wallet"
@@ -351,21 +363,21 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                     <span className="mr-2">Balance:</span>
                     <span className="text-white font-medium">
                       {balanceLoading && tokenBalance === "0"
-                        ? "Loading balance..." 
+                        ? "Loading balance..."
                         : activeTab === "wallet"
                           ? `${tokenBalance} ${repayAsset.symbol}`
-                          : `28.29 ${repayAsset.collateralAsset?.symbol}`
-                      }
+                          : `28.29 ${repayAsset.collateralAsset?.symbol}`}
                     </span>
                   </div>
                 </div>
-                
+
                 {/* Owed debt info - smaller display */}
                 {activeTab === "wallet" && repayAsset && (
                   <div className="mb-4 text-xs text-right">
                     <span className="text-[#728395]">Owed Debt: </span>
                     <span className="text-[#f59e0b] font-medium">
-                      {repayAsset.amount} {repayAsset.symbol} ({calculateUSDValue(repayAsset.amount, repayAsset.symbol)})
+                      {repayAsset.amount} {repayAsset.symbol} (
+                      {calculateUSDValue(repayAsset.amount, repayAsset.symbol)})
                     </span>
                   </div>
                 )}
@@ -439,7 +451,12 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                       className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
                     />
                     <div className="text-[#728395] text-sm mt-1">
-                      {calculateUSDValue(collateralAmount, activeTab === "wallet" ? repayAsset.symbol : repayAsset.collateralAsset?.symbol || "")}
+                      {calculateUSDValue(
+                        collateralAmount,
+                        activeTab === "wallet"
+                          ? repayAsset.symbol
+                          : repayAsset.collateralAsset?.symbol || ""
+                      )}
                     </div>
                   </div>
                 </div>
@@ -500,7 +517,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                       className="text-2xl font-bold text-right max-w-[140px] bg-transparent border-none text-white"
                     />
                     <div className="text-[#728395] text-sm mt-1">
-                      {calculateUSDValue(debtAmount || repayAsset.amount, repayAsset.symbol)}
+                      {calculateUSDValue(
+                        debtAmount || repayAsset.amount,
+                        repayAsset.symbol
+                      )}
                     </div>
                   </div>
                 </div>
@@ -508,7 +528,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             )}
 
             {/* Repay percentage slider - Enhanced design */}
-            <div className={`bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
+            <div
+              className={`bg-gradient-to-br from-[#0c1d2f] to-[#0a1420] border border-[#14304e] rounded-lg p-6 mb-6 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
+            >
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <div className="text-white font-semibold text-lg">
@@ -550,7 +572,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             </div>
 
             {/* Action buttons - Enhanced design */}
-            <div className={`${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
+            <div
+              className={`${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
+            >
               <button
                 type="button"
                 className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 ${

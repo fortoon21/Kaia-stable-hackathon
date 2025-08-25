@@ -226,7 +226,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     }
   }, [provider, signer]);
 
-
   const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   const cacheGet = useCallback((key: string) => {

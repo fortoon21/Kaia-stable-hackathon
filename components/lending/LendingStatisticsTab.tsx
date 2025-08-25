@@ -55,9 +55,7 @@ export function LendingStatisticsTab({
                       getTotalSupply(selectedPair.debtAsset.symbol)?.amount ||
                       "1,240,000"
                     } ${selectedPair.debtAsset.symbol}`
-                  : `1,240,000 ${
-                      selectedPair?.debtAsset?.symbol || "USDT"
-                    }`}
+                  : `1,240,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`}
             </div>
           </div>
 
@@ -89,14 +87,14 @@ export function LendingStatisticsTab({
                       getTotalBorrowed(selectedPair.debtAsset.symbol)?.amount ||
                       "896,000"
                     } ${selectedPair.debtAsset.symbol}`
-                  : `896,000 ${
-                      selectedPair?.debtAsset?.symbol || "USDT"
-                    }`}
+                  : `896,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`}
             </div>
           </div>
 
           <div>
-            <div className="text-[#728395] text-sm mb-2">Available liquidity</div>
+            <div className="text-[#728395] text-sm mb-2">
+              Available liquidity
+            </div>
             <div className="text-white text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol
