@@ -11,8 +11,8 @@ import {
   TOKEN_ADDRESSES,
   TOKEN_DECIMALS,
 } from "@/constants/tokens";
-import { useWeb3 } from "@/lib/web3Provider";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
+import { useWeb3 } from "@/lib/web3Provider";
 
 interface RepayProps {
   onGoBack?: () => void;

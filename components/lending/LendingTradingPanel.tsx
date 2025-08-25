@@ -6,10 +6,10 @@ import { useCallback, useState } from "react";
 import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import {
+  AAVE_CONFIG,
   DRAGON_SWAP_POOLS,
   LOOP_CONFIG,
   TOKEN_DECIMALS,
-  AAVE_CONFIG,
 } from "@/constants/tokens";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
@@ -46,7 +46,7 @@ export function LendingTradingPanel({
   const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
   const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
     useLeverageCalculations(selectedPair, collateralAmount, multiplier);
-  const { getLTV } = useAaveData();
+  const { getLTV, getSupplyAPY, getBorrowAPY } = useAaveData();
 
   // Calculate real max multiplier from Markets logic
   const realMaxMultiplier = selectedPair?.collateralAsset?.symbol
@@ -857,8 +857,8 @@ export function LendingTradingPanel({
                     <span className="text-white">-</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Your LTV (LLTV)</span>
-                    <span className="text-white">∞ (∞)</span>
+                    <span className="text-[#a1acb8]">Your LTV</span>
+                    <span className="text-white">∞</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#a1acb8]">Your health</span>
@@ -881,27 +881,63 @@ export function LendingTradingPanel({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
                     <span className="text-[#a1acb8]">ROE</span>
-                    <span className="text-white">0.00%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Current price</span>
-                    <span className="text-white">-</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">
-                      Liquidation oracle price
-                    </span>
-                    <span className="text-white">-</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Your LTV (LLTV)</span>
                     <span className="text-white">
-                      ∞ <span className="text-[#a1acb8]">(∞)</span>
+                      {(() => {
+                        if (
+                          !selectedPair?.collateralAsset?.symbol ||
+                          !selectedPair?.debtAsset?.symbol
+                        ) {
+                          return "0.00%";
+                        }
+
+                        const collateralSupplyAPY = parseFloat(
+                          getSupplyAPY(
+                            selectedPair.collateralAsset.symbol
+                          )?.replace("%", "") || "0"
+                        );
+                        const debtBorrowAPY = parseFloat(
+                          getBorrowAPY(selectedPair.debtAsset.symbol)?.replace(
+                            "%",
+                            ""
+                          ) || "0"
+                        );
+
+                        const longValue =
+                          parseFloat(collateralAmount || "0") *
+                          multiplier *
+                          collateralPrice;
+                        const shortValue =
+                          parseFloat(leveragePosition.flashloanAmount || "0") *
+                          debtPrice;
+                        const yourLTV =
+                          longValue === 0 ? 0 : shortValue / longValue;
+
+                        const roe =
+                          (collateralSupplyAPY - yourLTV * debtBorrowAPY) *
+                          multiplier;
+
+                        return `${roe.toFixed(2)}%`;
+                      })()}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Your health</span>
-                    <span className="text-white">-</span>
+                    <span className="text-[#a1acb8]">Your LTV</span>
+                    <span className="text-white">
+                      {(() => {
+                        const longValue =
+                          parseFloat(collateralAmount || "0") *
+                          multiplier *
+                          collateralPrice;
+                        const shortValue =
+                          parseFloat(leveragePosition.flashloanAmount || "0") *
+                          debtPrice;
+
+                        if (longValue === 0) return "0.00%";
+
+                        const ltv = (shortValue / longValue) * 100;
+                        return `${ltv.toFixed(2)}%`;
+                      })()}
+                    </span>
                   </div>
                 </div>
 
@@ -910,30 +946,22 @@ export function LendingTradingPanel({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex justify-between">
                     <span className="text-[#a1acb8]">Swap</span>
-                    <span className="text-white">-</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Price impact</span>
-                    <span className="text-white">-</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">
-                      Leveraged price impact
-                    </span>
-                    <span className="text-white">-</span>
+                    <span className="text-white">Yes</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#a1acb8]">Slippage tolerance</span>
-                    <span className="text-white">0.1%</span>
+                    <span className="text-white">0.05%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#a1acb8]">Routed via</span>
-                    <span className="text-white">-</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#a1acb8]">Estimated gas fee</span>
-                    <span className="text-white">
-                      0 ETH <span className="text-[#a1acb8]">$0</span>
+                    <span className="text-white flex items-center">
+                      <Image
+                        src="https://raw.githubusercontent.com/EisenFinance/assets/main/assets/eisen/symbol/eisen-favicon.svg"
+                        alt="Eisen"
+                        width={16}
+                        height={16}
+                        className="w-4 h-4 mr-1"
+                      />
                     </span>
                   </div>
                 </div>

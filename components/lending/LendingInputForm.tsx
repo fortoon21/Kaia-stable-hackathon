@@ -67,7 +67,7 @@ export function LendingInputForm({
     const value = e.target.value;
     onMultiplierInputChange(value);
     const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 1 && numValue <= maxMultiplier) {
+    if (!Number.isNaN(numValue) && numValue >= 1 && numValue <= maxMultiplier) {
       onMultiplierChange(numValue);
     }
   };
@@ -81,7 +81,7 @@ export function LendingInputForm({
     const value = e.target.value;
     onLtvInputChange(value);
     const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 0 && numValue <= 80) {
+    if (!Number.isNaN(numValue) && numValue >= 0 && numValue <= 80) {
       onLtvChange(numValue);
     }
   };
