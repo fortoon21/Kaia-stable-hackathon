@@ -5,7 +5,12 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
-import { LOOP_CONFIG, TOKEN_DECIMALS } from "@/constants/tokens";
+import {
+  DRAGON_SWAP_POOLS,
+  LOOP_CONFIG,
+  TOKEN_DECIMALS,
+  AAVE_CONFIG,
+} from "@/constants/tokens";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
@@ -78,13 +83,17 @@ export default function Lending({ selectedPair }: LendingProps) {
           variableDebtTokenAddress?: string;
         }
       >;
-      const params = paramsIndex[collateralUnderlying];
-      if (!params?.aTokenAddress || !params?.variableDebtTokenAddress) {
-        throw new Error("Missing Aave asset params");
+      const paramsCollateral = paramsIndex[collateralUnderlying];
+      if (!paramsCollateral?.aTokenAddress) {
+        throw new Error("Missing Aave asset params for collateral");
+      }
+      const paramsBorrow = paramsIndex[borrowUnderlying];
+      if (!paramsBorrow?.variableDebtTokenAddress) {
+        throw new Error("Missing Aave asset params for borrow");
       }
 
-      const aToken = params.aTokenAddress;
-      const variableDebtAsset = params.variableDebtTokenAddress;
+      const aToken = paramsCollateral.aTokenAddress;
+      const variableDebtAsset = paramsBorrow.variableDebtTokenAddress;
       const collateralDecimals =
         TOKEN_DECIMALS[selectedPair.collateralAsset.symbol] ?? 18;
 
@@ -184,11 +193,122 @@ export default function Lending({ selectedPair }: LendingProps) {
         loopAddress
       );
       if (currentAllowance < collAmtWei) {
+        // eslint-disable-next-line no-console
+        console.log(
+          "Prompting wallet: ERC20.approve for collateral allowance",
+          {
+            asset: collateralUnderlying,
+            spender: loopAddress,
+            currentAllowance: currentAllowance.toString(),
+            requiredAllowance: collAmtWei.toString(),
+          }
+        );
         const txApprove = await collateralErc20.approve(
           loopAddress,
           ethers.MaxUint256
         );
         await txApprove.wait();
+      }
+
+      // 1b) Borrow delegation: variableDebtToken -> allow loop contract to incur debt on user's behalf
+      const debtTokenAbi: ethers.InterfaceAbi = [
+        "function borrowAllowance(address fromUser, address toUser) view returns (uint256)",
+        "function approveDelegation(address delegatee, uint256 amount)",
+      ];
+      const variableDebtToken = new ethers.Contract(
+        variableDebtAsset,
+        debtTokenAbi,
+        signer
+      );
+      const currentBorrowAllowance: bigint =
+        await variableDebtToken.borrowAllowance(address, loopAddress);
+      // Include flashloan premium in required delegation allowance (rounding up)
+      const bpsNumber = Number.isFinite(flBps)
+        ? Math.max(0, Math.floor(Number(flBps)))
+        : 0;
+      // Scale flashloan premium from bps to 1e18 (WAD) and compute premium in wei
+      const ONE_WAD = BigInt("1000000000000000000");
+      const premiumWad = (BigInt(bpsNumber) * ONE_WAD) / BigInt("10000");
+      const premiumWei =
+        (flashloanAmtWei * premiumWad + (ONE_WAD - BigInt("1"))) / ONE_WAD;
+      const requiredBorrowAllowance = flashloanAmtWei + premiumWei;
+      console.log("variable debt asset", variableDebtAsset);
+      console.log("loop address", loopAddress);
+      console.log("current borrow allowance", currentBorrowAllowance);
+      console.log("required borrow allowance", requiredBorrowAllowance);
+      if (currentBorrowAllowance < requiredBorrowAllowance) {
+        // eslint-disable-next-line no-console
+        console.log(
+          "Prompting wallet: approveDelegation for variable debt delegation",
+          {
+            debtToken: variableDebtAsset,
+            delegatee: loopAddress,
+            currentBorrowAllowance: currentBorrowAllowance.toString(),
+            requiredBorrowAllowance: requiredBorrowAllowance.toString(),
+          }
+        );
+        const txApproveDelegation = await variableDebtToken.approveDelegation(
+          loopAddress,
+          ethers.MaxUint256
+        );
+        await txApproveDelegation.wait();
+      }
+
+      // 1c) Ensure the supplied collateral is flagged as usable as collateral in Aave for the user
+      // Resolve pool address (handle AddressesProvider case)
+      let pool: string = AAVE_CONFIG.LENDING_POOL_V3 as unknown as string;
+      try {
+        const providerProbeAbi: ethers.InterfaceAbi = [
+          "function getPool() view returns (address)",
+        ];
+        const probe = new ethers.Contract(pool, providerProbeAbi, signer);
+        const maybePool: string = await probe.getPool();
+        if (ethers.isAddress(maybePool) && maybePool !== ethers.ZeroAddress) {
+          pool = maybePool;
+        }
+      } catch {
+        // Not an addresses provider; pool remains as configured
+      }
+      // Check if already using reserve as collateral; skip tx if true
+      try {
+        const userConfAbi: ethers.InterfaceAbi = [
+          "function getUserConfiguration(address user) view returns (uint256)",
+        ];
+        const poolView = new ethers.Contract(pool, userConfAbi, signer);
+        const confData: bigint = await poolView.getUserConfiguration(address);
+        const reserveMeta = paramsIndex[collateralUnderlying] as unknown as {
+          id?: number | string | bigint;
+        };
+        const reserveId = Number(reserveMeta?.id ?? 0);
+        const collateralBitPos = BigInt(reserveId * 2 + 1);
+        const isUsingCollateral =
+          ((confData >> collateralBitPos) & BigInt(1)) === BigInt(1);
+        if (!isUsingCollateral) {
+          const aavePoolAbi: ethers.InterfaceAbi = [
+            "function setUserUseReserveAsCollateral(address asset, bool useAsCollateral)",
+          ];
+          const poolContract = new ethers.Contract(pool, aavePoolAbi, signer);
+          // eslint-disable-next-line no-console
+          console.log(
+            "Prompting wallet: setUserUseReserveAsCollateral to enable collateral",
+            {
+              pool,
+              asset: collateralUnderlying,
+              useAsCollateral: true,
+            }
+          );
+          const txEnable = await poolContract.setUserUseReserveAsCollateral(
+            collateralUnderlying,
+            true
+          );
+          await txEnable.wait();
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "Skipping collateral enable because read check failed",
+          err
+        );
       }
 
       // 2) Get encoded swap path from Eisen router API (borrow -> collateral)
@@ -204,23 +324,29 @@ export default function Lending({ selectedPair }: LendingProps) {
 
       // 3) Call LeverageLoop.openMultiply with LeverageParams
       const leverageLoopAbi: ethers.InterfaceAbi = [
-        "function executeLeverageLoop((address,address,address,address,uint256,uint256,bytes)) payable",
+        "function executeLeverageLoop((address,address,address,address,address,uint256,uint256,bytes)) payable",
       ];
 
+      const dragonSwapPool =
+        DRAGON_SWAP_POOLS[
+          selectedPair?.debtAsset.symbol as keyof typeof DRAGON_SWAP_POOLS
+        ];
       const loop = new ethers.Contract(loopAddress, leverageLoopAbi, signer);
       const paramsTuple: [
         string,
         string,
         string,
         string,
-        bigint,
-        bigint,
         string,
+        bigint,
+        bigint,
+        string
       ] = [
         aToken,
         variableDebtAsset,
         collateralUnderlying,
         borrowUnderlying,
+        dragonSwapPool,
         collAmtWei,
         flashloanAmtWei,
         swapPathData,
@@ -1275,16 +1401,10 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Supply APY
                       </div>
                       <div className="text-white text-lg font-medium">
-                        {bottomTab === "collateral"
-                          ? selectedPair?.collateralAsset?.symbol
-                            ? getSupplyAPY(
-                                selectedPair.collateralAsset.symbol
-                              ) || "13.45%"
-                            : "13.45%"
-                          : selectedPair?.debtAsset?.symbol
-                            ? getSupplyAPY(selectedPair.debtAsset.symbol) ||
-                              "13.45%"
-                            : "13.45%"}
+                        {selectedPair?.collateralAsset?.symbol
+                          ? getSupplyAPY(selectedPair.collateralAsset.symbol) ||
+                            "13.45%"
+                          : "13.45%"}
                       </div>
                     </div>
 
@@ -1293,16 +1413,10 @@ export default function Lending({ selectedPair }: LendingProps) {
                         Borrow APY
                       </div>
                       <div className="text-white text-lg font-medium">
-                        {bottomTab === "collateral"
-                          ? selectedPair?.collateralAsset?.symbol
-                            ? getBorrowAPY(
-                                selectedPair.collateralAsset.symbol
-                              ) || "9.90%"
-                            : "9.90%"
-                          : selectedPair?.debtAsset?.symbol
-                            ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
-                              "9.90%"
-                            : "9.90%"}
+                        {selectedPair?.debtAsset?.symbol
+                          ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
+                            "9.90%"
+                          : "9.90%"}
                       </div>
                     </div>
                   </div>
@@ -1362,18 +1476,30 @@ export default function Lending({ selectedPair }: LendingProps) {
                                 )?.usdValue || "$2.85M"
                               : "$2.85M"
                             : selectedPair?.debtAsset?.symbol
-                              ? getTotalSupply(selectedPair.debtAsset.symbol)
-                                  ?.usdValue || "$1.24M"
-                              : "$1.24M"}
+                            ? getTotalSupply(selectedPair.debtAsset.symbol)
+                                ?.usdValue || "$1.24M"
+                            : "$1.24M"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
                             ? selectedPair?.collateralAsset?.symbol
-                              ? `${getTotalSupply(selectedPair.collateralAsset.symbol)?.amount || "20,357,142"} ${selectedPair.collateralAsset.symbol}`
-                              : `20,357,142 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`
+                              ? `${
+                                  getTotalSupply(
+                                    selectedPair.collateralAsset.symbol
+                                  )?.amount || "20,357,142"
+                                } ${selectedPair.collateralAsset.symbol}`
+                              : `20,357,142 ${
+                                  selectedPair?.collateralAsset?.symbol ||
+                                  "WKAIA"
+                                }`
                             : selectedPair?.debtAsset?.symbol
-                              ? `${getTotalSupply(selectedPair.debtAsset.symbol)?.amount || "1,240,000"} ${selectedPair.debtAsset.symbol}`
-                              : `1,240,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`}
+                            ? `${
+                                getTotalSupply(selectedPair.debtAsset.symbol)
+                                  ?.amount || "1,240,000"
+                              } ${selectedPair.debtAsset.symbol}`
+                            : `1,240,000 ${
+                                selectedPair?.debtAsset?.symbol || "USDT"
+                              }`}
                         </div>
                       </div>
 
@@ -1389,18 +1515,30 @@ export default function Lending({ selectedPair }: LendingProps) {
                                 )?.usdValue || "$2.34M"
                               : "$2.34M"
                             : selectedPair?.debtAsset?.symbol
-                              ? getTotalBorrowed(selectedPair.debtAsset.symbol)
-                                  ?.usdValue || "$896K"
-                              : "$896K"}
+                            ? getTotalBorrowed(selectedPair.debtAsset.symbol)
+                                ?.usdValue || "$896K"
+                            : "$896K"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
                             ? selectedPair?.collateralAsset?.symbol
-                              ? `${getTotalBorrowed(selectedPair.collateralAsset.symbol)?.amount || "16,714,285"} ${selectedPair.collateralAsset.symbol}`
-                              : `16,714,285 ${selectedPair?.collateralAsset?.symbol || "WKAIA"}`
+                              ? `${
+                                  getTotalBorrowed(
+                                    selectedPair.collateralAsset.symbol
+                                  )?.amount || "16,714,285"
+                                } ${selectedPair.collateralAsset.symbol}`
+                              : `16,714,285 ${
+                                  selectedPair?.collateralAsset?.symbol ||
+                                  "WKAIA"
+                                }`
                             : selectedPair?.debtAsset?.symbol
-                              ? `${getTotalBorrowed(selectedPair.debtAsset.symbol)?.amount || "896,000"} ${selectedPair.debtAsset.symbol}`
-                              : `896,000 ${selectedPair?.debtAsset?.symbol || "USDT"}`}
+                            ? `${
+                                getTotalBorrowed(selectedPair.debtAsset.symbol)
+                                  ?.amount || "896,000"
+                              } ${selectedPair.debtAsset.symbol}`
+                            : `896,000 ${
+                                selectedPair?.debtAsset?.symbol || "USDT"
+                              }`}
                         </div>
                       </div>
 
@@ -1416,18 +1554,29 @@ export default function Lending({ selectedPair }: LendingProps) {
                                 )?.usdValue || "$506.7K"
                               : "$506.7K"
                             : selectedPair?.debtAsset?.symbol
-                              ? getLiquidity(selectedPair.debtAsset.symbol)
-                                  ?.usdValue || "$506.7K"
-                              : "$506.7K"}
+                            ? getLiquidity(selectedPair.debtAsset.symbol)
+                                ?.usdValue || "$506.7K"
+                            : "$506.7K"}
                         </div>
                         <div className="text-[#a1acb8] text-xs mt-1">
                           {bottomTab === "collateral"
                             ? selectedPair?.collateralAsset?.symbol
-                              ? `${getLiquidity(selectedPair.collateralAsset.symbol)?.amount || "506.7K"} ${selectedPair.collateralAsset.symbol}`
-                              : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "WKAIA"}`
+                              ? `${
+                                  getLiquidity(
+                                    selectedPair.collateralAsset.symbol
+                                  )?.amount || "506.7K"
+                                } ${selectedPair.collateralAsset.symbol}`
+                              : `${selectedPair?.liquidityAmount || "506.7K"} ${
+                                  selectedPair?.liquidityToken || "WKAIA"
+                                }`
                             : selectedPair?.debtAsset?.symbol
-                              ? `${getLiquidity(selectedPair.debtAsset.symbol)?.amount || "506.7K"} ${selectedPair.debtAsset.symbol}`
-                              : `${selectedPair?.liquidityAmount || "506.7K"} ${selectedPair?.liquidityToken || "USDT"}`}
+                            ? `${
+                                getLiquidity(selectedPair.debtAsset.symbol)
+                                  ?.amount || "506.7K"
+                              } ${selectedPair.debtAsset.symbol}`
+                            : `${selectedPair?.liquidityAmount || "506.7K"} ${
+                                selectedPair?.liquidityToken || "USDT"
+                              }`}
                         </div>
                       </div>
                     </div>
@@ -1439,22 +1588,16 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Supply APY
                         </div>
                         <div className="text-[#2ae5b9] text-lg font-medium">
-                          {bottomTab === "pair"
+                          {bottomTab === "collateral"
                             ? selectedPair?.collateralAsset?.symbol
                               ? getSupplyAPY(
                                   selectedPair.collateralAsset.symbol
                                 ) || "8.83%"
                               : "8.83%"
-                            : bottomTab === "collateral"
-                              ? selectedPair?.collateralAsset?.symbol
-                                ? getSupplyAPY(
-                                    selectedPair.collateralAsset.symbol
-                                  ) || "8.83%"
-                                : "8.83%"
-                              : selectedPair?.debtAsset?.symbol
-                                ? getSupplyAPY(selectedPair.debtAsset.symbol) ||
-                                  "8.83%"
-                                : "8.83%"}
+                            : selectedPair?.debtAsset?.symbol
+                            ? getSupplyAPY(selectedPair.debtAsset.symbol) ||
+                              "8.83%"
+                            : "8.83%"}
                         </div>
                       </div>
 
@@ -1463,21 +1606,16 @@ export default function Lending({ selectedPair }: LendingProps) {
                           Borrow APY
                         </div>
                         <div className="text-orange-400 text-lg font-medium">
-                          {bottomTab === "pair"
-                            ? selectedPair?.debtAsset?.symbol
-                              ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
-                                "5.40%"
+                          {bottomTab === "collateral"
+                            ? selectedPair?.collateralAsset?.symbol
+                              ? getBorrowAPY(
+                                  selectedPair.collateralAsset.symbol
+                                ) || "5.40%"
                               : "5.40%"
-                            : bottomTab === "collateral"
-                              ? selectedPair?.collateralAsset?.symbol
-                                ? getBorrowAPY(
-                                    selectedPair.collateralAsset.symbol
-                                  ) || "5.40%"
-                                : "5.40%"
-                              : selectedPair?.debtAsset?.symbol
-                                ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
-                                  "5.40%"
-                                : "5.40%"}
+                            : selectedPair?.debtAsset?.symbol
+                            ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
+                              "5.40%"
+                            : "5.40%"}
                         </div>
                       </div>
 

@@ -22,7 +22,7 @@ export const AAVE_CONFIG = {
 } as const;
 
 export const LOOP_CONFIG = {
-  LEVERAGE_LOOP_ADDRESS: "0x33d349BB3D4FB201c672498902dBfBDaB1887c79",
+  LEVERAGE_LOOP_ADDRESS: "0xB44c7C7c5254Ce9e16ff2bCe45dC83d6114355DC",
 } as const;
 
 export const EISEN_CONFIG = {
@@ -42,6 +42,13 @@ export const DEBT_TOKEN_ADDRESSES = {
   USDT: "0x3a5724329f807eef8f2a069e66c9aa34982afbec", // variableDebtKLAYUSD₮
   USDT0: "0xa9f23143c38fbfb2fa299b604a2402bab1e541fc", // variableDebtKLAYUSDT
   USDC: "0x4880c4b5a3d83965c78faed3373154610b39046b", // variableDebtKLAYUSDC
+} as const;
+
+export const DRAGON_SWAP_POOLS = {
+  WKAIA: "0xb64ba987ed3bd9808dbcc19ee3c2a3c79a977e66",
+  USDT: "0xe6face64967c6cdd53651d6ac97a04bc9ef305d6",
+  USDT0: "0xa53048153de2b74f92a8636bce1349192c58d1a1",
+  USDC: "0x2d30da704c03f11de0255543476acc9e1322a1f5",
 } as const;
 
 // Generate Aave assets list from TOKEN_ADDRESSES (original tokens only)
