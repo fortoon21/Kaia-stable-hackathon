@@ -406,7 +406,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                   <button
                     type="button"
                     onClick={() => setActiveTab("borrow")}
-                    className="absolute h-[53px] left-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
+                    className="absolute h-[53px] left-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors relative"
                     data-name="Tab"
                     data-node-id="1:35"
                   >
@@ -427,6 +427,11 @@ export default function Lending({ selectedPair }: LendingProps) {
                       }}
                     >
                       <p className="block leading-[20px]">Borrow</p>
+                    </div>
+                    <div className="absolute top-1 right-1">
+                      <span className="text-xs text-[#2ae5b9] font-medium bg-[#0c1d2f] px-1.5 py-0.5 rounded">
+                        Coming Soon
+                      </span>
                     </div>
                     {activeTab === "borrow" && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
@@ -735,7 +740,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                     )}
 
                     {activeTab === "borrow" && (
-                      <div className="space-y-4">
+                      <div className="space-y-4 blur-sm opacity-50 pointer-events-none">
                         {/* Supply Section */}
                         <div className="bg-[#040a10] rounded-lg p-6">
                           <div className="flex items-center justify-between mb-3">
@@ -1047,7 +1052,7 @@ export default function Lending({ selectedPair }: LendingProps) {
               </div>
 
               {/* Fixed Bottom Action Button */}
-              <div className="flex-shrink-0 bg-[#08131f] rounded-b-2xl border-t border-[#14304e] p-4">
+              <div className={`flex-shrink-0 bg-[#08131f] rounded-b-2xl border-t border-[#14304e] p-4 ${activeTab === "borrow" ? "blur-sm opacity-50 pointer-events-none" : ""}`}>
                 {!isConnected ? (
                   <WalletConnectorV2 />
                 ) : (
