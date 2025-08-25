@@ -189,16 +189,6 @@ export default function Lending({ selectedPair }: LendingProps) {
         loopAddress
       );
       if (currentAllowance < collAmtWei) {
-        // eslint-disable-next-line no-console
-        console.log(
-          "Prompting wallet: ERC20.approve for collateral allowance",
-          {
-            asset: collateralUnderlying,
-            spender: loopAddress,
-            currentAllowance: currentAllowance.toString(),
-            requiredAllowance: collAmtWei.toString(),
-          }
-        );
         const txApprove = await collateralErc20.approve(
           loopAddress,
           ethers.MaxUint256
@@ -228,21 +218,7 @@ export default function Lending({ selectedPair }: LendingProps) {
       const premiumWei =
         (flashloanAmtWei * premiumWad + (ONE_WAD - BigInt("1"))) / ONE_WAD;
       const requiredBorrowAllowance = flashloanAmtWei + premiumWei;
-      console.log("variable debt asset", variableDebtAsset);
-      console.log("loop address", loopAddress);
-      console.log("current borrow allowance", currentBorrowAllowance);
-      console.log("required borrow allowance", requiredBorrowAllowance);
       if (currentBorrowAllowance < requiredBorrowAllowance) {
-        // eslint-disable-next-line no-console
-        console.log(
-          "Prompting wallet: approveDelegation for variable debt delegation",
-          {
-            debtToken: variableDebtAsset,
-            delegatee: loopAddress,
-            currentBorrowAllowance: currentBorrowAllowance.toString(),
-            requiredBorrowAllowance: requiredBorrowAllowance.toString(),
-          }
-        );
         const txApproveDelegation = await variableDebtToken.approveDelegation(
           loopAddress,
           ethers.MaxUint256
@@ -273,27 +249,14 @@ export default function Lending({ selectedPair }: LendingProps) {
             "function setUserUseReserveAsCollateral(address asset, bool useAsCollateral)",
           ];
           const poolContract = new ethers.Contract(pool, aavePoolAbi, signer);
-          // eslint-disable-next-line no-console
-          console.log(
-            "Prompting wallet: setUserUseReserveAsCollateral to enable collateral",
-            {
-              pool,
-              asset: collateralUnderlying,
-              useAsCollateral: true,
-            }
-          );
           const txEnable = await poolContract.setUserUseReserveAsCollateral(
             collateralUnderlying,
             true
           );
           await txEnable.wait();
         }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "Skipping collateral enable because read check failed",
-          err
-        );
+      } catch {
+        // Ignore errors when enabling collateral
       }
 
       // 2) Get encoded swap path from Eisen router API (borrow -> collateral)
@@ -406,7 +369,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                   <button
                     type="button"
                     onClick={() => setActiveTab("borrow")}
-                    className="absolute h-[53px] left-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors relative"
+                    className="absolute h-[53px] left-0 w-1/2 rounded-tl-[16px] top-0 cursor-pointer hover:bg-[#14304e] transition-colors relative"
                     data-name="Tab"
                     data-node-id="1:35"
                   >
@@ -440,7 +403,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                   <button
                     type="button"
                     onClick={() => setActiveTab("multiply")}
-                    className="absolute h-[53px] right-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
+                    className="absolute h-[53px] right-0 w-1/2 rounded-tr-[16px] top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
                     data-name="Tab"
                     data-node-id="1:37"
                   >
