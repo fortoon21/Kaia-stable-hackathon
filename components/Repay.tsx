@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import NumberInput from "@/components/ui/NumberInput";
 import Slider from "@/components/ui/Slider";
+import { showToast } from "@/components/ui/Toast";
 import { LAYOUT } from "@/constants/layout";
 import {
   AAVE_CONFIG,
@@ -196,15 +197,32 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
       );
       await tx.wait();
 
-      // Refresh on-chain data
+      // Show success toast
+      showToast({
+        type: "success",
+        title: "Debt Repayment Successful",
+        description: `Successfully repaid ${cleanedAmount} ${repayAsset.symbol}`,
+        duration: 5000,
+      });
+
+      // Refresh on-chain data and token balances
       await refreshAaveData?.();
 
-      // Reset local UI state minimally
+      // Reset form state
       setDebtAmount("");
+      setCollateralAmount("");
+      setRepayPercent(0);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Repay failed:", e);
-      alert((e as Error).message || "Repay failed");
+      
+      // Show error toast instead of alert
+      showToast({
+        type: "error",
+        title: "Repayment Failed",
+        description: (e as Error).message || "Repay failed",
+        duration: 8000,
+      });
     } finally {
       setIsRepaying(false);
     }
