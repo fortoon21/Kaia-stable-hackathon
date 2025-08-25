@@ -392,89 +392,9 @@ export default function Lending({ selectedPair }: LendingProps) {
         >
           {/* Combined Header and Stats Wrapper */}
           <div className="absolute left-[80px] top-12 w-[780px] h-[280px] bg-[#0a1a14]/5 rounded-lg p-4">
-            {/* Header Section - Grouped */}
+            {/* Header Section - Using Component */}
             <div className="absolute left-0 top-0 w-[740px] h-[120px]">
-              {/* Token Icons */}
-              <div className="absolute left-0 top-[20px] flex -space-x-3">
-                <div
-                  className="relative rounded-[30px] size-[60px]"
-                  data-name="Border"
-                  data-node-id="1:6"
-                >
-                  <div
-                    aria-hidden="true"
-                    className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-[30px]"
-                  />
-                  <div
-                    className="absolute bg-[#14304e] left-px overflow-clip rounded-[29px] size-[58px] top-px"
-                    data-name="Background"
-                    data-node-id="1:7"
-                  >
-                    <div
-                      className="absolute inset-0 rounded-[29px] flex items-center justify-center"
-                      data-name="Border"
-                      data-node-id="1:9"
-                    >
-                      {selectedPair?.collateralAsset.imageUrl ? (
-                        <Image
-                          src={selectedPair.collateralAsset.imageUrl}
-                          alt={selectedPair.collateralAsset.symbol}
-                          width={56}
-                          height={56}
-                          className="w-14 h-14 rounded-full object-cover z-10"
-                        />
-                      ) : (
-                        <div className="w-14 h-14 bg-[#17e3c2] rounded-full flex items-center justify-center text-white font-bold z-10">
-                          {selectedPair?.collateralAsset.symbol?.[0] || "K"}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="relative rounded-[30px] size-[60px] z-10"
-                  data-name="Border"
-                  data-node-id="1:10"
-                >
-                  <div
-                    aria-hidden="true"
-                    className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-[30px]"
-                  />
-                  <div
-                    className="absolute bg-[#14304e] left-px overflow-clip rounded-[29px] size-[58px] top-px"
-                    data-name="Background"
-                    data-node-id="1:11"
-                  >
-                    <div className="absolute inset-0 rounded-[29px] flex items-center justify-center">
-                      {selectedPair?.debtAsset.imageUrl ? (
-                        <Image
-                          src={selectedPair.debtAsset.imageUrl}
-                          alt={selectedPair.debtAsset.symbol}
-                          width={56}
-                          height={56}
-                          className="w-14 h-14 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="bg-blue-500 rounded-full w-14 h-14 flex items-center justify-center text-white font-bold">
-                          {selectedPair?.debtAsset.symbol?.[0] || "U"}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Title Section */}
-              <div className="absolute left-[120px] top-0">
-                <div className="text-[#728395] text-[16px] font-semibold leading-[20px] mb-2">
-                  {selectedPair?.collateralAsset.protocol || "TGIF Yield"}
-                </div>
-                <div className="flex items-center text-[#f7f7f8] text-[36px] font-medium leading-[48px]">
-                  <span>{selectedPair?.collateralAsset.asset || "Error"}</span>
-                  <span className="text-[#728395] mx-2">/</span>
-                  <span>{selectedPair?.debtAsset.symbol || "USDC"}</span>
-                </div>
-              </div>
+              <LendingHeader selectedPair={selectedPair} />
             </div>
 
             {/* Stats Section */}
@@ -604,70 +524,7 @@ export default function Lending({ selectedPair }: LendingProps) {
                 data-name="Background"
                 data-node-id="1:33"
               >
-                <div
-                  className="h-full overflow-visible relative"
-                  data-name="Tablist"
-                  data-node-id="1:34"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("borrow")}
-                    className="absolute h-[53px] left-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
-                    data-name="Tab"
-                    data-node-id="1:35"
-                  >
-                    <div
-                      aria-hidden="true"
-                      className="absolute border-[#14304e] border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
-                    />
-                    <div
-                      className={`absolute flex flex-col font-normal h-5 justify-center leading-[0] not-italic text-[16px] text-center translate-x-[-50%] translate-y-[-50%] w-[54.205px] ${
-                        activeTab === "borrow"
-                          ? "text-[#ddfbf4]"
-                          : "text-[#728395]"
-                      }`}
-                      data-node-id="1:36"
-                      style={{
-                        top: "calc(50% - 0.5px)",
-                        left: "calc(50% + 0.183px)",
-                      }}
-                    >
-                      <p className="block leading-[20px]">Borrow</p>
-                    </div>
-                    {activeTab === "borrow" && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("multiply")}
-                    className="absolute h-[53px] right-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
-                    data-name="Tab"
-                    data-node-id="1:37"
-                  >
-                    <div
-                      aria-hidden="true"
-                      className="absolute border-[#14304e] border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
-                    />
-                    <div
-                      className={`absolute flex flex-col font-normal h-5 justify-center leading-[0] not-italic text-[16px] text-center translate-x-[-50%] translate-y-[-50%] w-[59.773px] ${
-                        activeTab === "multiply"
-                          ? "text-[#ddfbf4]"
-                          : "text-[#728395]"
-                      }`}
-                      data-node-id="1:38"
-                      style={{
-                        top: "calc(50% - 0.5px)",
-                        left: "calc(50% + 0.186px)",
-                      }}
-                    >
-                      <p className="block leading-[20px]">Multiply</p>
-                    </div>
-                    {activeTab === "multiply" && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
-                    )}
-                  </button>
-                </div>
+                <LendingTabs activeTab={activeTab} onTabChange={setActiveTab} />
               </div>
 
               {/* Trading Interface Content */}
@@ -1277,93 +1134,9 @@ export default function Lending({ selectedPair }: LendingProps) {
 
           {/* Bottom Tabs and Overview */}
           <div className="absolute left-[80px] w-[780px] top-[332px]">
-            {/* Tabs */}
+            {/* Tabs - Using Component */}
             <div className="h-auto bg-[#0c1d2f] border border-[#14304e] rounded-t-2xl">
-              <div className="flex w-full">
-                <button
-                  type="button"
-                  onClick={() => setBottomTab("pair")}
-                  className={`flex-1 flex items-center justify-center space-x-2 px-5 py-4 border-b-2 ${
-                    bottomTab === "pair"
-                      ? "border-[#2ae5b9] text-[#ddfbf4]"
-                      : "border-transparent text-[#728395] hover:text-white"
-                  } transition-colors cursor-pointer`}
-                >
-                  <div className="flex space-x-1">
-                    {selectedPair?.collateralAsset.imageUrl ? (
-                      <Image
-                        src={selectedPair.collateralAsset.imageUrl}
-                        alt={selectedPair.collateralAsset.symbol}
-                        width={20}
-                        height={20}
-                        className="w-5 h-5 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
-                    )}
-                    {selectedPair?.debtAsset.imageUrl ? (
-                      <Image
-                        src={selectedPair.debtAsset.imageUrl}
-                        alt={selectedPair.debtAsset.symbol}
-                        width={20}
-                        height={20}
-                        className="w-5 h-5 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
-                    )}
-                  </div>
-                  <span className="font-semibold">Pair details</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBottomTab("collateral")}
-                  className={`flex-1 flex items-center justify-center space-x-2 px-5 py-4 border-b-2 ${
-                    bottomTab === "collateral"
-                      ? "border-[#2ae5b9] text-[#ddfbf4]"
-                      : "border-transparent text-[#728395] hover:text-white"
-                  } transition-colors cursor-pointer`}
-                >
-                  {selectedPair?.collateralAsset.imageUrl ? (
-                    <Image
-                      src={selectedPair.collateralAsset.imageUrl}
-                      alt={selectedPair.collateralAsset.symbol}
-                      width={20}
-                      height={20}
-                      className="w-5 h-5 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
-                  )}
-                  <span className="font-semibold">
-                    Collateral {selectedPair?.collateralAsset.symbol || "WKAIA"}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBottomTab("debt")}
-                  className={`flex-1 flex items-center justify-center space-x-2 px-5 py-4 border-b-2 ${
-                    bottomTab === "debt"
-                      ? "border-[#2ae5b9] text-[#ddfbf4]"
-                      : "border-transparent text-[#728395] hover:text-white"
-                  } transition-colors cursor-pointer`}
-                >
-                  {selectedPair?.debtAsset.imageUrl ? (
-                    <Image
-                      src={selectedPair.debtAsset.imageUrl}
-                      alt={selectedPair.debtAsset.symbol}
-                      width={20}
-                      height={20}
-                      className="w-5 h-5 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-5 h-5 bg-blue-500 rounded-full"></div>
-                  )}
-                  <span className="font-semibold">
-                    Debt {selectedPair?.debtAsset.symbol || "USDT0"}
-                  </span>
-                </button>
-              </div>
+              <LendingBottomTabs activeTab={bottomTab} onTabChange={setBottomTab} />
             </div>
 
             {/* Content based on selected tab */}
