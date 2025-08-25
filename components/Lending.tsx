@@ -3,18 +3,21 @@
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useCallback, useState } from "react";
+import Slider from "@/components/ui/Slider";
+import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import { LendingBottomTabs } from "@/components/lending/LendingBottomTabs";
 import { LendingHeader } from "@/components/lending/LendingHeader";
 import { LendingInputForm } from "@/components/lending/LendingInputForm";
+import { LendingOverviewTab } from "@/components/lending/LendingOverviewTab";
 import { LendingPositionInfo } from "@/components/lending/LendingPositionInfo";
+import { LendingStatisticsTab } from "@/components/lending/LendingStatisticsTab";
+import { LendingStatsSection } from "@/components/lending/LendingStatsSection";
 import { LendingTabs } from "@/components/lending/LendingTabs";
-import Slider from "@/components/ui/Slider";
-import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import {
-  AAVE_CONFIG,
   DRAGON_SWAP_POOLS,
   LOOP_CONFIG,
   TOKEN_DECIMALS,
+  AAVE_CONFIG,
 } from "@/constants/tokens";
 import { useAaveData } from "@/hooks/useAaveData";
 import { useLeverageCalculations } from "@/hooks/useLeverageCalculations";
@@ -345,7 +348,7 @@ export default function Lending({ selectedPair }: LendingProps) {
         string,
         bigint,
         bigint,
-        string,
+        string
       ] = [
         aToken,
         variableDebtAsset,
@@ -392,122 +395,96 @@ export default function Lending({ selectedPair }: LendingProps) {
         >
           {/* Combined Header and Stats Wrapper */}
           <div className="absolute left-[80px] top-12 w-[780px] h-[280px] bg-[#0a1a14]/5 rounded-lg p-4">
-            {/* Header Section - Using Component */}
+            {/* Header Section - Grouped */}
             <div className="absolute left-0 top-0 w-[740px] h-[120px]">
-              <LendingHeader selectedPair={selectedPair} />
+              {/* Token Icons */}
+              <div className="absolute left-0 top-[20px] flex -space-x-3">
+                <div
+                  className="relative rounded-[30px] size-[60px]"
+                  data-name="Border"
+                  data-node-id="1:6"
+                >
+                  <div
+                    aria-hidden="true"
+                    className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-[30px]"
+                  />
+                  <div
+                    className="absolute bg-[#14304e] left-px overflow-clip rounded-[29px] size-[58px] top-px"
+                    data-name="Background"
+                    data-node-id="1:7"
+                  >
+                    <div
+                      className="absolute inset-0 rounded-[29px] flex items-center justify-center"
+                      data-name="Border"
+                      data-node-id="1:9"
+                    >
+                      {selectedPair?.collateralAsset.imageUrl ? (
+                        <Image
+                          src={selectedPair.collateralAsset.imageUrl}
+                          alt={selectedPair.collateralAsset.symbol}
+                          width={56}
+                          height={56}
+                          className="w-14 h-14 rounded-full object-cover z-10"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-[#17e3c2] rounded-full flex items-center justify-center text-white font-bold z-10">
+                          {selectedPair?.collateralAsset.symbol?.[0] || "K"}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="relative rounded-[30px] size-[60px] z-10"
+                  data-name="Border"
+                  data-node-id="1:10"
+                >
+                  <div
+                    aria-hidden="true"
+                    className="absolute border border-[#14304e] border-solid inset-0 pointer-events-none rounded-[30px]"
+                  />
+                  <div
+                    className="absolute bg-[#14304e] left-px overflow-clip rounded-[29px] size-[58px] top-px"
+                    data-name="Background"
+                    data-node-id="1:11"
+                  >
+                    <div className="absolute inset-0 rounded-[29px] flex items-center justify-center">
+                      {selectedPair?.debtAsset.imageUrl ? (
+                        <Image
+                          src={selectedPair.debtAsset.imageUrl}
+                          alt={selectedPair.debtAsset.symbol}
+                          width={56}
+                          height={56}
+                          className="w-14 h-14 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="bg-blue-500 rounded-full w-14 h-14 flex items-center justify-center text-white font-bold">
+                          {selectedPair?.debtAsset.symbol?.[0] || "U"}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Title Section */}
+              <div className="absolute left-[120px] top-0">
+                <div className="text-[#728395] text-[16px] font-semibold leading-[20px] mb-2">
+                  {selectedPair?.collateralAsset.protocol || "TGIF Yield"}
+                </div>
+                <div className="flex items-center text-[#f7f7f8] text-[36px] font-medium leading-[48px]">
+                  <span>{selectedPair?.collateralAsset.asset || "Error"}</span>
+                  <span className="text-[#728395] mx-2">/</span>
+                  <span>{selectedPair?.debtAsset.symbol || "USDC"}</span>
+                </div>
+              </div>
             </div>
 
-            {/* Stats Section */}
-            <div
-              className="absolute h-[98.66px] left-0 right-4 top-[140px] bg-[#0a1a14]/10 rounded-lg p-2"
-              data-name="List"
-              data-node-id="1:18"
-            >
-              <div
-                className="absolute leading-[0] left-0 not-italic right-[582px] top-0 bottom-0 bg-[#08131f]/30 rounded-lg"
-                data-name="Item"
-                data-node-id="1:19"
-              >
-                <div
-                  className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-[#728395] text-[16px] top-2.5 translate-y-[-50%] w-[66.993px]"
-                  data-node-id="1:20"
-                >
-                  <p className="block leading-[20px]">Liquidity</p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[20.912px]"
-                  data-node-id="1:21"
-                >
-                  <p className="block leading-[42.67px]">$</p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-medium h-[39px] justify-center left-[26.59px] text-[#f7f7f8] text-[32px] top-[48.5px] translate-y-[-50%] w-[117.772px]"
-                  data-node-id="1:22"
-                >
-                  <p className="block leading-[42.67px]">
-                    {selectedPair?.debtAsset?.symbol
-                      ? getLiquidity(
-                          selectedPair.debtAsset.symbol
-                        )?.usdValue?.replace("$", "") || "22.84M"
-                      : "22.84M"}
-                  </p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-semibold h-[17px] justify-center left-0 text-[#728395] text-[14px] top-[88.16px] translate-y-[-50%] w-[95.427px]"
-                  data-node-id="1:23"
-                >
-                  <p className="block leading-[20px]">
-                    {selectedPair?.debtAsset?.symbol
-                      ? getLiquidity(selectedPair.debtAsset.symbol)?.amount ||
-                        "22.85M"
-                      : "22.85M"}{" "}
-                    {selectedPair?.debtAsset.symbol || "USDC"}
-                  </p>
-                </div>
-              </div>
-              <div
-                className="absolute leading-[0] left-[275px] not-italic right-[307px] top-0 bottom-0 bg-[#08131f]/30 rounded-lg"
-                data-name="Item"
-                data-node-id="1:24"
-              >
-                <div
-                  className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-[#728395] text-[16px] top-2.5 translate-y-[-50%] w-[109.729px]"
-                  data-node-id="1:25"
-                >
-                  <p className="block leading-[20px]">Max multiplier</p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#f7f7f8] text-[32px] top-[48.5px] translate-y-[-50%] w-[63.875px]"
-                  data-node-id="1:26"
-                >
-                  <p className="block leading-[42.67px]">
-                    {realMaxMultiplier > 1
-                      ? realMaxMultiplier.toFixed(2)
-                      : "--"}
-                  </p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-medium h-[39px] justify-center left-[69.48px] text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[17.944px]"
-                  data-node-id="1:27"
-                >
-                  <p className="block leading-[42.67px]">x</p>
-                </div>
-              </div>
-              <div
-                className="absolute leading-[0] left-[550px] not-italic right-8 top-0 bottom-0 bg-[#08131f]/30 rounded-lg"
-                data-name="Item"
-                data-node-id="1:28"
-              >
-                <div
-                  className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-[#728395] text-[16px] top-2.5 translate-y-[-50%] w-[90px]"
-                  data-node-id="1:29"
-                >
-                  <p className="block leading-[20px] whitespace-nowrap">
-                    Max ROE
-                  </p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#23c09b] text-[32px] top-[48.5px] translate-y-[-50%] w-[85.221px]"
-                  data-node-id="1:30"
-                >
-                  <p className="block leading-[42.67px]">
-                    {selectedPair?.collateralAsset?.symbol &&
-                    selectedPair?.debtAsset?.symbol
-                      ? getMaxROE(
-                          selectedPair.collateralAsset.symbol,
-                          selectedPair.debtAsset.symbol
-                        )?.replace("%", "") || "39.41"
-                      : "39.41"}
-                  </p>
-                </div>
-                <div
-                  className="absolute flex flex-col font-medium h-[39px] justify-center left-[90.89px] text-[#728395] text-[32px] top-[48.5px] translate-y-[-50%] w-[26.88px]"
-                  data-node-id="1:31"
-                >
-                  <p className="block leading-[42.67px]">%</p>
-                </div>
-              </div>
-            </div>
+            {/* Stats Section - Using Component */}
+            <LendingStatsSection
+              selectedPair={selectedPair}
+              realMaxMultiplier={realMaxMultiplier}
+            />
           </div>
           <div className="absolute left-[900px] top-24 w-[420px] h-[650px]">
             <div
@@ -524,7 +501,70 @@ export default function Lending({ selectedPair }: LendingProps) {
                 data-name="Background"
                 data-node-id="1:33"
               >
-                <LendingTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <div
+                  className="h-full overflow-visible relative"
+                  data-name="Tablist"
+                  data-node-id="1:34"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("borrow")}
+                    className="absolute h-[53px] left-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
+                    data-name="Tab"
+                    data-node-id="1:35"
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="absolute border-[#14304e] border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
+                    />
+                    <div
+                      className={`absolute flex flex-col font-normal h-5 justify-center leading-[0] not-italic text-[16px] text-center translate-x-[-50%] translate-y-[-50%] w-[54.205px] ${
+                        activeTab === "borrow"
+                          ? "text-[#ddfbf4]"
+                          : "text-[#728395]"
+                      }`}
+                      data-node-id="1:36"
+                      style={{
+                        top: "calc(50% - 0.5px)",
+                        left: "calc(50% + 0.183px)",
+                      }}
+                    >
+                      <p className="block leading-[20px]">Borrow</p>
+                    </div>
+                    {activeTab === "borrow" && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("multiply")}
+                    className="absolute h-[53px] right-0 w-1/2 rounded top-0 cursor-pointer hover:bg-[#14304e] transition-colors"
+                    data-name="Tab"
+                    data-node-id="1:37"
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="absolute border-[#14304e] border-[0px_0px_1px] border-solid inset-0 pointer-events-none rounded"
+                    />
+                    <div
+                      className={`absolute flex flex-col font-normal h-5 justify-center leading-[0] not-italic text-[16px] text-center translate-x-[-50%] translate-y-[-50%] w-[59.773px] ${
+                        activeTab === "multiply"
+                          ? "text-[#ddfbf4]"
+                          : "text-[#728395]"
+                      }`}
+                      data-node-id="1:38"
+                      style={{
+                        top: "calc(50% - 0.5px)",
+                        left: "calc(50% + 0.186px)",
+                      }}
+                    >
+                      <p className="block leading-[20px]">Multiply</p>
+                    </div>
+                    {activeTab === "multiply" && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2ae5b9]"></div>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Trading Interface Content */}
@@ -532,47 +572,83 @@ export default function Lending({ selectedPair }: LendingProps) {
                 <div className="p-3">
                   {/* Trading Form Container */}
                   <div className="space-y-4">
-                    {/* Input Form Component */}
-                    <LendingInputForm
-                      activeTab={activeTab}
-                      selectedPair={selectedPair}
-                      collateralAmount={collateralAmount}
-                      onCollateralAmountChange={setCollateralAmount}
-                      collateralBalance={collateralBalance || "0"}
-                      isLoadingBalance={isLoadingBalance}
-                      collateralPrice={collateralPrice}
-                      multiplier={multiplier}
-                      onMultiplierChange={setMultiplier}
-                      multiplierInput={multiplierInput}
-                      onMultiplierInputChange={setMultiplierInput}
-                      maxMultiplier={realMaxMultiplier}
-                      ltvValue={ltvValue}
-                      onLtvChange={setLtvValue}
-                      ltvInput={ltvInput}
-                      onLtvInputChange={setLtvInput}
-                    />
+                    {/* Margin Collateral - Only for Multiply Tab */}
+                    {activeTab === "multiply" && (
+                      <div className="bg-[#040a10] rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="text-[#a1acb8] text-sm">
+                            Margin collateral
+                          </div>
+                          {isConnected && (
+                            <div className="flex items-center space-x-2">
+                              <div className="text-[#728395] text-xs">
+                                <span>Balance: </span>
+                                <span className="tabular-nums font-mono">
+                                  {isLoadingBalance ? "..." : collateralBalance}
+                                </span>
+                                <span>
+                                  {" "}
+                                  {selectedPair?.collateralAsset.symbol ||
+                                    "WKAIA"}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setCollateralAmount(collateralBalance || "0")
+                                }
+                                className="bg-[#14304e] hover:bg-[#1a3d5c] text-[#2ae5b9] text-xs px-2 py-1 rounded transition-colors"
+                                disabled={
+                                  isLoadingBalance ||
+                                  !collateralBalance ||
+                                  collateralBalance === "-"
+                                }
+                              >
+                                MAX
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={collateralAmount}
+                            onChange={(e) =>
+                              setCollateralAmount(e.target.value)
+                            }
+                            className="bg-transparent text-white text-2xl w-full outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                          />
+                          <div className="bg-[#10263e] rounded-full px-3 py-1.5 flex items-center space-x-2 flex-shrink-0">
+                            {selectedPair?.collateralAsset.imageUrl ? (
+                              <Image
+                                src={selectedPair.collateralAsset.imageUrl}
+                                alt={selectedPair.collateralAsset.symbol}
+                                width={20}
+                                height={20}
+                                className="w-5 h-5 rounded-full"
+                              />
+                            ) : (
+                              <div className="w-5 h-5 bg-[#17e3c2] rounded-full"></div>
+                            )}
+                            <span className="text-white text-sm font-semibold">
+                              {selectedPair?.collateralAsset.symbol ||
+                                "PT-USDe"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-[#a1acb8] text-sm mt-3">
+                          ~{" "}
+                          {calculateUSDValue(
+                            collateralAmount || "0",
+                            collateralPrice
+                          )}
+                        </div>
+                      </div>
+                    )}
 
-                    {/* Position Info Component */}
-                    <LendingPositionInfo
-                      activeTab={activeTab}
-                      selectedPair={selectedPair}
-                      multiplier={multiplier}
-                      collateralAmount={collateralAmount}
-                      leveragePosition={{
-                        totalCollateral: parseFloat(leveragePosition.collateralAmount || "0"),
-                        totalDebt: parseFloat(leveragePosition.debtAmount || "0"),
-                        netAPY: 8.5 * multiplier - 5.4 * (multiplier - 1),
-                        currentLTV: parseFloat(leveragePosition.ltv || "0"),
-                        liquidationPrice: collateralPrice * 0.8,
-                        healthFactor: 2.5
-                      }}
-                      collateralPrice={collateralPrice}
-                      debtPrice={debtPrice}
-                      isReady={false}
-                    />
-
-                    {/* Remove old Multiplier Section - keeping for reference */}
-                    {false && activeTab === "multiply" && (
+                    {/* Multiplier Section - Only for Multiply Tab */}
+                    {activeTab === "multiply" && (
                       <div className="bg-[#040a10] rounded-lg p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="text-white text-sm font-semibold">
@@ -1098,274 +1174,27 @@ export default function Lending({ selectedPair }: LendingProps) {
 
           {/* Bottom Tabs and Overview */}
           <div className="absolute left-[80px] w-[780px] top-[332px]">
-            {/* Tabs - Using Component */}
+            {/* Tabs */}
             <div className="h-auto bg-[#0c1d2f] border border-[#14304e] rounded-t-2xl">
-              <LendingBottomTabs activeTab={bottomTab} onTabChange={setBottomTab} />
+              <LendingBottomTabs 
+                activeTab={bottomTab} 
+                onTabChange={setBottomTab}
+                selectedPair={selectedPair}
+              />
             </div>
 
             {/* Content based on selected tab */}
             <div className="bg-[#0c1d2f] border border-[#14304e] border-t-0 rounded-b-2xl p-8">
               {bottomTab === "pair" ? (
-                <>
-                  <h2 className="text-white text-xl font-semibold mb-8">
-                    Overview
-                  </h2>
-
-                  <div className="grid grid-cols-3 gap-8 mb-8">
-                    <div>
-                      <div className="text-[#728395] text-sm mb-2">
-                        Oracle price
-                      </div>
-                      <div className="text-white text-lg font-medium">
-                        ${collateralPrice.toFixed(4)}
-                      </div>
-                      <div className="text-[#a1acb8] text-xs mt-1 flex items-center">
-                        {selectedPair?.collateralAsset.asset ||
-                          "PT-USDe-25SEP2025"}
-                        <svg
-                          aria-hidden="true"
-                          focusable="false"
-                          className="ml-1.5 w-3 h-3 text-[#a1acb8]"
-                          role="img"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 448 512"
-                        >
-                          <path
-                            fill="currentColor"
-                            d="M103 497c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-55-55L424 408c13.3 0 24-10.7 24-24s-10.7-24-24-24L81.9 360l55-55c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0L7 367c-9.4 9.4-9.4 24.6 0 33.9l96 96zM441 145c9.4-9.4 9.4-24.6 0-33.9L345 15c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l55 55L24 104c-13.3 0-24 10.7-24 24s10.7 24 24 24l342.1 0-55 55c9.4-9.4 9.4-24.6 0 33.9s24.6 9.4 33.9 0l96-96z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[#728395] text-sm mb-2">
-                        Supply APY
-                      </div>
-                      <div className="text-white text-lg font-medium">
-                        {selectedPair?.collateralAsset?.symbol
-                          ? getSupplyAPY(selectedPair.collateralAsset.symbol) ||
-                            "13.45%"
-                          : "13.45%"}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[#728395] text-sm mb-2">
-                        Borrow APY
-                      </div>
-                      <div className="text-white text-lg font-medium">
-                        {selectedPair?.debtAsset?.symbol
-                          ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
-                            "9.90%"
-                          : "9.90%"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-8">
-                    <div>
-                      <div className="text-[#728395] text-sm mb-2">
-                        Correlated assets
-                      </div>
-                      <div className="text-white text-lg">
-                        {selectedPair?.collateralAsset?.symbol === "WKAIA" ||
-                        selectedPair?.debtAsset?.symbol === "WKAIA"
-                          ? "No"
-                          : "Yes"}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[#728395] text-sm mb-2">Max LTV</div>
-                      <div className="text-white text-lg font-medium">
-                        {selectedPair?.collateralAsset?.symbol
-                          ? getLTV(selectedPair.collateralAsset.symbol) ||
-                            "88.00%"
-                          : "88.00%"}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[#728395] text-sm mb-2">LLTV</div>
-                      <div className="text-white text-lg font-medium">
-                        {selectedPair?.collateralAsset?.symbol
-                          ? getLLTV(selectedPair.collateralAsset.symbol) ||
-                            "90.00%"
-                          : "90.00%"}
-                      </div>
-                    </div>
-                  </div>
-                </>
+                <LendingOverviewTab
+                  selectedPair={selectedPair}
+                  collateralPrice={collateralPrice}
+                />
               ) : (
-                <>
-                  <h2 className="text-white text-xl font-semibold mb-8">
-                    Statistics
-                  </h2>
-
-                  <div className="space-y-8">
-                    {/* First row - Total supply, Total borrowed, Available liquidity */}
-                    <div className="grid grid-cols-3 gap-8">
-                      <div>
-                        <div className="text-[#728395] text-sm mb-2">
-                          Total supply
-                        </div>
-                        <div className="text-white text-lg font-medium">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? getTotalSupply(
-                                  selectedPair.collateralAsset.symbol
-                                )?.usdValue || "$2.85M"
-                              : "$2.85M"
-                            : selectedPair?.debtAsset?.symbol
-                              ? getTotalSupply(selectedPair.debtAsset.symbol)
-                                  ?.usdValue || "$1.24M"
-                              : "$1.24M"}
-                        </div>
-                        <div className="text-[#a1acb8] text-xs mt-1">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? `${
-                                  getTotalSupply(
-                                    selectedPair.collateralAsset.symbol
-                                  )?.amount || "20,357,142"
-                                } ${selectedPair.collateralAsset.symbol}`
-                              : `20,357,142 ${
-                                  selectedPair?.collateralAsset?.symbol ||
-                                  "WKAIA"
-                                }`
-                            : selectedPair?.debtAsset?.symbol
-                              ? `${
-                                  getTotalSupply(selectedPair.debtAsset.symbol)
-                                    ?.amount || "1,240,000"
-                                } ${selectedPair.debtAsset.symbol}`
-                              : `1,240,000 ${
-                                  selectedPair?.debtAsset?.symbol || "USDT"
-                                }`}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-[#728395] text-sm mb-2">
-                          Total borrowed
-                        </div>
-                        <div className="text-white text-lg font-medium">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? getTotalBorrowed(
-                                  selectedPair.collateralAsset.symbol
-                                )?.usdValue || "$2.34M"
-                              : "$2.34M"
-                            : selectedPair?.debtAsset?.symbol
-                              ? getTotalBorrowed(selectedPair.debtAsset.symbol)
-                                  ?.usdValue || "$896K"
-                              : "$896K"}
-                        </div>
-                        <div className="text-[#a1acb8] text-xs mt-1">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? `${
-                                  getTotalBorrowed(
-                                    selectedPair.collateralAsset.symbol
-                                  )?.amount || "16,714,285"
-                                } ${selectedPair.collateralAsset.symbol}`
-                              : `16,714,285 ${
-                                  selectedPair?.collateralAsset?.symbol ||
-                                  "WKAIA"
-                                }`
-                            : selectedPair?.debtAsset?.symbol
-                              ? `${
-                                  getTotalBorrowed(
-                                    selectedPair.debtAsset.symbol
-                                  )?.amount || "896,000"
-                                } ${selectedPair.debtAsset.symbol}`
-                              : `896,000 ${
-                                  selectedPair?.debtAsset?.symbol || "USDT"
-                                }`}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-[#728395] text-sm mb-2">
-                          Available liquidity
-                        </div>
-                        <div className="text-white text-lg font-medium">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? getLiquidity(
-                                  selectedPair.collateralAsset.symbol
-                                )?.usdValue || "$506.7K"
-                              : "$506.7K"
-                            : selectedPair?.debtAsset?.symbol
-                              ? getLiquidity(selectedPair.debtAsset.symbol)
-                                  ?.usdValue || "$506.7K"
-                              : "$506.7K"}
-                        </div>
-                        <div className="text-[#a1acb8] text-xs mt-1">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? `${
-                                  getLiquidity(
-                                    selectedPair.collateralAsset.symbol
-                                  )?.amount || "506.7K"
-                                } ${selectedPair.collateralAsset.symbol}`
-                              : `${selectedPair?.liquidityAmount || "506.7K"} ${
-                                  selectedPair?.liquidityToken || "WKAIA"
-                                }`
-                            : selectedPair?.debtAsset?.symbol
-                              ? `${
-                                  getLiquidity(selectedPair.debtAsset.symbol)
-                                    ?.amount || "506.7K"
-                                } ${selectedPair.debtAsset.symbol}`
-                              : `${selectedPair?.liquidityAmount || "506.7K"} ${
-                                  selectedPair?.liquidityToken || "USDT"
-                                }`}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Second row - Supply APY, Borrow APY, Empty */}
-                    <div className="grid grid-cols-3 gap-8">
-                      <div>
-                        <div className="text-[#728395] text-sm mb-2">
-                          Supply APY
-                        </div>
-                        <div className="text-[#2ae5b9] text-lg font-medium">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? getSupplyAPY(
-                                  selectedPair.collateralAsset.symbol
-                                ) || "8.83%"
-                              : "8.83%"
-                            : selectedPair?.debtAsset?.symbol
-                              ? getSupplyAPY(selectedPair.debtAsset.symbol) ||
-                                "8.83%"
-                              : "8.83%"}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-[#728395] text-sm mb-2">
-                          Borrow APY
-                        </div>
-                        <div className="text-orange-400 text-lg font-medium">
-                          {bottomTab === "collateral"
-                            ? selectedPair?.collateralAsset?.symbol
-                              ? getBorrowAPY(
-                                  selectedPair.collateralAsset.symbol
-                                ) || "5.40%"
-                              : "5.40%"
-                            : selectedPair?.debtAsset?.symbol
-                              ? getBorrowAPY(selectedPair.debtAsset.symbol) ||
-                                "5.40%"
-                              : "5.40%"}
-                        </div>
-                      </div>
-
-                      <div>{/* Empty space for alignment */}</div>
-                    </div>
-                  </div>
-                </>
+                <LendingStatisticsTab
+                  selectedPair={selectedPair}
+                  bottomTab={bottomTab}
+                />
               )}
             </div>
           </div>
