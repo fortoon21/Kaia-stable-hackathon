@@ -20,8 +20,10 @@ export function useTokenBalance(selectedPair?: SelectedPair) {
   const tokenInfo = useMemo(() => {
     if (!selectedPair) return null;
     const symbol = selectedPair.collateralAsset.symbol;
-    const tokenAddress = TOKEN_ADDRESSES[symbol as keyof typeof TOKEN_ADDRESSES];
-    const decimals = TOKEN_DECIMALS[symbol as keyof typeof TOKEN_DECIMALS] || 18;
+    const tokenAddress =
+      TOKEN_ADDRESSES[symbol as keyof typeof TOKEN_ADDRESSES];
+    const decimals =
+      TOKEN_DECIMALS[symbol as keyof typeof TOKEN_DECIMALS] || 18;
     return { symbol, tokenAddress, decimals };
   }, [selectedPair]);
 
@@ -31,7 +33,7 @@ export function useTokenBalance(selectedPair?: SelectedPair) {
 
     fetchingRef.current = true;
     setIsLoadingBalance(true);
-    
+
     try {
       const { tokenAddress, decimals } = tokenInfo;
 
@@ -55,7 +57,7 @@ export function useTokenBalance(selectedPair?: SelectedPair) {
       setCollateralBalance("-");
       return;
     }
-    
+
     fetchBalance();
   }, [isConnected, tokenInfo?.symbol, tokenInfo?.tokenAddress]);
 

@@ -37,13 +37,13 @@ type RepayAsset = {
 } | null;
 
 export default function Repay({ onGoBack }: RepayProps = {}) {
-  const { 
-    signer, 
-    address, 
-    refreshAaveData, 
-    getTokenBalance, 
-    isConnected, 
-    aaveUserBalances 
+  const {
+    signer,
+    address,
+    refreshAaveData,
+    getTokenBalance,
+    isConnected,
+    aaveUserBalances,
   } = useWeb3();
   const { loading: pricesLoading, getPriceBySymbol } = useTokenPrices();
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("wallet");
@@ -154,11 +154,12 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
 
   // Get current debt from Aave data
   const getCurrentDebt = useCallback(() => {
-    if (!repayAsset?.symbol || !aaveUserBalances) return repayAsset?.amount || "0";
-    
+    if (!repayAsset?.symbol || !aaveUserBalances)
+      return repayAsset?.amount || "0";
+
     const tokenAddress = getTokenAddress(repayAsset.symbol);
     if (!tokenAddress) return repayAsset?.amount || "0";
-    
+
     const balanceData = aaveUserBalances[tokenAddress];
     return balanceData?.variableDebtBalance || repayAsset?.amount || "0";
   }, [repayAsset?.symbol, aaveUserBalances, repayAsset?.amount]);
@@ -233,7 +234,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Repay failed:", e);
-      
+
       // Show error toast instead of alert
       showToast({
         type: "error",
@@ -301,8 +302,15 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
       const currentDebt = getCurrentDebt();
       const debtAmount = parseFloat(currentDebt.replace(/,/g, ""));
 
-      if (!Number.isNaN(amount) && !Number.isNaN(debtAmount) && debtAmount > 0) {
-        const percentage = Math.min(100, Math.max(0, (amount / debtAmount) * 100));
+      if (
+        !Number.isNaN(amount) &&
+        !Number.isNaN(debtAmount) &&
+        debtAmount > 0
+      ) {
+        const percentage = Math.min(
+          100,
+          Math.max(0, (amount / debtAmount) * 100)
+        );
         setRepayPercent(Math.round(percentage));
       }
     },
@@ -351,7 +359,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
         </button>
 
         {/* Page title */}
-        <h1 className="text-3xl font-bold mb-8 text-heading font-heading">Repay</h1>
+        <h1 className="text-3xl font-bold mb-8 text-heading font-heading">
+          Repay
+        </h1>
 
         <div className="max-w-4xl mx-auto">
           {/* Main repay interface */}
@@ -361,20 +371,22 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
               <button
                 type="button"
                 onClick={() => setActiveTab("wallet")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors font-heading ${activeTab === "wallet"
-                  ? "bg-primary-100/20 text-heading border border-line-soft"
-                  : "text-body hover:text-heading hover:bg-surface-ghost text-sage-600"
-                  }`}
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors font-heading ${
+                  activeTab === "wallet"
+                    ? "bg-primary-100/20 text-heading border border-line-soft"
+                    : "text-body hover:text-heading hover:bg-surface-ghost text-sage-600"
+                }`}
               >
                 From wallet
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("swap")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative font-heading ${activeTab === "swap"
-                  ? "bg-primary-100/20 text-heading border border-line-soft"
-                  : "text-body hover:text-heading hover:bg-surface-ghost text-sage-600"
-                  }`}
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative font-heading ${
+                  activeTab === "swap"
+                    ? "bg-primary-100/20 text-heading border border-line-soft"
+                    : "text-body hover:text-heading hover:bg-surface-ghost text-sage-600"
+                }`}
               >
                 Swap collateral
                 <div className="absolute top-1 right-1">
@@ -434,9 +446,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           />
                         ) : (
                           <div
-                            className={`w-full h-full flex items-center justify-center rounded-full ${repayAsset.asset?.iconBg ||
-                              "bg-primary-200"
-                              }`}
+                            className={`w-full h-full flex items-center justify-center rounded-full ${
+                              repayAsset.asset?.iconBg || "bg-primary-200"
+                            }`}
                           >
                             <span className="text-heading font-bold text-lg">
                               {repayAsset.asset?.icon || repayAsset.symbol[0]}
@@ -444,26 +456,26 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           </div>
                         )
                       ) : // Show collateral asset for swap tab
-                        repayAsset.collateralAsset?.imageUrl ? (
-                          <Image
-                            src={repayAsset.collateralAsset.imageUrl}
-                            alt={repayAsset.collateralAsset.symbol}
-                            width={48}
-                            height={48}
-                            className="object-cover rounded-full"
-                          />
-                        ) : (
-                          <div
-                            className={`w-full h-full flex items-center justify-center rounded-full ${repayAsset.collateralAsset?.iconBg ||
-                              "bg-secondary"
-                              }`}
-                          >
-                            <span className="text-heading font-bold text-lg">
-                              {repayAsset.collateralAsset?.icon ||
-                                repayAsset.collateralAsset?.symbol?.[0]}
-                            </span>
-                          </div>
-                        )}
+                      repayAsset.collateralAsset?.imageUrl ? (
+                        <Image
+                          src={repayAsset.collateralAsset.imageUrl}
+                          alt={repayAsset.collateralAsset.symbol}
+                          width={48}
+                          height={48}
+                          className="object-cover rounded-full"
+                        />
+                      ) : (
+                        <div
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
+                            repayAsset.collateralAsset?.iconBg || "bg-secondary"
+                          }`}
+                        >
+                          <span className="text-heading font-bold text-lg">
+                            {repayAsset.collateralAsset?.icon ||
+                              repayAsset.collateralAsset?.symbol?.[0]}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <div className="font-semibold text-lg text-heading font-heading">
@@ -502,7 +514,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             {activeTab === "swap" && repayAsset && (
               <div className="bg-surface-1 border border-line-soft rounded-lg p-6 mb-6 blur-sm opacity-50 pointer-events-none shadow-1">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-heading font-medium font-heading">Debt to Repay</span>
+                  <span className="text-heading font-medium font-heading">
+                    Debt to Repay
+                  </span>
                   <div className="flex items-center text-sm text-body">
                     <span className="mr-2">Owed:</span>
                     <span className="text-warning font-medium font-heading">
@@ -524,9 +538,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                         />
                       ) : (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${repayAsset.asset?.iconBg ||
-                            "bg-primary-200"
-                            }`}
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
+                            repayAsset.asset?.iconBg || "bg-primary-200"
+                          }`}
                         >
                           <span className="text-heading font-bold text-sm">
                             {repayAsset.asset?.icon || repayAsset.symbol[0]}
@@ -611,10 +625,11 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             >
               <button
                 type="button"
-                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 font-heading ${isRepaying || !repayAsset || !isValidRepayAmount()
-                  ? "bg-primary-200/10 text-sage-600 cursor-not-allowed border border-line-soft"
-                  : "bg-primary-100 text-black hover:bg-primary-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                  }`}
+                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 font-heading ${
+                  isRepaying || !repayAsset || !isValidRepayAmount()
+                    ? "bg-primary-200/10 text-sage-600 cursor-not-allowed border border-line-soft"
+                    : "bg-primary-100 text-black hover:bg-primary-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                }`}
                 disabled={isRepaying || !repayAsset || !isValidRepayAmount()}
                 onClick={handleRepay}
               >

@@ -77,9 +77,7 @@ export function ValueWithLabel({
       >
         {value}
       </div>
-      {subValue && (
-        <div className="text-muted text-xs mt-0.5">{subValue}</div>
-      )}
+      {subValue && <div className="text-muted text-xs mt-0.5">{subValue}</div>}
     </div>
   );
 }

@@ -29,28 +29,48 @@ export default function Footer() {
               className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
               <span className="sr-only">X</span>
-              <Image src="/x.png" alt="X" width={20} height={20} className="w-5 h-5" />
+              <Image
+                src="/x.png"
+                alt="X"
+                width={20}
+                height={20}
+                className="w-5 h-5"
+              />
             </button>
             <button
               type="button"
               className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
               <span className="sr-only">Discord</span>
-              <Image src="/discord.png" alt="Discord" width={20} height={20} className="w-5 h-5" />
+              <Image
+                src="/discord.png"
+                alt="Discord"
+                width={20}
+                height={20}
+                className="w-5 h-5"
+              />
             </button>
             <button
               type="button"
               className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
               <span className="sr-only">GitHub</span>
-              <Image src="/github.png" alt="GitHub" width={20} height={20} className="w-5 h-5" />
+              <Image
+                src="/github.png"
+                alt="GitHub"
+                width={20}
+                height={20}
+                className="w-5 h-5"
+              />
             </button>
           </div>
         </div>
 
         {/* Products */}
         <div>
-          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">Products</h3>
+          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">
+            Products
+          </h3>
           <ul className="space-y-2">
             <li>
               <button
@@ -81,7 +101,9 @@ export default function Footer() {
 
         {/* Resources */}
         <div>
-          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">Resources</h3>
+          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">
+            Resources
+          </h3>
           <ul className="space-y-2">
             <li>
               <button
@@ -120,7 +142,9 @@ export default function Footer() {
 
         {/* Support */}
         <div>
-          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">Support</h3>
+          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">
+            Support
+          </h3>
           <ul className="space-y-2">
             <li>
               <button

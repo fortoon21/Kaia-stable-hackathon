@@ -125,13 +125,15 @@ export function usePairPrices(collateralSymbol: string, debtSymbol: string) {
   };
 
   // Use API prices if available, fallback otherwise
-  const collateralPrice = (rawCollateralPrice && rawCollateralPrice > 0) 
-    ? rawCollateralPrice 
-    : (fallbackPrices[collateralSymbol] || 0.14);
-    
-  const debtPrice = (rawDebtPrice && rawDebtPrice > 0) 
-    ? rawDebtPrice 
-    : (fallbackPrices[debtSymbol] || 1.0);
+  const collateralPrice =
+    rawCollateralPrice && rawCollateralPrice > 0
+      ? rawCollateralPrice
+      : fallbackPrices[collateralSymbol] || 0.14;
+
+  const debtPrice =
+    rawDebtPrice && rawDebtPrice > 0
+      ? rawDebtPrice
+      : fallbackPrices[debtSymbol] || 1.0;
 
   return {
     collateralPrice,

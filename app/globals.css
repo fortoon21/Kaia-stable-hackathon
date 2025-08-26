@@ -9,16 +9,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1B2009;
+    --background: #1b2009;
     --foreground: #ededed;
   }
 }
 
 html,
 body {
-  color: theme('colors.text.body');
-  background: theme('colors.bg-main');
-  font-family: theme('fontFamily.body');
+  color: theme("colors.text.body");
+  background: theme("colors.bg-main");
+  font-family: theme("fontFamily.body");
   width: 100%;
 }
 
@@ -88,27 +88,35 @@ body {
 
   /* Glow effects */
   .glow-primary {
-    box-shadow: 0 0 20px theme('colors.primary.100 / 30%');
+    box-shadow: 0 0 20px theme("colors.primary.100 / 30%");
   }
 
   .glow-primary-hover:hover {
-    box-shadow: 0 0 30px theme('colors.primary.100 / 50%');
+    box-shadow: 0 0 30px theme("colors.primary.100 / 50%");
   }
 
   /* Gradient backgrounds */
   .gradient-primary {
-    background: linear-gradient(135deg, theme('colors.primary.100') 0%, theme('colors.primary.200') 100%);
+    background: linear-gradient(
+      135deg,
+      theme("colors.primary.100") 0%,
+      theme("colors.primary.200") 100%
+    );
   }
 
   .gradient-dark {
-    background: linear-gradient(135deg, theme('colors.primary.500') 0%, theme('colors.bg-main') 100%);
+    background: linear-gradient(
+      135deg,
+      theme("colors.primary.500") 0%,
+      theme("colors.bg-main") 100%
+    );
   }
 
   /* Glass morphism */
   .glass {
-    background: theme('colors.surface.ghost');
+    background: theme("colors.surface.ghost");
     backdrop-filter: blur(10px);
-    border: 1px solid theme('colors.line.soft');
+    border: 1px solid theme("colors.line.soft");
   }
 
   /* Skeleton loading */
@@ -124,9 +132,9 @@ body {
   .skeleton {
     background: linear-gradient(
       90deg,
-      theme('colors.surface.1') 0px,
-      theme('colors.surface.2') 20px,
-      theme('colors.surface.1') 40px
+      theme("colors.surface.1") 0px,
+      theme("colors.surface.2") 20px,
+      theme("colors.surface.1") 40px
     );
     background-size: 1000px 100%;
     animation: shimmer 2s infinite;
@@ -159,17 +167,17 @@ body {
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: theme('colors.bg-main');
+    background: theme("colors.bg-main");
     border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: theme('colors.primary.400');
+    background: theme("colors.primary.400");
     border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: theme('colors.primary.200');
+    background: theme("colors.primary.200");
   }
 
   /* Custom slider styles */
@@ -178,20 +186,20 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: theme('colors.primary.100');
-    border: 4px solid theme('colors.bg-main');
+    background: theme("colors.primary.100");
+    border: 4px solid theme("colors.bg-main");
     cursor: pointer;
-    box-shadow: 0 0 0 1px theme('colors.primary.100');
+    box-shadow: 0 0 0 1px theme("colors.primary.100");
   }
 
   .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: theme('colors.primary.100');
-    border: 4px solid theme('colors.bg-main');
+    background: theme("colors.primary.100");
+    border: 4px solid theme("colors.bg-main");
     cursor: pointer;
-    box-shadow: 0 0 0 1px theme('colors.primary.100');
+    box-shadow: 0 0 0 1px theme("colors.primary.100");
   }
 
   /* Hide scrollbar but keep scroll functionality */

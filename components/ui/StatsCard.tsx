@@ -36,7 +36,10 @@ export function StatsCard({
     <div className={`${className}`}>
       <div className="text-body text-sm mb-2 font-heading">{label}</div>
       <div className="flex items-baseline gap-2">
-        <div className="text-lg font-heading font-medium" style={{ color: valueColor }}>
+        <div
+          className="text-lg font-heading font-medium"
+          style={{ color: valueColor }}
+        >
           {value}
         </div>
         {trend && trendValue && (
@@ -46,9 +49,7 @@ export function StatsCard({
           </span>
         )}
       </div>
-      {subValue && (
-        <div className="text-muted text-xs mt-1">{subValue}</div>
-      )}
+      {subValue && <div className="text-muted text-xs mt-1">{subValue}</div>}
     </div>
   );
 }

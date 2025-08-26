@@ -4,8 +4,8 @@ import { ethers } from "ethers";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import Slider from "@/components/ui/Slider";
-import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import { showToast } from "@/components/ui/Toast";
+import WalletConnectorV2 from "@/components/WalletConnectorV2";
 import {
   AAVE_CONFIG,
   DRAGON_SWAP_POOLS,
@@ -45,7 +45,8 @@ export function LendingTradingPanel({
     aaveUserBalances,
     refreshAaveData,
   } = useWeb3();
-  const { collateralBalance, isLoadingBalance, refreshBalance } = useTokenBalance(selectedPair);
+  const { collateralBalance, isLoadingBalance, refreshBalance } =
+    useTokenBalance(selectedPair);
   const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
     useLeverageCalculations(selectedPair, collateralAmount, multiplier);
   const { getLTV, getSupplyAPY, getBorrowAPY } = useAaveData();
@@ -323,7 +324,7 @@ export function LendingTradingPanel({
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Open multiply failed:", e);
-      
+
       // Show error toast instead of alert
       showToast({
         type: "error",
@@ -505,7 +506,7 @@ export function LendingTradingPanel({
 
             {/* Multiplier Section - Only for Multiply Tab */}
             {activeTab === "multiply" && (
-                <div className="bg-surface-3 rounded-md shadow-1 p-6">
+              <div className="bg-surface-3 rounded-md shadow-1 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-heading text-sm font-semibold text-sage-400">
                     Multiplier
@@ -645,7 +646,9 @@ export function LendingTradingPanel({
 
                 {/* Short Position */}
                 <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
-                  <div className="text-body text-sm mb-2 text-warning">Short</div>
+                  <div className="text-body text-sm mb-2 text-warning">
+                    Short
+                  </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-heading font-semibold">
@@ -794,7 +797,9 @@ export function LendingTradingPanel({
                 {/* LTV Section */}
                 <div className="bg-surface-2 rounded-md shadow-1 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="text-heading text-sm font-semibold">LTV</div>
+                    <div className="text-heading text-sm font-semibold">
+                      LTV
+                    </div>
                     <div className="bg-primary-600 rounded px-3 py-1 flex items-center">
                       <input
                         type="text"
@@ -874,13 +879,14 @@ export function LendingTradingPanel({
                   <div className="flex justify-between">
                     <span className="text-body">Current oracle price</span>
                     <span className="text-heading">
-                      ${collateralPrice.toFixed(4)} <span className="text-body">{selectedPair?.collateralAsset.symbol || "PT-USDe"} ⇄</span>
+                      ${collateralPrice.toFixed(4)}{" "}
+                      <span className="text-body">
+                        {selectedPair?.collateralAsset.symbol || "PT-USDe"} ⇄
+                      </span>
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-body">
-                      Liquidation oracle price
-                    </span>
+                    <span className="text-body">Liquidation oracle price</span>
                     <span className="text-heading">-</span>
                   </div>
                   <div className="flex justify-between">
@@ -976,7 +982,9 @@ export function LendingTradingPanel({
                     <span className="text-heading text-sage-400">Yes</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-body text-sage-600">Slippage tolerance</span>
+                    <span className="text-body text-sage-600">
+                      Slippage tolerance
+                    </span>
                     <span className="text-heading text-sage-400">0.05%</span>
                   </div>
                   <div className="flex justify-between">
@@ -1003,7 +1011,7 @@ export function LendingTradingPanel({
         className={`flex-shrink-0 bg-bg-main rounded-b-2xl border-t border-line-soft p-4 ${activeTab === "borrow" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
       >
         {!isConnected ? (
-          <WalletConnectorV2 className="w-full"/>
+          <WalletConnectorV2 className="w-full" />
         ) : (
           <button
             type="button"

@@ -31,7 +31,11 @@ interface Wallet {
   recommended?: boolean;
 }
 
-export default function WalletConnectorV2({ className = "" }: { className?: string } = {}) {
+export default function WalletConnectorV2({
+  className = "",
+}: {
+  className?: string;
+} = {}) {
   const {
     address,
     balance,
@@ -205,7 +209,13 @@ export default function WalletConnectorV2({ className = "" }: { className?: stri
           typeof document !== "undefined" &&
           createPortal(
             <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[10000] animate-fade-in">
-              <div className="bg-surface-3 border border-line-strong rounded-lg p-6 w-96 max-w-[90vw] animate-scale-in shadow-3" style={{ boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.3)' }}>
+              <div
+                className="bg-surface-3 border border-line-strong rounded-lg p-6 w-96 max-w-[90vw] animate-scale-in shadow-3"
+                style={{
+                  boxShadow:
+                    "0 32px 80px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.3)",
+                }}
+              >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold text-heading font-heading">
                     Account Details
@@ -241,7 +251,9 @@ export default function WalletConnectorV2({ className = "" }: { className?: stri
 
                   {/* Balance Section */}
                   <div className="bg-surface-1 border border-line-soft rounded-md p-4 shadow-1">
-                    <div className="text-body text-sm mb-2 font-heading">Balance</div>
+                    <div className="text-body text-sm mb-2 font-heading">
+                      Balance
+                    </div>
                     <div className="text-heading font-semibold text-lg font-heading">
                       {balance
                         ? `${formatBalance(balance)} KAIA`
@@ -256,7 +268,9 @@ export default function WalletConnectorV2({ className = "" }: { className?: stri
 
                   {/* Network Section */}
                   <div className="bg-surface-1 border border-line-soft rounded-md p-4 shadow-1">
-                    <div className="text-body text-sm mb-2 font-heading">Network</div>
+                    <div className="text-body text-sm mb-2 font-heading">
+                      Network
+                    </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <div
@@ -328,7 +342,13 @@ export default function WalletConnectorV2({ className = "" }: { className?: stri
         typeof document !== "undefined" &&
         createPortal(
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[10000] animate-fade-in p-4">
-            <div className="bg-surface-3 border border-line-strong rounded-lg p-6 w-96 max-w-full max-h-[80vh] overflow-y-auto animate-scale-in shadow-3" style={{ boxShadow: '0 32px 80px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.3)' }}>
+            <div
+              className="bg-surface-3 border border-line-strong rounded-lg p-6 w-96 max-w-full max-h-[80vh] overflow-y-auto animate-scale-in shadow-3"
+              style={{
+                boxShadow:
+                  "0 32px 80px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.3)",
+              }}
+            >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold text-heading font-heading">
                   Connect Wallet
@@ -355,10 +375,11 @@ export default function WalletConnectorV2({ className = "" }: { className?: stri
                     key={wallet.name}
                     onClick={() => handleConnect(wallet)}
                     disabled={!wallet.detected || isConnecting}
-                    className={`w-full flex items-center space-x-4 p-4 rounded-md border transition-all duration-200 ${wallet.detected
-                      ? "border-line-soft bg-surface-2 hover:border-primary-100 hover:bg-surface-ghost hover:scale-[1.02]"
-                      : "border-line-soft bg-surface-2 opacity-50 cursor-not-allowed"
-                      }`}
+                    className={`w-full flex items-center space-x-4 p-4 rounded-md border transition-all duration-200 ${
+                      wallet.detected
+                        ? "border-line-soft bg-surface-2 hover:border-primary-100 hover:bg-surface-ghost hover:scale-[1.02]"
+                        : "border-line-soft bg-surface-2 opacity-50 cursor-not-allowed"
+                    }`}
                   >
                     <div className="w-8 h-8">
                       <Image
@@ -405,9 +426,7 @@ export default function WalletConnectorV2({ className = "" }: { className?: stri
 
               <div className="mt-6 pt-6 border-t border-line-soft">
                 <div className="text-center">
-                  <p className="text-body text-sm mb-2">
-                    New to Web3 wallets?
-                  </p>
+                  <p className="text-body text-sm mb-2">New to Web3 wallets?</p>
                   <a
                     href="https://docs.kaia.io/build/wallets/overview/kaia-wallet/"
                     target="_blank"

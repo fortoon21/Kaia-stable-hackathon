@@ -107,7 +107,9 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
       <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6 pt-20`}>
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-heading font-bold mb-2 mt-16 text-sage-100">TGIF Lending Markets</h1>
+          <h1 className="text-3xl font-heading font-bold mb-2 mt-16 text-sage-100">
+            TGIF Lending Markets
+          </h1>
           <p className="text-body text-sage-400">
             Leverage your positions with collateral and debt assets
           </p>
@@ -149,10 +151,11 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <svg
-                        className={`w-5 h-5 text-body transition-transform duration-200 ${expandedGroup === group.name
-                          ? "rotate-90"
-                          : "rotate-0"
-                          }`}
+                        className={`w-5 h-5 text-body transition-transform duration-200 ${
+                          expandedGroup === group.name
+                            ? "rotate-90"
+                            : "rotate-0"
+                        }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -383,13 +386,14 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 const canRepay = hasDebt && isConnected;
 
                                 return (
-                                  <div
-                                    className={`px-3 py-1.5 rounded-sm border border-primary-100/20 bg-primary-100/10 ml-2 text-primary-100 font-heading font-semibold text-xs transition-all duration-200 cursor-pointer ${canRepay
-                                      ? "bg-primary-100/10 hover:bg-primary-100/80 text-heading shadow-lg hover:shadow-xl"
-                                      : "bg-surface-2 text-sage-600 cursor-not-allowed"
-                                      }`}
-                                    role="button"
-                                    tabIndex={canRepay ? 0 : -1}
+                                  <button
+                                    type="button"
+                                    className={`px-3 py-1.5 rounded-sm border border-primary-100/20 bg-primary-100/10 ml-2 text-primary-100 font-heading font-semibold text-xs transition-all duration-200 cursor-pointer ${
+                                      canRepay
+                                        ? "bg-primary-100/10 hover:bg-primary-100/80 text-heading shadow-lg hover:shadow-xl"
+                                        : "bg-surface-2 text-sage-600 cursor-not-allowed"
+                                    }`}
+                                    disabled={!canRepay}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (canRepay && onPageChange) {
@@ -435,7 +439,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                     }}
                                   >
                                     Repay
-                                  </div>
+                                  </button>
                                 );
                               })()}
                             </div>

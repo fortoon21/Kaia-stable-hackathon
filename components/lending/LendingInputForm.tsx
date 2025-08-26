@@ -91,7 +91,9 @@ export function LendingInputForm({
       {/* Collateral Amount Input */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="text-sm text-body font-heading">Collateral Amount</label>
+          <label className="text-sm text-body font-heading">
+            Collateral Amount
+          </label>
           <div className="text-xs text-body">
             Balance:{" "}
             {isLoadingBalance ? "Loading..." : collateralBalance || "0"}{" "}

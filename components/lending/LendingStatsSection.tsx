@@ -74,7 +74,9 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[109.729px] font-heading"
           data-node-id="1:25"
         >
-          <p className="block leading-[20px] whitespace-nowrap text-sage-600">Max multiplier</p>
+          <p className="block leading-[20px] whitespace-nowrap text-sage-600">
+            Max multiplier
+          </p>
         </div>
         <div
           className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-heading text-[32px] top-[48.5px] translate-y-[-50%] w-[63.875px] font-heading"
@@ -102,7 +104,9 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[90px] font-heading"
           data-node-id="1:29"
         >
-          <p className="block leading-[20px] whitespace-nowra text-sage-600">Max ROE</p>
+          <p className="block leading-[20px] whitespace-nowra text-sage-600">
+            Max ROE
+          </p>
         </div>
         <div
           className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#23c09b] text-[32px] top-[48.5px] translate-y-[-50%] w-[85.221px] font-heading"
@@ -122,7 +126,9 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-medium h-[39px] justify-center left-[91px] text-muted text-[32px] top-[48.5px] translate-y-[-50%] w-[20px] font-heading"
           data-node-id="1:31"
         >
-          <p className="block leading-[42.67px] text-primary-100 ml-[-20px]">%</p>
+          <p className="block leading-[42.67px] text-primary-100 ml-[-20px]">
+            %
+          </p>
         </div>
       </div>
     </div>

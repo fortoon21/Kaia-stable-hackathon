@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { ToastContainer } from "@/components/ui/Toast";
@@ -7,15 +7,15 @@ import { LAYOUT } from "@/constants/layout";
 import { Web3Provider } from "@/lib/web3Provider";
 
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-space-grotesk',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

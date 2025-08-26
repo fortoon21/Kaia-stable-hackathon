@@ -84,7 +84,9 @@ const TokenSelector = ({
           )}
         </div>
         <div className="text-left">
-          <div className="font-heading font-semibold text-heading">{token.symbol}</div>
+          <div className="font-heading font-semibold text-heading">
+            {token.symbol}
+          </div>
           <div className="text-body text-sm">{token.name}</div>
         </div>
         <svg
@@ -137,9 +139,7 @@ const TokenSelector = ({
                 <div className="font-heading font-semibold text-heading">
                   {availableToken.symbol}
                 </div>
-                <div className="text-body text-sm">
-                  {availableToken.name}
-                </div>
+                <div className="text-body text-sm">{availableToken.name}</div>
               </div>
               <div className="text-right">
                 <div className="text-heading font-heading font-semibold">
@@ -176,7 +176,9 @@ export default function SwapCollateral() {
       <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto`}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 font-heading text-heading">Swap Collateral</h1>
+          <h1 className="text-3xl font-bold mb-2 font-heading text-heading">
+            Swap Collateral
+          </h1>
           <p className="text-body">
             Swap between your available collateral tokens
           </p>
@@ -188,7 +190,9 @@ export default function SwapCollateral() {
             {/* From Token */}
             <div className="mb-4">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-body text-sm font-medium font-heading">From</span>
+                <span className="text-body text-sm font-medium font-heading">
+                  From
+                </span>
                 <span className="text-body text-sm">
                   Balance: {fromToken.balance} {fromToken.symbol}
                 </span>
@@ -240,7 +244,9 @@ export default function SwapCollateral() {
             {/* To Token */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-body text-sm font-medium font-heading">To</span>
+                <span className="text-body text-sm font-medium font-heading">
+                  To
+                </span>
                 <span className="text-body text-sm">
                   Balance: {toToken.balance} {toToken.symbol}
                 </span>
@@ -285,15 +291,17 @@ export default function SwapCollateral() {
                 <div className="flex justify-between">
                   <span className="text-body text-sm">Network Fee</span>
                   <div className="text-right">
-                    <div className="font-heading font-semibold text-heading">~0.002 ETH</div>
+                    <div className="font-heading font-semibold text-heading">
+                      ~0.002 ETH
+                    </div>
                     <div className="text-body text-xs">$6.84</div>
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-body text-sm">
-                    Slippage Tolerance
+                  <span className="text-body text-sm">Slippage Tolerance</span>
+                  <span className="font-heading font-semibold text-heading">
+                    0.5%
                   </span>
-                  <span className="font-heading font-semibold text-heading">0.5%</span>
                 </div>
               </div>
             </div>

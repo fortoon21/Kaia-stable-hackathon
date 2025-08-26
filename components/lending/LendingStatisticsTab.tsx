@@ -92,9 +92,7 @@ export function LendingStatisticsTab({
           </div>
 
           <div>
-            <div className="text-body text-sm mb-2">
-              Available liquidity
-            </div>
+            <div className="text-body text-sm mb-2">Available liquidity</div>
             <div className="text-heading text-lg font-medium">
               {bottomTab === "collateral"
                 ? selectedPair?.collateralAsset?.symbol

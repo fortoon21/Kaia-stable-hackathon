@@ -114,7 +114,10 @@ export default function Home() {
     return (
       <div className="text-white min-h-screen flex flex-col">
         {/* Navigation */}
-        <Navigation currentPage={currentPage === "repay" ? "markets" : currentPage} onPageChange={handlePageChange} />
+        <Navigation
+          currentPage={currentPage === "repay" ? "markets" : currentPage}
+          onPageChange={handlePageChange}
+        />
 
         {/* Network Warning */}
         <NetworkWarning />
@@ -132,7 +135,10 @@ export default function Home() {
   return (
     <div className="text-white min-h-screen flex flex-col">
       {/* Navigation */}
-      <Navigation currentPage={currentPage === "repay" ? "markets" : currentPage} onPageChange={handlePageChange} />
+      <Navigation
+        currentPage={currentPage === "repay" ? "markets" : currentPage}
+        onPageChange={handlePageChange}
+      />
 
       {/* Network Warning */}
       <NetworkWarning />

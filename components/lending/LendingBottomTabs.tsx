@@ -49,7 +49,9 @@ export function LendingBottomTabs({
             <div className="w-5 h-5 bg-blue-500 rounded-pill"></div>
           )}
         </div>
-        <span className="font-heading font-semibold text-sage-400">Pair details</span>
+        <span className="font-heading font-semibold text-sage-400">
+          Pair details
+        </span>
       </button>
       <button
         type="button"

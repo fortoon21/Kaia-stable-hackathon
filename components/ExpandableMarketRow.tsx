@@ -68,21 +68,19 @@ export default function ExpandableMarketRow({
         <div className="text-center">
           <div className="font-heading font-semibold">{market.liquidity}</div>
           {market.liquidityDetail && (
-            <div className="text-muted text-sm">
-              {market.liquidityDetail}
-            </div>
+            <div className="text-muted text-sm">{market.liquidityDetail}</div>
           )}
         </div>
-        <div className="text-center font-heading font-semibold">{market.volume24h}</div>
+        <div className="text-center font-heading font-semibold">
+          {market.volume24h}
+        </div>
         <div className="text-center">
           {market.ytYield ? (
             <>
               <div className="bg-surface-2 px-3 py-1 rounded-sm text-sm inline-block">
                 YT
               </div>
-              <div className="text-muted text-sm mt-1">
-                {market.ytYield}
-              </div>
+              <div className="text-muted text-sm mt-1">{market.ytYield}</div>
             </>
           ) : (
             <div className="text-[#23c09b] font-semibold">
