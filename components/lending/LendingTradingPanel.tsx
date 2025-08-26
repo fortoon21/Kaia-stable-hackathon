@@ -874,7 +874,7 @@ export function LendingTradingPanel({
                   <div className="flex justify-between">
                     <span className="text-body">Current oracle price</span>
                     <span className="text-heading">
-                      ${collateralPrice.toFixed(4)} <span className="text-body">{selectedPair?.collateralAsset.symbol || "PT-USDe"} ⇄</span>
+                      {collateralPrice > 0 ? `$${collateralPrice.toFixed(4)}` : "Loading..."} <span className="text-body">{selectedPair?.collateralAsset.symbol || "PT-USDe"} ⇄</span>
                     </span>
                   </div>
                   <div className="flex justify-between">

@@ -111,14 +111,27 @@ export function useTokenPrices(): UseTokenPricesReturn {
 export function usePairPrices(collateralSymbol: string, debtSymbol: string) {
   const { loading, error, getPriceBySymbol } = useTokenPrices();
 
-  const collateralPrice = getPriceBySymbol(collateralSymbol);
-  const debtPrice = getPriceBySymbol(debtSymbol);
+  const rawCollateralPrice = getPriceBySymbol(collateralSymbol);
+  const rawDebtPrice = getPriceBySymbol(debtSymbol);
+
+  // Fallback prices when API fails or returns 0
+  const fallbackPrices: { [key: string]: number } = {
+    WKAIA: 0.14,
+    USDC: 1.0,
+    "USD₮": 1.0,
+    USDT0: 1.0,
+    USDT: 1.0,
+    "PT-USDe": 1.0,
+  };
+
+  const collateralPrice = rawCollateralPrice > 0 ? rawCollateralPrice : (fallbackPrices[collateralSymbol] || 1.0);
+  const debtPrice = rawDebtPrice > 0 ? rawDebtPrice : (fallbackPrices[debtSymbol] || 1.0);
 
   return {
     collateralPrice,
     debtPrice,
     loading,
     error,
-    isReady: !loading && collateralPrice > 0 && debtPrice > 0,
+    isReady: collateralPrice > 0 && debtPrice > 0,
   };
 }

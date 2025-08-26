@@ -22,7 +22,7 @@ export function LendingOverviewTab({
         <div>
           <div className="text-body text-sm mb-2 font-heading text-sage-600">Oracle price</div>
           <div className="text-heading text-lg font-heading font-medium text-sage-400">
-            ${collateralPrice.toFixed(4)}
+            {collateralPrice > 0 ? `$${collateralPrice.toFixed(4)}` : "Loading..."}
           </div>
           <div className="text-muted text-xs mt-1 flex items-center">
             {selectedPair?.collateralAsset.asset || "PT-USDe-25SEP2025"}
