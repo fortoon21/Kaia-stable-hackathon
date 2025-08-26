@@ -331,7 +331,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
         <button
           type="button"
           onClick={() => onGoBack?.()}
-          className="flex items-center text-body hover:text-heading transition-colors mb-6"
+          className="flex items-center text-body hover:text-heading transition-colors text-sm text-sage-400 my-6 p-4 bg-surface-2 border border-line-soft rounded-xl"
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -361,22 +361,20 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
               <button
                 type="button"
                 onClick={() => setActiveTab("wallet")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors font-heading ${
-                  activeTab === "wallet"
-                    ? "bg-surface-3 text-heading border border-line-soft"
-                    : "text-body hover:text-heading hover:bg-surface-ghost"
-                }`}
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors font-heading ${activeTab === "wallet"
+                  ? "bg-primary-100/20 text-heading border border-line-soft"
+                  : "text-body hover:text-heading hover:bg-surface-ghost text-sage-600"
+                  }`}
               >
                 From wallet
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab("swap")}
-                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative font-heading ${
-                  activeTab === "swap"
-                    ? "bg-surface-3 text-heading border border-line-soft"
-                    : "text-body hover:text-heading hover:bg-surface-ghost"
-                }`}
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-colors relative font-heading ${activeTab === "swap"
+                  ? "bg-primary-100/20 text-heading border border-line-soft"
+                  : "text-body hover:text-heading hover:bg-surface-ghost text-sage-600"
+                  }`}
               >
                 Swap collateral
                 <div className="absolute top-1 right-1">
@@ -393,14 +391,14 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                 className={`bg-surface-1 border border-line-soft rounded-lg p-6 mb-6 shadow-1 ${activeTab === "swap" ? "blur-sm opacity-50 pointer-events-none" : ""}`}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-heading font-medium font-heading">
+                  <span className="text-heading font-medium font-heading text-sage-400">
                     {activeTab === "wallet"
                       ? "From Wallet"
                       : "Collateral to Swap"}
                   </span>
                   <div className="flex items-center text-sm text-body">
-                    <span className="mr-2">Balance:</span>
-                    <span className="text-heading font-medium font-heading">
+                    <span className="mr-2 text-sage-400">Balance:</span>
+                    <span className="text-heading font-medium font-heading text-sage-400">
                       {balanceLoading && tokenBalance === "0"
                         ? "Loading balance..."
                         : activeTab === "wallet"
@@ -413,8 +411,8 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                 {/* Owed debt info - smaller display */}
                 {activeTab === "wallet" && repayAsset && (
                   <div className="mb-4 text-xs text-right">
-                    <span className="text-body">Owed Debt: </span>
-                    <span className="text-warning font-medium font-heading">
+                    <span className="text-body text-sage-400">Owed Debt: </span>
+                    <span className="text-warning font-medium font-heading text-sage-400">
                       {getCurrentDebt()} {repayAsset.symbol} (
                       {calculateUSDValue(getCurrentDebt(), repayAsset.symbol)})
                     </span>
@@ -436,10 +434,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           />
                         ) : (
                           <div
-                            className={`w-full h-full flex items-center justify-center rounded-full ${
-                              repayAsset.asset?.iconBg ||
+                            className={`w-full h-full flex items-center justify-center rounded-full ${repayAsset.asset?.iconBg ||
                               "bg-primary-200"
-                            }`}
+                              }`}
                           >
                             <span className="text-heading font-bold text-lg">
                               {repayAsset.asset?.icon || repayAsset.symbol[0]}
@@ -447,27 +444,26 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                           </div>
                         )
                       ) : // Show collateral asset for swap tab
-                      repayAsset.collateralAsset?.imageUrl ? (
-                        <Image
-                          src={repayAsset.collateralAsset.imageUrl}
-                          alt={repayAsset.collateralAsset.symbol}
-                          width={48}
-                          height={48}
-                          className="object-cover rounded-full"
-                        />
-                      ) : (
-                        <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            repayAsset.collateralAsset?.iconBg ||
-                            "bg-secondary"
-                          }`}
-                        >
-                          <span className="text-heading font-bold text-lg">
-                            {repayAsset.collateralAsset?.icon ||
-                              repayAsset.collateralAsset?.symbol?.[0]}
-                          </span>
-                        </div>
-                      )}
+                        repayAsset.collateralAsset?.imageUrl ? (
+                          <Image
+                            src={repayAsset.collateralAsset.imageUrl}
+                            alt={repayAsset.collateralAsset.symbol}
+                            width={48}
+                            height={48}
+                            className="object-cover rounded-full"
+                          />
+                        ) : (
+                          <div
+                            className={`w-full h-full flex items-center justify-center rounded-full ${repayAsset.collateralAsset?.iconBg ||
+                              "bg-secondary"
+                              }`}
+                          >
+                            <span className="text-heading font-bold text-lg">
+                              {repayAsset.collateralAsset?.icon ||
+                                repayAsset.collateralAsset?.symbol?.[0]}
+                            </span>
+                          </div>
+                        )}
                     </div>
                     <div>
                       <div className="font-semibold text-lg text-heading font-heading">
@@ -528,10 +524,9 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                         />
                       ) : (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            repayAsset.asset?.iconBg ||
+                          className={`w-full h-full flex items-center justify-center rounded-full ${repayAsset.asset?.iconBg ||
                             "bg-primary-200"
-                          }`}
+                            }`}
                         >
                           <span className="text-heading font-bold text-sm">
                             {repayAsset.asset?.icon || repayAsset.symbol[0]}
@@ -572,10 +567,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             >
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <div className="text-heading font-semibold text-lg font-heading">
+                  <div className="text-heading font-semibold text-lg font-heading text-sage-400">
                     Repay Amount
                   </div>
-                  <div className="text-body text-sm mt-1">
+                  <div className="text-body text-sm mt-1 text-sage-600">
                     Select percentage of debt to repay
                   </div>
                 </div>
@@ -583,7 +578,7 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   <span className="text-primary-100 font-bold text-2xl font-heading">
                     {repayPercent}%
                   </span>
-                  <div className="text-body text-sm mt-1">
+                  <div className="text-body text-sm mt-1 text-sage-400">
                     of total debt
                   </div>
                 </div>
@@ -596,11 +591,11 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   step={1}
                   value={repayPercent}
                   onChange={handleSliderChange}
-                  fillColor="rgba(42,229,185,0.8)"
-                  trackColor="rgba(42,229,185,0.15)"
+                  fillColor="rgba(212, 251, 68, 0.8)"
+                  trackColor="rgba(212, 251, 68, 0.15)"
                   className="h-1.5"
                 />
-                <div className="flex justify-between text-xs text-body mt-3">
+                <div className="flex justify-between text-xs text-body mt-3 text-sage-400">
                   <span>0%</span>
                   <span>25%</span>
                   <span>50%</span>
@@ -616,11 +611,10 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
             >
               <button
                 type="button"
-                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 font-heading ${
-                  isRepaying || !repayAsset || !isValidRepayAmount()
-                    ? "bg-surface-3 text-muted cursor-not-allowed border border-line-soft"
-                    : "bg-primary-100 text-black hover:bg-primary-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                }`}
+                className={`w-full py-4 px-6 font-semibold rounded-lg transition-all duration-200 font-heading ${isRepaying || !repayAsset || !isValidRepayAmount()
+                  ? "bg-primary-200/10 text-sage-600 cursor-not-allowed border border-line-soft"
+                  : "bg-primary-100 text-black hover:bg-primary-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  }`}
                 disabled={isRepaying || !repayAsset || !isValidRepayAmount()}
                 onClick={handleRepay}
               >
