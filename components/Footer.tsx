@@ -20,25 +20,25 @@ export default function Footer() {
               className="h-8 w-auto"
             />
           </div>
-          <p className="text-body text-sm mb-4">
+          <p className="text-body text-sm mb-4 text-sage-600">
             The future of DeFi lending and leveraged trading on Kaia Network.
           </p>
           <div className="flex space-x-4">
             <button
               type="button"
-              className="text-body hover:text-primary-100 transition-colors"
+              className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
               <span className="sr-only">Twitter</span>🐦
             </button>
             <button
               type="button"
-              className="text-body hover:text-primary-100 transition-colors"
+              className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
               <span className="sr-only">Discord</span>💬
             </button>
             <button
               type="button"
-              className="text-body hover:text-primary-100 transition-colors"
+              className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
               <span className="sr-only">GitHub</span>📝
             </button>
@@ -47,12 +47,12 @@ export default function Footer() {
 
         {/* Products */}
         <div>
-          <h3 className="text-heading font-heading font-semibold mb-4">Products</h3>
+          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">Products</h3>
           <ul className="space-y-2">
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Lending
               </button>
@@ -60,7 +60,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Markets
               </button>
@@ -68,7 +68,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Analytics
               </button>
@@ -78,12 +78,12 @@ export default function Footer() {
 
         {/* Resources */}
         <div>
-          <h3 className="text-heading font-heading font-semibold mb-4">Resources</h3>
+          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">Resources</h3>
           <ul className="space-y-2">
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Documentation
               </button>
@@ -91,7 +91,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 FAQ
               </button>
@@ -99,7 +99,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Security
               </button>
@@ -107,7 +107,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                  className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Bug Bounty
               </button>
@@ -117,12 +117,12 @@ export default function Footer() {
 
         {/* Support */}
         <div>
-          <h3 className="text-heading font-heading font-semibold mb-4">Support</h3>
+          <h3 className="text-heading font-heading font-semibold mb-4 text-sage-600">Support</h3>
           <ul className="space-y-2">
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Help Center
               </button>
@@ -130,7 +130,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Contact Us
               </button>
@@ -138,7 +138,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Terms of Service
               </button>
@@ -146,7 +146,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                className="text-body hover:text-heading transition-colors text-sm text-left"
+                  className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Privacy Policy
               </button>
@@ -157,11 +157,11 @@ export default function Footer() {
 
       {/* Bottom Footer */}
       <div className="pt-6 border-t border-line-soft flex flex-col md:flex-row justify-between items-center mb-8">
-        <p className="text-body text-sm">
+        <p className="text-body text-sm text-sage-600">
           © 2024 TGIF Finance. All rights reserved.
         </p>
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
-          <span className="text-body text-sm">Built on</span>
+          <span className="text-body text-sm text-sage-600">Built on</span>
           <div className="flex items-center space-x-2">
             <Image
               src="https://raw.githubusercontent.com/EisenFinance/assets/main/assets/icons/chains/kaia/kaia.png"

@@ -14,7 +14,7 @@ export function MarketStatsOverview({
   totalPairs: number;
   totalAssets: number;
   totalLiquidity: { totalUSD: string | null; hasData: boolean };
-  pairs: LendingProps["pairs"];
+  pairs: Array<{ collateralAsset: { symbol: string }; debtAsset: { symbol: string } }>;
 }) {
   const { getMaxROE } = useAaveData();
 
@@ -40,22 +40,22 @@ export function MarketStatsOverview({
   );
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div className="bg-surface-1 border border-line-soft rounded-lg p-4 shadow-1">
-        <div className="text-body text-sm mb-1 font-heading">Total Liquidity</div>
-        <div className="text-2xl font-bold font-heading text-heading">
+      <div className="bg-surface-3 border border-line-soft rounded-lg p-4 shadow-1">
+        <div className="text-body text-sm mb-1 font-heading text-sage-600">Total Liquidity</div>
+        <div className="text-2xl font-bold font-heading text-heading text-sage-200">
           {totalLiquidity.totalUSD || "-"}
         </div>
-        <div className="text-muted text-sm">4 Pools</div>
+        <div className="text-muted text-sm text-sage-400">4 Pools</div>
       </div>
-      <div className="bg-surface-1 border border-line-soft rounded-lg p-4 shadow-1">
-        <div className="text-body text-sm mb-1 font-heading">Active Pairs</div>
-        <div className="text-2xl font-bold font-heading text-heading">{totalPairs}</div>
-        <div className="text-muted text-sm">{totalAssets} Assets</div>
+      <div className="bg-surface-3 border border-line-soft rounded-lg p-4 shadow-1">
+        <div className="text-body text-sm mb-1 font-heading text-sage-600">Active Pairs</div>
+        <div className="text-2xl font-bold font-heading text-heading text-sage-200">{totalPairs}</div>
+        <div className="text-muted text-sm text-sage-400">{totalAssets} Assets</div>
       </div>
-      <div className="bg-surface-1 border border-line-soft rounded-lg p-4 shadow-1">
-        <div className="text-body text-sm mb-1 font-heading">Best ROE</div>
-        <div className="text-2xl font-bold font-heading text-heading">{bestROEData.roe}</div>
-        <div className="text-[#23c09b] text-sm font-heading">{bestROEData.pairName}</div>
+      <div className="bg-surface-3 border border-line-soft rounded-lg p-4 shadow-1">
+        <div className="text-body text-sm mb-1 font-heading text-sage-600">Best ROE</div>
+        <div className="text-2xl font-bold font-heading text-heading text-primary-100">{bestROEData.roe}</div>
+        <div className="text-sage-400 text-sm font-heading">{bestROEData.pairName}</div>
       </div>
     </div>
   );

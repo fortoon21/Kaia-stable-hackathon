@@ -16,13 +16,13 @@ export function LendingStatsSection({
 
   return (
     <div
-      className="absolute h-[98.66px] left-0 right-4 top-[140px] bg-surface-ghost rounded-md p-2"
+      className="absolute h-[98.66px] left-0 right-4 top-[140px] rounded-md p-2"
       data-name="List"
       data-node-id="1:18"
     >
       {/* Liquidity */}
       <div
-        className="absolute leading-[0] left-0 not-italic right-[582px] top-0 bottom-0 bg-surface-2 rounded-md"
+        className="absolute leading-[0] left-0 not-italic right-[582px] top-0 bottom-0 rounded-md"
         data-name="Item"
         data-node-id="1:19"
       >
@@ -30,7 +30,7 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[66.993px] font-heading"
           data-node-id="1:20"
         >
-          <p className="block leading-[20px]">Liquidity</p>
+          <p className="block leading-[20px] text-sage-600">Liquidity</p>
         </div>
         <div
           className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-muted text-[32px] top-[48.5px] translate-y-[-50%] w-[20.912px] font-heading"
@@ -55,7 +55,7 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-semibold h-[17px] justify-center left-0 text-body text-[14px] top-[88.16px] translate-y-[-50%] w-[95.427px] font-heading"
           data-node-id="1:23"
         >
-          <p className="block leading-[20px] whitespace-nowrap">
+          <p className="block leading-[20px] whitespace-nowrap text-sage-400">
             {selectedPair?.debtAsset?.symbol
               ? getLiquidity(selectedPair.debtAsset.symbol)?.amount || "22.85M"
               : "22.85M"}{" "}
@@ -66,7 +66,7 @@ export function LendingStatsSection({
 
       {/* Max multiplier */}
       <div
-        className="absolute leading-[0] left-[275px] not-italic right-[307px] top-0 bottom-0 bg-surface-2 rounded-md"
+        className="absolute px-4 border-x-1 border-color-sage-400 leading-[0] left-[275px] not-italic right-[307px] top-0 bottom-0"
         data-name="Item"
         data-node-id="1:24"
       >
@@ -74,7 +74,7 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[109.729px] font-heading"
           data-node-id="1:25"
         >
-          <p className="block leading-[20px] whitespace-nowrap">Max multiplier</p>
+          <p className="block leading-[20px] whitespace-nowrap text-sage-600">Max multiplier</p>
         </div>
         <div
           className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-heading text-[32px] top-[48.5px] translate-y-[-50%] w-[63.875px] font-heading"
@@ -94,7 +94,7 @@ export function LendingStatsSection({
 
       {/* Max ROE */}
       <div
-        className="absolute leading-[0] left-[550px] not-italic right-8 top-0 bottom-0 bg-surface-2 rounded-md"
+        className="absolute leading-[0] left-[550px] not-italic right-8 top-0 bottom-0 rounded-md"
         data-name="Item"
         data-node-id="1:28"
       >
@@ -102,13 +102,13 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-semibold h-5 justify-center left-0 text-body text-[16px] top-2.5 translate-y-[-50%] w-[90px] font-heading"
           data-node-id="1:29"
         >
-          <p className="block leading-[20px] whitespace-nowrap">Max ROE</p>
+          <p className="block leading-[20px] whitespace-nowra text-sage-600">Max ROE</p>
         </div>
         <div
           className="absolute flex flex-col font-medium h-[39px] justify-center left-0 text-[#23c09b] text-[32px] top-[48.5px] translate-y-[-50%] w-[85.221px] font-heading"
           data-node-id="1:30"
         >
-          <p className="block leading-[42.67px]">
+          <p className="block leading-[42.67px] text-primary-100">
             {selectedPair?.collateralAsset?.symbol &&
             selectedPair?.debtAsset?.symbol
               ? getMaxROE(
@@ -122,7 +122,7 @@ export function LendingStatsSection({
           className="absolute flex flex-col font-medium h-[39px] justify-center left-[91px] text-muted text-[32px] top-[48.5px] translate-y-[-50%] w-[20px] font-heading"
           data-node-id="1:31"
         >
-          <p className="block leading-[42.67px]">%</p>
+          <p className="block leading-[42.67px] text-primary-100 ml-[-20px]">%</p>
         </div>
       </div>
     </div>

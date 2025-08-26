@@ -41,7 +41,7 @@ export default function Lending({ selectedPair }: LendingProps) {
           {/* Combined Header and Stats Wrapper */}
           <div className="absolute left-[80px] top-12 w-[780px] h-[280px] rounded-md p-4">
             {/* Header Section - Component */}
-            <div className="absolute left-0 top-0 w-[740px] h-[120px]">
+            <div className="absolute left-0 top-0 w-[740px] h-[100px]">
               <LendingHeader selectedPair={selectedPair} />
             </div>
 

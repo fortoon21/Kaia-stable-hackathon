@@ -16,12 +16,12 @@ export function LendingOverviewTab({
 
   return (
     <>
-      <h2 className="text-heading text-xl font-heading font-semibold mb-8">Overview</h2>
+      <h2 className="text-heading text-lg font-heading font-semibold mb-8 text-sage-600">Overview</h2>
 
       <div className="grid grid-cols-3 gap-8 mb-8">
         <div>
-          <div className="text-body text-sm mb-2 font-heading">Oracle price</div>
-          <div className="text-heading text-lg font-heading font-medium">
+          <div className="text-body text-sm mb-2 font-heading text-sage-600">Oracle price</div>
+          <div className="text-heading text-lg font-heading font-medium text-sage-400">
             ${collateralPrice.toFixed(4)}
           </div>
           <div className="text-muted text-xs mt-1 flex items-center">
@@ -43,8 +43,8 @@ export function LendingOverviewTab({
         </div>
 
         <div>
-          <div className="text-body text-sm mb-2 font-heading">Supply APY</div>
-          <div className="text-heading text-lg font-heading font-medium">
+          <div className="text-body text-sm mb-2 font-heading text-sage-600">Supply APY</div>
+          <div className="text-heading text-lg font-heading font-medium text-sage-400">
             {selectedPair?.collateralAsset?.symbol
               ? getSupplyAPY(selectedPair.collateralAsset.symbol) || "13.45%"
               : "13.45%"}
@@ -52,8 +52,8 @@ export function LendingOverviewTab({
         </div>
 
         <div>
-          <div className="text-body text-sm mb-2 font-heading">Borrow APY</div>
-          <div className="text-heading text-lg font-heading font-medium">
+          <div className="text-body text-sm mb-2 font-heading text-sage-600">Borrow APY</div>
+          <div className="text-heading text-lg font-heading font-medium text-sage-400">
             {selectedPair?.debtAsset?.symbol
               ? getBorrowAPY(selectedPair.debtAsset.symbol) || "9.90%"
               : "9.90%"}
@@ -63,18 +63,18 @@ export function LendingOverviewTab({
 
       <div className="grid grid-cols-3 gap-8">
         <div>
-          <div className="text-body text-sm mb-2 font-heading">Correlated assets</div>
-          <div className="text-heading text-lg font-heading">
+          <div className="text-body text-sm mb-2 font-heading text-sage-600">Correlated assets</div>
+          <div className="text-heading text-lg font-heading text-sage-400">
             {selectedPair?.collateralAsset?.symbol === "WKAIA" ||
-            selectedPair?.debtAsset?.symbol === "WKAIA"
+              selectedPair?.debtAsset?.symbol === "WKAIA"
               ? "No"
               : "Yes"}
           </div>
         </div>
 
         <div>
-          <div className="text-body text-sm mb-2 font-heading">Max LTV</div>
-          <div className="text-heading text-lg font-heading font-medium">
+          <div className="text-body text-sm mb-2 font-heading text-sage-600">Max LTV</div>
+          <div className="text-heading text-lg font-heading font-medium text-sage-400">
             {selectedPair?.collateralAsset?.symbol
               ? getLTV(selectedPair.collateralAsset.symbol) || "88.00%"
               : "88.00%"}
@@ -82,8 +82,8 @@ export function LendingOverviewTab({
         </div>
 
         <div>
-          <div className="text-body text-sm mb-2 font-heading">LLTV</div>
-          <div className="text-heading text-lg font-heading font-medium">
+          <div className="text-body text-sm mb-2 font-heading text-sage-600">LLTV</div>
+          <div className="text-heading text-lg font-heading font-medium text-sage-400">
             {selectedPair?.collateralAsset?.symbol
               ? getLLTV(selectedPair.collateralAsset.symbol) || "90.00%"
               : "90.00%"}

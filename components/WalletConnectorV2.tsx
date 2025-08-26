@@ -31,7 +31,7 @@ interface Wallet {
   recommended?: boolean;
 }
 
-export default function WalletConnectorV2() {
+export default function WalletConnectorV2({ className = "" }: { className?: string } = {}) {
   const {
     address,
     balance,
@@ -187,7 +187,7 @@ export default function WalletConnectorV2() {
         <button
           type="button"
           onClick={() => setShowAccountModal(true)}
-          className="flex items-center space-x-2 text-primary-100 hover:text-heading transition-all duration-200"
+          className={`${className} flex items-center space-x-2 text-primary-100 hover:text-heading transition-all duration-200`}
         >
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
           <span className="text-sm font-semibold whitespace-nowrap">
@@ -311,7 +311,7 @@ export default function WalletConnectorV2() {
         type="button"
         onClick={() => setShowModal(true)}
         disabled={isConnecting}
-        className="bg-primary-100 text-black font-semibold px-6 py-2 rounded-pill hover:shadow-2 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed font-heading"
+        className={`${className} bg-primary-100 text-black font-semibold px-4 py-2 rounded-pill hover:shadow-2 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed font-heading`}
       >
         {isConnecting ? (
           <div className="flex items-center space-x-2">
@@ -355,11 +355,10 @@ export default function WalletConnectorV2() {
                     key={wallet.name}
                     onClick={() => handleConnect(wallet)}
                     disabled={!wallet.detected || isConnecting}
-                    className={`w-full flex items-center space-x-4 p-4 rounded-md border transition-all duration-200 ${
-                      wallet.detected
-                        ? "border-line-soft bg-surface-2 hover:border-primary-100 hover:bg-surface-ghost hover:scale-[1.02]"
-                        : "border-line-soft bg-surface-2 opacity-50 cursor-not-allowed"
-                    }`}
+                    className={`w-full flex items-center space-x-4 p-4 rounded-md border transition-all duration-200 ${wallet.detected
+                      ? "border-line-soft bg-surface-2 hover:border-primary-100 hover:bg-surface-ghost hover:scale-[1.02]"
+                      : "border-line-soft bg-surface-2 opacity-50 cursor-not-allowed"
+                      }`}
                   >
                     <div className="w-8 h-8">
                       <Image

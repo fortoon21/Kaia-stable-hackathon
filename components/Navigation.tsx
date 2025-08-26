@@ -29,7 +29,7 @@ export default function Navigation({
         className={`fixed ${LAYOUT.NAVIGATION_HEIGHT_CLASS} left-4 right-4 top-4 mx-auto max-w-7xl min-w-[1024px] bg-surface-1 border border-line-soft rounded-2xl backdrop-blur-md z-[9999] shadow-2 font-heading`}
       >
         <div className="h-full overflow-visible">
-          <div className="min-w-max px-6 h-full flex items-center justify-between">
+          <div className="min-w-max px-6 h-16 flex items-center justify-between">
             {/* Logo and Navigation */}
             <div className="flex items-center space-x-8 flex-shrink-0">
               {/* Logo */}
