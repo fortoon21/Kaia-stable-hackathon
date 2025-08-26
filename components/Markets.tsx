@@ -107,7 +107,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
       <div className={`${LAYOUT.MAX_WIDTH_CONTAINER} mx-auto px-6 pt-20`}>
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-heading font-bold mb-2 mt-16 text-sage-200">TGIF Lending Markets</h1>
+          <h1 className="text-3xl font-heading font-bold mb-2 mt-16 text-sage-100">TGIF Lending Markets</h1>
           <p className="text-body text-sage-400">
             Leverage your positions with collateral and debt assets
           </p>
