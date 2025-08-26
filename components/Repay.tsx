@@ -14,6 +14,7 @@ import {
 } from "@/constants/tokens";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
 import { useWeb3 } from "@/lib/web3Provider";
+import { getTokenAddress } from "@/utils/tokenHelpers";
 
 interface RepayProps {
   onGoBack?: () => void;
@@ -36,8 +37,14 @@ type RepayAsset = {
 } | null;
 
 export default function Repay({ onGoBack }: RepayProps = {}) {
-  const { signer, address, refreshAaveData, getTokenBalance, isConnected } =
-    useWeb3();
+  const { 
+    signer, 
+    address, 
+    refreshAaveData, 
+    getTokenBalance, 
+    isConnected, 
+    aaveUserBalances 
+  } = useWeb3();
   const { loading: pricesLoading, getPriceBySymbol } = useTokenPrices();
   const [activeTab, setActiveTab] = useState<"wallet" | "swap">("wallet");
   const [repayPercent, setRepayPercent] = useState(0);
@@ -145,6 +152,17 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
     };
   }, [isConnected, repayAsset?.symbol, getTokenBalance]);
 
+  // Get current debt from Aave data
+  const getCurrentDebt = useCallback(() => {
+    if (!repayAsset?.symbol || !aaveUserBalances) return repayAsset?.amount || "0";
+    
+    const tokenAddress = getTokenAddress(repayAsset.symbol);
+    if (!tokenAddress) return repayAsset?.amount || "0";
+    
+    const balanceData = aaveUserBalances[tokenAddress];
+    return balanceData?.variableDebtBalance || repayAsset?.amount || "0";
+  }, [repayAsset?.symbol, aaveUserBalances, repayAsset?.amount]);
+
   const handleRepay = useCallback(async () => {
     try {
       if (!signer || !address) throw new Error("Connect wallet first");
@@ -248,44 +266,47 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
     [getPriceBySymbol, pricesLoading]
   );
 
-  // Handle percentage slider changes
+  // Handle percentage slider changes - calculate based on debt amount, not token balance
   const handleSliderChange = useCallback(
     (newPercent: number) => {
       setRepayPercent(newPercent);
 
-      if (newPercent === 0 || !tokenBalance || tokenBalance === "0") {
+      if (newPercent === 0 || !repayAsset?.amount) {
         setCollateralAmount("");
         return;
       }
 
-      const balance = parseFloat(tokenBalance.replace(/,/g, ""));
-      if (!Number.isNaN(balance)) {
-        const calculatedAmount = (balance * newPercent) / 100;
+      // Calculate based on current debt amount (what needs to be repaid)
+      const currentDebt = getCurrentDebt();
+      const debtAmount = parseFloat(currentDebt.replace(/,/g, ""));
+      if (!Number.isNaN(debtAmount)) {
+        const calculatedAmount = (debtAmount * newPercent) / 100;
         setCollateralAmount(calculatedAmount.toFixed(6));
       }
     },
-    [tokenBalance]
+    [repayAsset?.amount, getCurrentDebt]
   );
 
-  // Handle input amount changes
+  // Handle input amount changes - calculate percentage based on debt amount
   const handleAmountChange = useCallback(
     (newAmount: string) => {
       setCollateralAmount(newAmount);
 
-      if (!newAmount || !tokenBalance || tokenBalance === "0") {
+      if (!newAmount || !repayAsset?.amount) {
         setRepayPercent(0);
         return;
       }
 
       const amount = parseFloat(newAmount.replace(/,/g, ""));
-      const balance = parseFloat(tokenBalance.replace(/,/g, ""));
+      const currentDebt = getCurrentDebt();
+      const debtAmount = parseFloat(currentDebt.replace(/,/g, ""));
 
-      if (!Number.isNaN(amount) && !Number.isNaN(balance) && balance > 0) {
-        const percentage = Math.min(100, Math.max(0, (amount / balance) * 100));
+      if (!Number.isNaN(amount) && !Number.isNaN(debtAmount) && debtAmount > 0) {
+        const percentage = Math.min(100, Math.max(0, (amount / debtAmount) * 100));
         setRepayPercent(Math.round(percentage));
       }
     },
-    [tokenBalance]
+    [repayAsset?.amount, getCurrentDebt]
   );
 
   // Check if repay amount is valid
@@ -394,8 +415,8 @@ export default function Repay({ onGoBack }: RepayProps = {}) {
                   <div className="mb-4 text-xs text-right">
                     <span className="text-body">Owed Debt: </span>
                     <span className="text-warning font-medium font-heading">
-                      {repayAsset.amount} {repayAsset.symbol} (
-                      {calculateUSDValue(repayAsset.amount, repayAsset.symbol)})
+                      {getCurrentDebt()} {repayAsset.symbol} (
+                      {calculateUSDValue(getCurrentDebt(), repayAsset.symbol)})
                     </span>
                   </div>
                 )}
