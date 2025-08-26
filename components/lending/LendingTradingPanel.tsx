@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import Slider from "@/components/ui/Slider";
 import WalletConnectorV2 from "@/components/WalletConnectorV2";
+import { showToast } from "@/components/ui/Toast";
 import {
   AAVE_CONFIG,
   DRAGON_SWAP_POOLS,
@@ -42,8 +43,9 @@ export function LendingTradingPanel({
     aaveParamsV3Index,
     aaveParamsV3,
     aaveUserBalances,
+    refreshAaveData,
   } = useWeb3();
-  const { collateralBalance, isLoadingBalance } = useTokenBalance(selectedPair);
+  const { collateralBalance, isLoadingBalance, refreshBalance } = useTokenBalance(selectedPair);
   const { maxLeverage, leveragePosition, collateralPrice, debtPrice } =
     useLeverageCalculations(selectedPair, collateralAmount, multiplier);
   const { getLTV, getSupplyAPY, getBorrowAPY } = useAaveData();
@@ -301,11 +303,34 @@ export function LendingTradingPanel({
       ];
       const tx = await loop.executeLeverageLoop(paramsTuple);
       await tx.wait();
-      // Optionally refresh state here
+
+      // Show success toast
+      showToast({
+        type: "success",
+        title: "Leverage Position Opened",
+        description: `Successfully opened ${multiplier.toFixed(2)}x leverage position with ${collateralAmount} ${selectedPair.collateralAsset.symbol}`,
+        duration: 5000,
+      });
+
+      // Refresh state data
+      await refreshAaveData?.();
+      await refreshBalance?.();
+
+      // Reset form
+      setCollateralAmount("");
+      setMultiplier(1.0);
+      setMultiplierInput("1.00");
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Open multiply failed:", e);
-      alert((e as Error).message || "Open multiply failed");
+      
+      // Show error toast instead of alert
+      showToast({
+        type: "error",
+        title: "Transaction Failed",
+        description: (e as Error).message || "Open multiply failed",
+        duration: 8000,
+      });
     }
   }, [
     signer,
@@ -319,6 +344,8 @@ export function LendingTradingPanel({
     multiplier,
     collateralPrice,
     debtPrice,
+    refreshAaveData,
+    refreshBalance,
   ]);
 
   return (
