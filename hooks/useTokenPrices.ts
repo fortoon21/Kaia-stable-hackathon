@@ -124,26 +124,21 @@ export function usePairPrices(collateralSymbol: string, debtSymbol: string) {
     "PT-USDe": 1.0,
   };
 
-  // Force fallback prices for now to debug
-  const collateralPrice = fallbackPrices[collateralSymbol] || 0.14;
-  const debtPrice = fallbackPrices[debtSymbol] || 1.0;
-
-  // Debug log
-  console.log('Price debug:', { 
-    collateralSymbol, 
-    debtSymbol, 
-    rawCollateralPrice, 
-    rawDebtPrice, 
-    collateralPrice, 
-    debtPrice,
-    loading 
-  });
+  // Use API prices if available, fallback otherwise
+  const collateralPrice = (rawCollateralPrice && rawCollateralPrice > 0) 
+    ? rawCollateralPrice 
+    : (fallbackPrices[collateralSymbol] || 0.14);
+    
+  const debtPrice = (rawDebtPrice && rawDebtPrice > 0) 
+    ? rawDebtPrice 
+    : (fallbackPrices[debtSymbol] || 1.0);
 
   return {
     collateralPrice,
     debtPrice,
     loading,
     error,
-    isReady: collateralPrice > 0 && debtPrice > 0,
+    // Always ready when we have fallback prices
+    isReady: true,
   };
 }
