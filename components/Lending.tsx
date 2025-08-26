@@ -13,7 +13,7 @@ import type { BottomTabType, LendingProps } from "@/types/lending";
 
 export default function Lending({ selectedPair }: LendingProps) {
   const [bottomTab, setBottomTab] = useState<BottomTabType>("pair");
-  const { maxLeverage } = useLeverageCalculations(selectedPair, "", 1.0);
+  const { maxLeverage, collateralPrice } = useLeverageCalculations(selectedPair, "", 1.0);
   const { getLTV } = useAaveData();
 
   // Calculate real max multiplier from Markets logic
@@ -71,7 +71,7 @@ export default function Lending({ selectedPair }: LendingProps) {
               {bottomTab === "pair" ? (
                 <LendingOverviewTab
                   selectedPair={selectedPair}
-                  collateralPrice={0}
+                  collateralPrice={collateralPrice}
                 />
               ) : (
                 <LendingStatisticsTab
