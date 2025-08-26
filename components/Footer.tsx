@@ -28,19 +28,22 @@ export default function Footer() {
               type="button"
               className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
-              <span className="sr-only">Twitter</span>🐦
+              <span className="sr-only">X</span>
+              <Image src="/x.png" alt="X" width={20} height={20} className="w-5 h-5" />
             </button>
             <button
               type="button"
               className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
-              <span className="sr-only">Discord</span>💬
+              <span className="sr-only">Discord</span>
+              <Image src="/discord.png" alt="Discord" width={20} height={20} className="w-5 h-5" />
             </button>
             <button
               type="button"
               className="text-body hover:text-sage-100 transition-colors text-sage-400"
             >
-              <span className="sr-only">GitHub</span>📝
+              <span className="sr-only">GitHub</span>
+              <Image src="/github.png" alt="GitHub" width={20} height={20} className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -107,7 +110,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                  className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Bug Bounty
               </button>
@@ -146,7 +149,7 @@ export default function Footer() {
             <li>
               <button
                 type="button"
-                  className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
+                className="text-body hover:text-sage-100 transition-colors text-sm text-left text-sage-600"
               >
                 Privacy Policy
               </button>

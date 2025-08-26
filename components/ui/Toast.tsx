@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export interface ToastMessage {
   id: string;
@@ -24,12 +25,12 @@ function Toast({ message, onClose }: ToastProps) {
     return () => clearTimeout(timer);
   }, [message, onClose]);
 
-  const icons = {
-    success: "✅",
-    error: "❌",
-    warning: "⚠️",
-    info: "ℹ️",
-  };
+  const iconSrc = {
+    success: "/success.png",
+    error: "/error.png",
+    warning: "/warning.png",
+    info: "/info.png",
+  } as const;
 
   const colors = {
     success: "border-green-500 bg-green-500/10",
@@ -42,7 +43,13 @@ function Toast({ message, onClose }: ToastProps) {
     <div
       className={`flex items-start space-x-3 p-4 rounded-lg border ${colors[message.type]} backdrop-blur-sm animate-slide-in-right`}
     >
-      <span className="text-2xl">{icons[message.type]}</span>
+      <Image
+        src={iconSrc[message.type]}
+        alt={message.type}
+        width={24}
+        height={24}
+        className="w-6 h-6"
+      />
       <div className="flex-1">
         <h4 className="font-semibold text-heading">{message.title}</h4>
         {message.description && (
