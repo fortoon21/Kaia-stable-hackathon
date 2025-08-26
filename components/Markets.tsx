@@ -386,14 +386,12 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 const canRepay = hasDebt && isConnected;
 
                                 return (
-                                  <button
-                                    type="button"
-                                    className={`px-3 py-1.5 rounded-sm border border-primary-100/20 bg-primary-100/10 ml-2 text-primary-100 font-heading font-semibold text-xs transition-all duration-200 cursor-pointer ${
+                                  <div
+                                    className={`px-3 py-1.5 rounded-sm border border-primary-100/20 bg-primary-100/10 ml-2 text-primary-100 font-heading font-semibold text-xs transition-all duration-200 ${
                                       canRepay
-                                        ? "bg-primary-100/10 hover:bg-primary-100/80 text-heading shadow-lg hover:shadow-xl"
+                                        ? "cursor-pointer bg-primary-100/10 hover:bg-primary-100/80 text-heading shadow-lg hover:shadow-xl"
                                         : "bg-surface-2 text-sage-600 cursor-not-allowed"
                                     }`}
-                                    disabled={!canRepay}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       if (canRepay && onPageChange) {
@@ -439,7 +437,7 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                     }}
                                   >
                                     Repay
-                                  </button>
+                                  </div>
                                 );
                               })()}
                             </div>
