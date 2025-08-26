@@ -35,6 +35,7 @@ export function LendingTradingPanel({
   const [ltvValue, setLtvValue] = useState(0);
   const [ltvInput, setLtvInput] = useState("0.0");
   const [multiplierInput, setMultiplierInput] = useState("1.00");
+  const [isOpeningPosition, setIsOpeningPosition] = useState(false);
   const {
     isConnected,
     signer,
@@ -61,10 +62,28 @@ export function LendingTradingPanel({
       })()
     : maxLeverage;
 
+  // Check if multiply amount is valid
+  const isValidMultiplyAmount = useCallback(() => {
+    if (!collateralAmount || !selectedPair) return false;
+
+    const amount = parseFloat(collateralAmount.replace(/,/g, ""));
+    if (Number.isNaN(amount) || amount <= 0) return false;
+
+    // Check if amount exceeds balance (only when connected)
+    if (isConnected && collateralBalance && collateralBalance !== "-") {
+      const balance = parseFloat(collateralBalance.replace(/,/g, ""));
+      if (!Number.isNaN(balance) && amount > balance) return false;
+    }
+
+    return true;
+  }, [collateralAmount, selectedPair, isConnected, collateralBalance]);
+
   const handleOpenMultiply = useCallback(async () => {
     try {
       if (!signer || !address) throw new Error("Connect wallet first");
       if (!selectedPair) throw new Error("No pair selected");
+
+      setIsOpeningPosition(true);
 
       // Resolve addresses
       const collateralUnderlying = getTokenAddress(
@@ -332,6 +351,8 @@ export function LendingTradingPanel({
         description: (e as Error).message || "Open multiply failed",
         duration: 8000,
       });
+    } finally {
+      setIsOpeningPosition(false);
     }
   }, [
     signer,
@@ -1015,11 +1036,18 @@ export function LendingTradingPanel({
         ) : (
           <button
             type="button"
-            className="w-full bg-primary-100 text-black py-4 rounded-full font-semibold hover:bg-primary-100 transition-colors"
+            className={`w-full py-4 rounded-full font-semibold transition-all duration-200 font-heading ${
+              activeTab === "multiply" && (isOpeningPosition || !isValidMultiplyAmount())
+                ? "bg-primary-200/10 text-sage-600 cursor-not-allowed border border-line-soft"
+                : "bg-primary-100 text-black hover:bg-primary-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            }`}
+            disabled={activeTab === "multiply" && (isOpeningPosition || !isValidMultiplyAmount())}
             onClick={activeTab === "multiply" ? handleOpenMultiply : undefined}
           >
             {activeTab === "multiply"
-              ? "Open Multiply Position"
+              ? isOpeningPosition
+                ? "Opening position..."
+                : "Open Multiply Position"
               : `Borrow ${selectedPair?.debtAsset.symbol || "USDC"}`}
           </button>
         )}
