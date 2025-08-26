@@ -385,8 +385,8 @@ export default function Markets({ onSelectPair, onPageChange }: MarketsProps) {
                                 return (
                                   <div
                                     className={`px-3 py-1.5 rounded-sm border border-primary-100/20 bg-primary-100/10 ml-2 text-primary-100 font-heading font-semibold text-xs transition-all duration-200 cursor-pointer ${canRepay
-                                      ? "bg-warning hover:bg-warning/80 text-heading shadow-lg hover:shadow-xl"
-                                      : "bg-surface-2 text-muted cursor-not-allowed"
+                                      ? "bg-primary-100/10 hover:bg-primary-100/80 text-heading shadow-lg hover:shadow-xl"
+                                      : "bg-surface-2 text-sage-600 cursor-not-allowed"
                                       }`}
                                     role="button"
                                     tabIndex={canRepay ? 0 : -1}
