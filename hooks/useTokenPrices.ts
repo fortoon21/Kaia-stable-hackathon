@@ -124,8 +124,20 @@ export function usePairPrices(collateralSymbol: string, debtSymbol: string) {
     "PT-USDe": 1.0,
   };
 
-  const collateralPrice = rawCollateralPrice > 0 ? rawCollateralPrice : (fallbackPrices[collateralSymbol] || 1.0);
-  const debtPrice = rawDebtPrice > 0 ? rawDebtPrice : (fallbackPrices[debtSymbol] || 1.0);
+  // Force fallback prices for now to debug
+  const collateralPrice = fallbackPrices[collateralSymbol] || 0.14;
+  const debtPrice = fallbackPrices[debtSymbol] || 1.0;
+
+  // Debug log
+  console.log('Price debug:', { 
+    collateralSymbol, 
+    debtSymbol, 
+    rawCollateralPrice, 
+    rawDebtPrice, 
+    collateralPrice, 
+    debtPrice,
+    loading 
+  });
 
   return {
     collateralPrice,
